@@ -18,7 +18,7 @@
     "incremental": true,
     "types": [
       "jest",
-      "@testing-library/jest-dom"
+      "node"
     ],
     "plugins": [
       {
