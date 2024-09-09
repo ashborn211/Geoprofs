@@ -27,5 +27,5 @@ export default {
   },
   transformIgnorePatterns: ['/node_modules/', '^.+\\.module\\.(css|sass|scss)$'],
   setupFilesAfterEnv: ['<rootDir>/src/app/jest.setup.ts'], 
-  testMatch: ['<rootDir>/__test__/page.test.tsx'], 
+  testMatch: ['<rootDir>/__tests__/page.test.tsx'], 
 };
