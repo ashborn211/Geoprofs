@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "jest"
   },
   "dependencies": {
     "@nextui-org/react": "^2.4.6",
@@ -15,12 +16,14 @@
     "@types/react": "18.3.2",
     "@types/react-dom": "18.3.0",
     "autoprefixer": "10.4.19",
+    "babel-jest": "^29.7.0",
     "eslint": "8.57.0",
     "eslint-config-next": "14.2.3",
     "firebase": "^10.13.1",
     "firebase-admin": "^12.1.1",
     "firebase-functions": "^5.0.1",
     "framer-motion": "^11.5.4",
+    "identity-obj-proxy": "^3.0.0",
     "next": "14.2.3",
     "postcss": "8.4.38",
     "react": "18.3.1",
