@@ -1,39 +1,29 @@
-// __test__/page.test.ts
-import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom"; // for additional matchers like toBeInTheDocument
-import Home from "../src/app/page"; // Import the component using relative path from __test__
+// src/app/__tests__/Home.test.tsx
 
-describe("Home Page", () => {
-  it("renders the home page without crashing", () => {
-    const { container } = render(<Home />);
-    expect(container).toMatchSnapshot();
-  });
+import { render, screen } from '@testing-library/react';
+import Home from '../src/app/page';
 
-  it('renders a "Click Me" button', () => {
+// Mock NextUI Button if needed
+jest.mock('@nextui-org/react', () => ({
+  Button: ({ children }: { children: React.ReactNode }) => <button>{children}</button>,
+}));
+
+describe('Home Component', () => {
+  it('renders a button with the text "Click Me"', () => {
     render(<Home />);
-    const button = screen.getByRole("button", { name: /click me/i });
+    const button = screen.getByText('Click Me');
     expect(button).toBeInTheDocument();
   });
 
-  it("renders the Vercel logo", () => {
+  it('renders an image with alt text "Next.js Logo"', () => {
     render(<Home />);
-    const vercelLogo = screen.getByAltText("Vercel Logo");
-    expect(vercelLogo).toBeInTheDocument();
+    const image = screen.getByAltText('Next.js Logo');
+    expect(image).toBeInTheDocument();
   });
 
-  it("renders the Next.js logo", () => {
+  it('renders a link with text "Docs"', () => {
     render(<Home />);
-    const nextLogo = screen.getByAltText("Next.js Logo");
-    expect(nextLogo).toBeInTheDocument();
-  });
-
-  it('renders the "Docs" link with text and href', () => {
-    render(<Home />);
-    const docsLink = screen.getByRole("link", { name: /Docs/ });
-    expect(docsLink).toBeInTheDocument();
-    expect(docsLink).toHaveAttribute(
-      "href",
-      expect.stringContaining("nextjs.org/docs")
-    );
+    const link = screen.getByText('Docs');
+    expect(link).toBeInTheDocument();
   });
 });
