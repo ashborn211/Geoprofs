@@ -1,0 +1,75 @@
+.main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f0f0f0; /* Light grey background for the entire page */
+  margin: 0; /* Ensure no default margin is applied */
+}
+
+.container {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  background: linear-gradient(to right, #ffffff, #a0c4ff); /* Gradient from white to a more intense blue */
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+.logo-container {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.logo {
+  width: 100px;
+  height: auto;
+}
+
+.title {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #444;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between; /* Ensure buttons are side-by-side */
+}
+
+.login-button {
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  text-transform: uppercase;
+  background-color: #007bff; /* Blue login button */
+  color: white;
+}
+
+.google-button {
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  background-color: #d9534f; /* Red google button */
+  color: white;
+}
+
+.signup-link {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.forgot-password {
+  color: #007bff;
+  text-align: right;
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
