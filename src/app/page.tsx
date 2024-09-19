@@ -6,7 +6,14 @@ import { auth, provider, db } from "../../FireBaseConfig";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { Input, Button, Link } from "@nextui-org/react"; // Using NextUI 2.0 components
 import "./page.css";
-import { query, collection, where, getDocs, setDoc, doc } from "firebase/firestore";
+import {
+  query,
+  collection,
+  where,
+  getDocs,
+  setDoc,
+  doc,
+} from "firebase/firestore";
 
 const standardProfilePicture =
   "https://hongkongfp.com/wp-content/uploads/2023/06/20230610_164958-Copy.jpg";
@@ -46,6 +53,8 @@ const LoginPage = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
+      console.log("User:", user);
+
       const userQuery = query(
         collection(db, "users"),
         where("email", "==", user.email)
@@ -63,7 +72,9 @@ const LoginPage = () => {
 
       router.push("/home");
     } catch (error: any) {
-      alert("Google Sign-In failed. Please try again.");
+      console.error("Google Sign-In error:", error);
+
+      alert(`Google Sign-In failed: ${error.message}`);
     }
   };
 
@@ -72,17 +83,16 @@ const LoginPage = () => {
       <div className="container">
         <div className="logo-container">
           <img
-            src="../images/Logo GeoProfs.png"
+            src="/images/LogoGeoProfs.png" // Corrected path for Next.js
             alt="GeoProfs Logo"
             className="logo"
           />
         </div>
-        <h2 className="title">Inlog</h2>
+        <h2 className="title">Inloggen</h2>
 
         <form onSubmit={handleLogin}>
           <div className="form-group">
             <Input
-              label="E-mail"
               type="email"
               placeholder="Enter your email"
               value={email}
@@ -96,7 +106,6 @@ const LoginPage = () => {
 
           <div className="form-group">
             <Input
-              label="Password"
               type="password"
               placeholder="Enter your password"
               value={password}
@@ -108,13 +117,7 @@ const LoginPage = () => {
             />
           </div>
 
-          <div className="form-group">
-            <Link href="register" className="forgot-password">
-              Forgot password?
-            </Link>
-          </div>
-
-          <div className="button-group"> {/* Updated to flex for side-by-side */}
+          <div className="button-group">
             <Button
               onClick={handleGoogleSignIn}
               color="danger"
@@ -122,11 +125,7 @@ const LoginPage = () => {
             >
               Google
             </Button>
-            <Button
-              type="submit"
-              className="login-button"
-              color="primary"
-            >
+            <Button type="submit" className="login-button" color="primary">
               Inloggen
             </Button>
           </div>
