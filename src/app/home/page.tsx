@@ -1,4 +1,4 @@
-import CalendarComponent from "../components/calendar";
+import CalendarComponent from "../../components/calendar";
 
 export default function Home() {
   return (
