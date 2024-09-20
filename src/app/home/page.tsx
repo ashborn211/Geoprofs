@@ -1,3 +1,5 @@
+import CalendarComponent from "../components/calendar";
+
 export default function Home() {
   return (
     <>
@@ -13,7 +15,9 @@ export default function Home() {
               <div
                 className="bg-white rounded-lg"
                 style={{ width: "90%", height: "90%" }}
-              ></div>
+              >
+              <CalendarComponent></CalendarComponent>
+              </div>
             </div>
           </div>
         </div>
