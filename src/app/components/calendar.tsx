@@ -13,14 +13,15 @@ export default function CalendarComponent() {
     <>
       <Calendar
         aria-label="Date (Min Date Value)"
+        visibleMonths={3}
         defaultValue={today(getLocalTimeZone())}
         minValue={today(getLocalTimeZone())}
         style={{
           fontSize: "20px",          // Tekstgrootte
-          letterSpacing: "2px",      // Meer ruimte tussen letters
+          letterSpacing: "0px",      // Meer ruimte tussen letters
           padding: "10px",           // Padding binnen de kalender
-          width: "100%",          // Breedte van de kalender aanpassen
-          height: "100%",
+          width: "100%",            // Breedte van de kalender aanpassen
+          height: "100%"
         }}
       />
     </>
