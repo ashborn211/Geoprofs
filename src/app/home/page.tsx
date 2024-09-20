@@ -1,7 +1,13 @@
-export default function Home() {
+"use client";
+import { useState } from "react";
+import VerlofComponent from "../../components/verlof"; // Import the VerlofComponent
+
+const Home = () => {
+  const [showPopup, setShowPopup] = useState(false);
+
   return (
     <>
-      <div className="flex h-screen overflow-hidden">
+      <div className="flex h-screen overflow-hidden relative">
         <div className="w-[6vw] bg-blue-500 h-full"></div>
         <div className="w-[94vw] h-full">
           <div className="h-full grid grid-cols-12 grid-rows-12">
@@ -17,7 +23,28 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* Popup Trigger */}
+        <div className="absolute bottom-4 right-4">
+          <button
+            className="bg-blue-500 text-white p-2 rounded-lg"
+            onClick={() => setShowPopup(true)}
+          >
+            Open Verlof Popup
+          </button>
+        </div>
+
+        {/* Centered Popup */}
+        {showPopup && (
+          <div className="fixed inset-0 flex justify-center items-center z-50">
+            <VerlofComponent
+              onClose={() => setShowPopup(false)} // Close popup when clicking "Close"
+            />
+          </div>
+        )}
       </div>
     </>
   );
-}
+};
+
+export default Home;
