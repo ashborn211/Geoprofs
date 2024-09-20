@@ -9,11 +9,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        'custom-red': '#FF6347', // Tomato red
-        'custom-blue': '#1E90FF', // Dodger blue
+        'custom-orange': '#FFA034', // Tomato red
+        'custom-cyan  ': '#34C6FE', // Dodger blue
+        'custom-blue  ': '#07476B', // Dark blue 
         'custom-black': '#1a1a1a', // Dark black
         'custom-white': '#f5f5f5', // Off white
-        'custom-gray': '#d1d5db',  // Light gray
+        'custom-green': '#33FF18',  // Light gray
       },
     },
   },
