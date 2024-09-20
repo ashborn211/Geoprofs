@@ -1,42 +1,29 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./verlof.css";
+import { Button } from "@nextui-org/react";
 
 interface VerlofComponentProps {
+  selectedDate: Date;
   onClose: () => void;
-  selectedDate: Date; // Pass the selected date as a prop
 }
 
-const VerlofComponent = ({ onClose, selectedDate }: VerlofComponentProps) => {
+const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
   const [reason, setReason] = useState<string>("");
-  const [dateRange, setDateRange] = useState<string>("");
 
-  // Helper function to format the date to DD/MM/YYYY
-  const formatDate = (date: Date): string => {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-
-  // Set the date range when the selected date changes
-  useEffect(() => {
-    if (selectedDate) {
-      const endDate = new Date(selectedDate);
-      endDate.setDate(selectedDate.getDate() + 3); // Set the end date to 3 days later
-
-      const formattedStartDate = formatDate(selectedDate);
-      const formattedEndDate = formatDate(endDate);
-
-      setDateRange(`${formattedStartDate} - ${formattedEndDate}`);
-    }
-  }, [selectedDate]);
+  // Format the date (you can adjust this to your preferred format)
+  const formattedDate = selectedDate.toLocaleDateString("nl-NL", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
 
   return (
     <div className="verlof-popup">
       <div className="popup-header">
-        <span className="date-range">{dateRange}</span>
+        {/* Show selected date */}
+        <span className="date-range">{formattedDate}</span>
         <button className="close-button" onClick={onClose}>
           &times;
         </button>
@@ -50,13 +37,8 @@ const VerlofComponent = ({ onClose, selectedDate }: VerlofComponentProps) => {
 
         <div className="time-section">
           <div className="time-input">
-            <label>{dateRange.split(" - ")[0]}</label>
+            <label>{formattedDate}</label>
             <input type="time" defaultValue="10:30" />
-          </div>
-          <span className="time-separator">tot</span>
-          <div className="time-input">
-            <label>{dateRange.split(" - ")[1]}</label>
-            <input type="time" defaultValue="14:30" />
           </div>
         </div>
 
@@ -69,7 +51,9 @@ const VerlofComponent = ({ onClose, selectedDate }: VerlofComponentProps) => {
           ></textarea>
         </div>
 
-        <button className="submit-button">verstuur</button>
+        <Button className="submit-button" color="primary">
+          verstuur
+        </Button>
       </div>
     </div>
   );

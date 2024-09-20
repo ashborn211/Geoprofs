@@ -1,6 +1,19 @@
+"use client"
+
+import { useState } from "react";
+import VerlofComponent from "../../components/verlof";
 import CalendarComponent from "../../components/calendar";
 
 export default function Home() {
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  // Handle the date selected from the calendar
+  const handleDateSelect = (date: Date) => {
+    setSelectedDate(date);
+    setShowPopup(true); // Open popup when a date is selected
+  };
+
   return (
     <>
       <div className="flex h-screen overflow-hidden">
@@ -16,11 +29,20 @@ export default function Home() {
                 className="bg-white rounded-lg"
                 style={{ width: "90%", height: "90%" }}
               >
-              <CalendarComponent></CalendarComponent>
+                {/* Pass handleDateSelect to CalendarComponent */}
+                <CalendarComponent onDateSelect={handleDateSelect} />
               </div>
             </div>
           </div>
         </div>
+
+        {/* Display the VerlofComponent popup when a date is selected */}
+        {showPopup && selectedDate && (
+          <VerlofComponent
+            selectedDate={selectedDate}
+            onClose={() => setShowPopup(false)}
+          />
+        )}
       </div>
     </>
   );
