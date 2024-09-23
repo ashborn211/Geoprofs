@@ -1,5 +1,4 @@
 "use client"
-
 import { useState } from "react";
 import VerlofComponent from "../../components/verlof";
 import CalendarComponent from "../../components/calendar";
@@ -29,7 +28,6 @@ export default function Home() {
                 className="bg-white rounded-lg"
                 style={{ width: "90%", height: "90%" }}
               >
-                {/* Pass handleDateSelect to CalendarComponent */}
                 <CalendarComponent onDateSelect={handleDateSelect} />
               </div>
             </div>

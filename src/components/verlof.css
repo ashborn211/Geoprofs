@@ -1,12 +1,30 @@
+.verlof-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* Background overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
 .verlof-popup {
-    width: 300px;
-    background-color: white;
-    border-radius: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    position: relative;
-    font-family: Arial, sans-serif;
-  }
+  width: 300px;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  position: fixed; /* Make it fixed to always appear in the viewport */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center it */
+  font-family: Arial, sans-serif;
+  z-index: 1000; /* Ensure it appears above other elements */
+}
+
   
   .popup-header {
     display: flex;
@@ -62,6 +80,7 @@
   .time-input {
     display: flex;
     flex-direction: column;
+    color: black;
   }
   
   .time-separator {
@@ -78,6 +97,7 @@
     padding: 5px;
     border-radius: 5px;
     border: 1px solid #ccc;
+    color: black;
   }
   
   .submit-button {
