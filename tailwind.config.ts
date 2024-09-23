@@ -12,9 +12,13 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      colors: {
+        'custom-orange': '#FFA034', // Tomato red
+        'custom-cyan': '#34C6FE', // Dodger blue
+        'custom-blue': '#07476B', // Dark blue 
+        'custom-black': '#1a1a1a', // Dark black
+        'custom-white': '#f5f5f5', // Off white
+        'custom-green': '#33FF18',  // Light gray
       },
     },
   },

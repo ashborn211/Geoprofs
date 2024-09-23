@@ -1,4 +1,4 @@
-import CalendarComponent from "../../components/calendar";
+import CalendarComponent from "../../components/calendar/calendar";
 
 export default function Home() {
   return (
@@ -13,10 +13,14 @@ export default function Home() {
             </div>
             <div className="col-span-12 row-span-8 col-start-1 row-start-5 bg-green-500 flex justify-center items-center">
               <div
-                className="bg-white rounded-lg"
-                style={{ width: "90%", height: "90%" }}
+                className="rounded-lg"
+                style={{
+                  width: "90%",
+                  height: "90%",
+                  background: "linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(52,198,254,1) 100%)"
+                }}
               >
-              <CalendarComponent></CalendarComponent>
+                <CalendarComponent />
               </div>
             </div>
           </div>
