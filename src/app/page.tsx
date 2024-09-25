@@ -49,7 +49,7 @@ const LoginPage = () => {
   };
 
   return (
-    <main className="main">
+    <main className="">
               <div className="logo-container">
           <img
             src="/images/LogoGeoProfs.png" // Corrected path for Next.js

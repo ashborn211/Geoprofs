@@ -1,4 +1,4 @@
-.main {
+main {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -8,6 +8,10 @@
 }
 
 .container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   max-width: 900px;
   padding: 11rem;
@@ -15,7 +19,6 @@
   border-radius: 43px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
-
 
 .logo-container {
   text-align: center;
@@ -31,6 +34,7 @@
   height: auto;
 }
 
+
 .title {
   text-align: center;
   font-size: 1.8rem;
@@ -39,30 +43,29 @@
 }
 
 .form-group {
+  width: 100%;
   margin-bottom: 1.5rem;
-  width: 50%;
 }
 
 .button-group {
   display: flex;
-  justify-content: space-between; /* Ensure buttons are side-by-side */
+  justify-content: space-between;
+  width: 100%; /* Ensure buttons take up the full width */
 }
 
 .login-button {
-  padding: 0.8rem 2rem;
+  flex: 1;
+  margin-right: 10px;
+  padding: 0.8rem;
   font-size: 1rem;
   border-radius: 8px;
   text-transform: uppercase;
-  background-color: #007bff; /* Blue login button */
   color: white;
+  border-radius: 10px;
 }
 
-.google-button {
-  padding: 0.8rem 2rem;
-  font-size: 1rem;
-  border-radius: 8px;
-  background-color: #d9534f; /* Red google button */
-  color: white;
+.login-button {
+  background-color: #007bff; /* Blue login button */
 }
 
 .signup-link {
@@ -78,3 +81,4 @@
   margin-bottom: 1rem;
   font-size: 0.9rem;
 }
+
