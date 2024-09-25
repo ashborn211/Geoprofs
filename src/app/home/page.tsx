@@ -11,7 +11,7 @@ export default function Home() {
               <div className="bg-red-500" style={{ width: "75%" }}></div>
               <div className="bg-red-500" style={{ width: "20%" }}></div>
             </div>
-            <div className="col-span-12 row-span-8 col-start-1 row-start-5 bg-green-500 flex justify-center items-center">
+            <div className="col-span-12 row-span-8 col-start-1 row-start-5 bg-custom-gray-500 flex justify-center items-center">
               <div
                 className="rounded-lg"
                 style={{
