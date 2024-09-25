@@ -11,33 +11,59 @@ interface VerlofComponentProps {
 
 const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
   const [reason, setReason] = useState<string>("");
+  const [selectedButton, setSelectedButton] = useState<string | null>(null);
 
-  // Format the date (you can adjust this to your preferred format)
   const formattedDate = selectedDate.toLocaleDateString("nl-NL", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
   });
+  const formattedTime = selectedDate.toLocaleTimeString("nl-NL", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  const handleButtonClick = (buttonType: string) => {
+    setSelectedButton(buttonType);
+  };
 
   return (
     <div className="verlof-popup-overlay">
       <div className="verlof-popup">
         <div className="popup-header">
-          <span className="date-range">{formattedDate}</span>
+          <span className="date-range">
+            {formattedDate} {formattedTime}
+          </span>
           <button className="close-button" onClick={onClose}>
             &times;
           </button>
         </div>
 
         <div className="content">
-          <div className="verlof-section">
-            <button className="verlof-button">Verlof</button>
-            <button className="verlof-button">Vakantie</button>
-          </div>
+          <div className="section-wrapper">
+            <div className="verlof-section">
+              <button
+                className={`verlof-button ${
+                  selectedButton === "verlof" ? "selected" : ""
+                }`}
+                onClick={() => handleButtonClick("verlof")}
+              >
+                Verlof
+              </button>
+              <button
+                className={`vakantie-button ${
+                  selectedButton === "vakantie" ? "selected" : ""
+                }`}
+                onClick={() => handleButtonClick("vakantie")}
+              >
+                Vakantie
+              </button>
+            </div>
 
-          <div className="time-section">
-            <div className="time-input">
-              <input type="time" defaultValue="10:30" />
+            <div className="time-section">
+              <div className="time-input">
+                <input type="time" defaultValue="10:30" />
+              </div>
             </div>
           </div>
 

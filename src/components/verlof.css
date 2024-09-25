@@ -47,35 +47,73 @@
     font-size: 1.5rem;
     cursor: pointer;
   }
-  
+  .verlof-label {
+    font-size: 14px;
+    margin-right: 10px;
+  }
   .content {
     padding: 10px;
   }
   
   .verlof-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; 
     margin-bottom: 10px;
+    width: 50%;
   }
   
-  .verlof-label {
-    font-size: 14px;
-    margin-right: 10px;
-  }
-  
-  .verlof-button {
-    background-color: #33a6ff;
-    color: white;
-    border: none;
+  .verlof-button, .vakantie-button {
+    background-color: white; /* Default background */
+    color: black; /* Default text color */
+    border: 1px solid black; /* Black outline */
     padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+  }
+  
+  .verlof-button.selected, .vakantie-button.selected {
+    background-color: #33a6ff; /* Blue background when selected */
+    color: white; /* White text when selected */
+    border: none; /* No outline when selected */
   }
   
   .time-section {
     display: flex;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
+  }
+  
+  /* Add margin for spacing */
+  .section-wrapper {
+    display: flex;
     justify-content: space-between;
+    gap: 10px;
     margin-bottom: 10px;
   }
+  
+  .reason-textarea {
+    width: 100%;
+    height: 60px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    color: black;
+  }
+  
+  .submit-button {
+    width: 100%;
+    background-color: #33a6ff;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
   
   .time-input {
     display: flex;
