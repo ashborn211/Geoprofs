@@ -2,28 +2,32 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  height: 100vh;
   background-color: #f0f0f0; /* Light grey background for the entire page */
   margin: 0; /* Ensure no default margin is applied */
 }
 
 .container {
   width: 100%;
-  max-width: 400px;
-  padding: 2rem;
+  max-width: 900px;
+  padding: 11rem;
   background: linear-gradient(to right, #ffffff, #a0c4ff); /* Gradient from white to a more intense blue */
-  border-radius: 10px;
+  border-radius: 43px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 
 .logo-container {
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  
 }
 
 .logo {
-  width: 100px;
+  width: 200px;
   height: auto;
 }
 
