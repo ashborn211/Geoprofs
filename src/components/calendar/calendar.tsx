@@ -18,7 +18,7 @@ export default function CalendarComponent() {
         defaultValue={today(getLocalTimeZone())}
         minValue={today(getLocalTimeZone())}
         style={{
-          fontSize: "25px",
+          fontSize: "23px",
           boxShadow: "none",
           textSizeAdjust: "larger",
           backgroundColor: "rgba(255, 255, 255, 0.5)",

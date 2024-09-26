@@ -1,10 +1,13 @@
 import CalendarComponent from "../../components/calendar/calendar";
+import { Link } from "@nextui-org/react";
 
 export default function Home() {
   return (
     <>
       <div className="flex h-screen overflow-hidden">
-        <div className="w-[6vw] bg-blue-500 h-full"></div>
+        <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center h-full">
+        <Link href="./" className="text-white underline mb-[10px]">Log out</Link>
+        </div>
         <div className="w-[94vw] h-full">
           <div className="h-full grid grid-cols-12 grid-rows-12">
             <div className="col-span-12 row-span-4 col-start-1 bg-yellow-500 flex justify-between p-4">
@@ -13,7 +16,7 @@ export default function Home() {
             </div>
             <div className="col-span-12 row-span-8 col-start-1 row-start-5 bg-custom-gray-500 flex justify-center items-center">
               <div
-                className="rounded-lg"
+                className=" rounded-lg"
                 style={{
                   width: "90%",
                   height: "90%",
