@@ -92,10 +92,6 @@ const LoginPage = () => {
               Inloggen
             </Button>
           </div>
-
-          <div className="signup-link">
-            <Link href="register">Or Sign Up Instead</Link>
-          </div>
         </form>
       </div>
     </main>
