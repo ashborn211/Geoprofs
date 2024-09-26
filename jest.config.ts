@@ -1,17 +1,18 @@
-export default {
-  preset: 'ts-jest', // Use ts-jest to transpile TypeScript
-  testEnvironment: 'jsdom', // Use jsdom for testing React components
-  transform: {
-    '^.+\\.(ts|tsx|js|jsx)$': 'ts-jest', // Use ts-jest to handle both TypeScript and JavaScript
-  },
-  
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  moduleNameMapper: {
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy', // Handle CSS imports
-  },
-  transformIgnorePatterns: [
-    'node_modules/(?!(some-esm-library|other-esm-library)/)', // If you need to transform specific node_modules
-  ],
-  setupFilesAfterEnv: ['<rootDir>/src/app/jest.setup.ts'], // Make sure jest.setup.ts is included
-  extensionsToTreatAsEsm: ['.ts', '.tsx'], // Treat TypeScript files as ESM
-};
+import type { Config } from 'jest'
+import nextJest from 'next/jest.js'
+ 
+const createJestConfig = nextJest({
+  // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
+  dir: './',
+})
+ 
+// Add any custom config to be passed to Jest
+const config: Config = {
+  coverageProvider: 'v8',
+  testEnvironment: 'jsdom',
+  // Add more setup options before each test is run
+  // setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+}
+ 
+// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
+export default createJestConfig(config)
