@@ -1,0 +1,150 @@
+.verlof-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* Background overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.verlof-popup {
+  width: 300px;
+  background-color: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  position: fixed; /* Make it fixed to always appear in the viewport */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Center it */
+  font-family: Arial, sans-serif;
+  z-index: 1000; /* Ensure it appears above other elements */
+}
+
+  
+  .popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #33a6ff;
+    padding: 10px;
+    border-radius: 20px 20px 0 0;
+    color: white;
+  }
+  
+  .date-range {
+    font-weight: bold;
+  }
+  
+  .close-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  .verlof-label {
+    font-size: 14px;
+    margin-right: 10px;
+  }
+  .content {
+    padding: 10px;
+  }
+  
+  .verlof-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; 
+    margin-bottom: 10px;
+    width: 50%;
+  }
+  
+  .verlof-button, .vakantie-button {
+    background-color: white; /* Default background */
+    color: black; /* Default text color */
+    border: 1px solid black; /* Black outline */
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+  }
+  
+  .verlof-button.selected, .vakantie-button.selected {
+    background-color: #33a6ff; /* Blue background when selected */
+    color: white; /* White text when selected */
+    border: none; /* No outline when selected */
+  }
+  
+  .time-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Add margin for spacing */
+  .section-wrapper {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .reason-textarea {
+    width: 100%;
+    height: 60px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    color: black;
+  }
+  
+  .submit-button {
+    width: 100%;
+    background-color: #33a6ff;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  
+  .time-input {
+    display: flex;
+    flex-direction: column;
+    color: black;
+  }
+  
+  .time-separator {
+    margin: 0 10px;
+  }
+  
+  .reason-section {
+    margin-bottom: 10px;
+  }
+  
+  .reason-textarea {
+    width: 100%;
+    height: 60px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    color: black;
+  }
+  
+  .submit-button {
+    width: 100%;
+    background-color: #33a6ff;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
