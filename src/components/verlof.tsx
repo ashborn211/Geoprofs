@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import "./verlof.css";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "../../FireBaseConfig";
 import { Button } from "@nextui-org/react";
 
 interface VerlofComponentProps {
@@ -12,6 +14,8 @@ interface VerlofComponentProps {
 const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
   const [reason, setReason] = useState<string>("");
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
+  const [startTime, setStartTime] = useState<string>("10:30"); // State for start time
+  const [endTime, setEndTime] = useState<string>("16:30"); // State for end time
 
   const formattedDate = selectedDate.toLocaleDateString("nl-NL", {
     day: "2-digit",
@@ -23,8 +27,29 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
     minute: "2-digit",
     hour12: false,
   });
+
   const handleButtonClick = (buttonType: string) => {
     setSelectedButton(buttonType);
+  };
+
+  const handleSubmit = async () => {
+    if (selectedButton && reason) {
+      try {
+        await addDoc(collection(db, "verlof"), {
+          type: selectedButton,
+          reason,
+          startDate: formattedDate,
+          startTime,
+          endTime,
+        });
+        alert("Verlof/Vakantie request submitted!");
+        onClose();
+      } catch (error) {
+        console.error("Error adding document: ", error);
+      }
+    } else {
+      alert("Please fill in all fields.");
+    }
   };
 
   return (
@@ -62,7 +87,18 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
 
             <div className="time-section">
               <div className="time-input">
-                <input type="time" defaultValue="10:30" />
+                <label>Start Time:</label>
+                <input
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                />
+                <label>End Time:</label>
+                <input
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                />
               </div>
             </div>
           </div>
@@ -76,8 +112,12 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
             ></textarea>
           </div>
 
-          <Button className="submit-button" color="primary">
-            verstuur
+          <Button
+            className="submit-button"
+            color="primary"
+            onClick={handleSubmit}
+          >
+            Verstuur
           </Button>
         </div>
       </div>
