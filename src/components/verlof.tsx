@@ -9,13 +9,15 @@ import { Button } from "@nextui-org/react";
 interface VerlofComponentProps {
   selectedDate: Date;
   onClose: () => void;
+  userId: string;   // New prop for user ID
+  name: string;     // New prop for user name
 }
 
-const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
+const VerlofComponent = ({ selectedDate, onClose, userId, name }: VerlofComponentProps) => {
   const [reason, setReason] = useState<string>("");
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
-  const [startTime, setStartTime] = useState<string>("10:30"); // State for start time
-  const [endTime, setEndTime] = useState<string>("16:30"); // State for end time
+  const [startTime, setStartTime] = useState<string>("10:30");
+  const [endTime, setEndTime] = useState<string>("16:30");
 
   const formattedDate = selectedDate.toLocaleDateString("nl-NL", {
     day: "2-digit",
@@ -41,6 +43,8 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
           startDate: formattedDate,
           startTime,
           endTime,
+          userId,  // Include the userId in the Firestore document
+          name,    // Include the user's name in the Firestore document
         });
         alert("Verlof/Vakantie request submitted!");
         onClose();

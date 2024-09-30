@@ -2,24 +2,30 @@
 import { useState } from "react";
 import VerlofComponent from "../../components/verlof";
 import CalendarComponent from "../../components/calendar";
-import SearchBar from "../../components/SearchBar"; // Import SearchBar component
-import "../../components/SearchBar.css"; // Import CSS for SearchBar
+import SearchBar from "../../components/SearchBar"; 
+import "../../components/SearchBar.css"; 
+import { useUser } from "../../context/UserContext"; 
 
 export default function Home() {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [searchResults, setSearchResults] = useState<any[]>([]);
-
-  // Handle the date selected from the calendar
+  
+  const { user } = useUser(); 
+  
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
-    setShowPopup(true); // Open popup when a date is selected
+    setShowPopup(true); 
   };
 
   // Handle search query results
   const handleSearchResults = (results: any[]) => {
-    setSearchResults(results); // Store the search results
+    setSearchResults(results); 
   };
+
+  if (!user) {
+    return <p>Loading user data...</p>; 
+  }
 
   return (
     <>
@@ -64,9 +70,13 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Display the VerlofComponent popup when a date is selected */}
         {showPopup && selectedDate && (
-          <VerlofComponent selectedDate={selectedDate} onClose={() => setShowPopup(false)} />
+          <VerlofComponent
+            selectedDate={selectedDate}
+            onClose={() => setShowPopup(false)}
+            userId={user.uid} 
+            name={user.displayName || user.email} 
+          />
         )}
       </div>
     </>
