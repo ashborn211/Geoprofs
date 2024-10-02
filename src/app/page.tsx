@@ -6,6 +6,7 @@ import { auth, db } from "../../FireBaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { Input, Button } from "@nextui-org/react";
 import { useUser } from "../context/UserContext"; // Import the User context
+import "./page.css";
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
@@ -17,7 +18,11 @@ const LoginPage = () => {
     e.preventDefault();
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
 
       setUser({
@@ -57,7 +62,9 @@ const LoginPage = () => {
               type="email"
               placeholder="E-mail..."
               value={email}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setEmail(e.target.value)
+              }
               isRequired
               fullWidth
             />
@@ -68,7 +75,9 @@ const LoginPage = () => {
               type="password"
               placeholder="****"
               value={password}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setPassword(e.target.value)
+              }
               isRequired
               fullWidth
             />
