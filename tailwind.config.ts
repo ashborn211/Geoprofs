@@ -21,7 +21,7 @@ const config: Config = {
         'custom-blue': '#07476B', // Dark blue 
         'custom-black': '#1a1a1a', // Dark black
         'custom-white': '#f5f5f5', // Off white
-        'custom-gray': '#33FF18',  // Light gray
+        'custom-gray': '#ECECEC',  // Light gray
       },
     },
   },
