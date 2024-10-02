@@ -31,7 +31,7 @@ export default function Home() {
   return (
     <>
       <div className="flex h-screen overflow-hidden">
-        <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center h-full">
+        <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
           <Link href="./" className="text-white underline mb-[10px]">
             Log out
           </Link>
@@ -47,7 +47,7 @@ export default function Home() {
                     "linear-gradient(90deg, rgba(255,255,255,1) 16%, rgba(52,198,254,1) 100%)",
                 }}
               >
-                <h1>Goedemorgen Velican</h1>
+                <h1>Goedemorgen {user.displayName || user.email}</h1>
               </div>
 
               <div style={{ width: "20%" }}>
@@ -64,7 +64,7 @@ export default function Home() {
             </div>
             <div className="col-span-12 row-span-8 col-start-1 row-start-5 bg-custom-gray-500 flex justify-center items-center">
               <div
-                className=" rounded-lg"
+                className="rounded-lg"
                 style={{
                   width: "90%",
                   height: "90%",
@@ -72,9 +72,7 @@ export default function Home() {
                     "linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(52,198,254,1) 100%)",
                 }}
               >
-                <CalendarComponent onDateSelect={function (date: Date): void {
-                  throw new Error("Function not implemented.");
-                } } />
+                <CalendarComponent onDateSelect={handleDateSelect} />
               </div>
             </div>
           </div>
