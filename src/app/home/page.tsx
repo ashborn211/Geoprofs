@@ -19,11 +19,6 @@ export default function Home() {
     setShowPopup(true); 
   };
 
-  // Handle search query results
-  const handleSearchResults = (results: any[]) => {
-    setSearchResults(results); 
-  };
-
   if (!user) {
     return <p>Loading user data...</p>; 
   }
