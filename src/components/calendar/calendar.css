@@ -1,0 +1,34 @@
+td{
+    width: 14.2857%;
+    padding: 10px;
+    height: 69px;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}
+tbody span{
+    height: auto;
+}
+thead th{
+font-size: 10;
+}
+thead tr{
+margin-top: 15px !important;
+width: 101% !important;
+justify-content: space-around !important;
+padding-left: 0rem !important;
+}
+thead th{
+font-size: large !important;
+font-weight: bold !important;
+color: black;
+}
+
+
+header span{
+    font-size: xx-large !important;
+    margin-top: 10px !important;
+    color: black !important;
+    font-weight: bold !important;
+}
