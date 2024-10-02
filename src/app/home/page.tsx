@@ -2,7 +2,6 @@
 import { useState } from "react";
 import VerlofComponent from "../../components/verlof";
 import CalendarComponent from "../../components/calendar";
-import SearchBar from "../../components/SearchBar"; 
 import "../../components/SearchBar.css"; 
 import { useUser } from "../../context/UserContext"; 
 import { Link } from "@nextui-org/react";
@@ -10,7 +9,6 @@ import { Link } from "@nextui-org/react";
 export default function Home() {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [searchResults, setSearchResults] = useState<any[]>([]);
   
   const { user } = useUser(); 
   
