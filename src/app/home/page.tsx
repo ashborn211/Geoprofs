@@ -1,8 +1,33 @@
-
-import CalendarComponent from "../../components/calendar/calendar";
+"use client";
+import { useState } from "react";
+import VerlofComponent from "../../components/verlof";
+import CalendarComponent from "../../components/calendar";
+import SearchBar from "../../components/SearchBar"; 
+import "../../components/SearchBar.css"; 
+import { useUser } from "../../context/UserContext"; 
 import { Link } from "@nextui-org/react";
 
 export default function Home() {
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  
+  const { user } = useUser(); 
+  
+  const handleDateSelect = (date: Date) => {
+    setSelectedDate(date);
+    setShowPopup(true); 
+  };
+
+  // Handle search query results
+  const handleSearchResults = (results: any[]) => {
+    setSearchResults(results); 
+  };
+
+  if (!user) {
+    return <p>Loading user data...</p>; 
+  }
+
   return (
     <>
       <div className="flex h-screen overflow-hidden">
@@ -47,11 +72,22 @@ export default function Home() {
                     "linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(52,198,254,1) 100%)",
                 }}
               >
-                <CalendarComponent />
+                <CalendarComponent onDateSelect={function (date: Date): void {
+                  throw new Error("Function not implemented.");
+                } } />
               </div>
             </div>
           </div>
         </div>
+
+        {showPopup && selectedDate && (
+          <VerlofComponent
+            selectedDate={selectedDate}
+            onClose={() => setShowPopup(false)}
+            userId={user.uid} 
+            name={user.displayName || user.email} 
+          />
+        )}
       </div>
     </>
   );
