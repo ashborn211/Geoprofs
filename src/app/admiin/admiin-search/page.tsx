@@ -1,6 +1,6 @@
 import { Link } from "@nextui-org/react";
 
-export default function AdminPage() {
+export default function AdminSearchPage() {
   return (
     <>
       <div className="flex h-screen overflow-hidden bg-custom-gray">
@@ -43,7 +43,7 @@ export default function AdminPage() {
               <div className="bg-white border-2 border-black rounded-lg p-8 flex justify-between items-center">
                 <h2 className="text-2xl">Admin Search</h2>
                 <Link
-                  href="./admiin/admiin-search"
+                  href="admiin-search"
                   className="bg-blue-500 text-white rounded-lg py-2 px-4"
                 >
                   Go to Admin Search
@@ -54,7 +54,7 @@ export default function AdminPage() {
               <div className="bg-white border-2 border-black rounded-lg p-8 flex justify-between items-center">
                 <h2 className="text-2xl">Add Users</h2>
                 <Link
-                  href="./admiin/add-users"
+                  href="add-users"
                   className="bg-blue-500 text-white rounded-lg py-2 px-4"
                 >
                   Go to Add Users
