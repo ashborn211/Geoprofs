@@ -9,11 +9,16 @@ import { Button } from "@nextui-org/react";
 interface VerlofComponentProps {
   selectedDate: Date;
   onClose: () => void;
-  userId: string;   // New prop for user ID
-  name: string;     // New prop for user name
+  userId: string; // New prop for user ID
+  name: string; // New prop for user name
 }
 
-const VerlofComponent = ({ selectedDate, onClose, userId, name }: VerlofComponentProps) => {
+const VerlofComponent = ({
+  selectedDate,
+  onClose,
+  userId,
+  name,
+}: VerlofComponentProps) => {
   const [reason, setReason] = useState<string>("");
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<string>("10:30");
@@ -43,8 +48,10 @@ const VerlofComponent = ({ selectedDate, onClose, userId, name }: VerlofComponen
           startDate: formattedDate,
           startTime,
           endTime,
-          userId,  // Include the userId in the Firestore document
-          name,    // Include the user's name in the Firestore document
+          userId, // Include the userId in the Firestore document
+          name, // Include the user's name in the Firestore document
+          verwerkt: false, // Set verwerkt to false by default
+          goedgekeurd: undefined,
         });
         alert("Verlof/Vakantie request submitted!");
         onClose();
