@@ -32,3 +32,10 @@ header span{
     color: black !important;
     font-weight: bold !important;
 }
+
+td span{
+    background-color: red !important;
+    border-style: solid !important; 
+}
+  
+
