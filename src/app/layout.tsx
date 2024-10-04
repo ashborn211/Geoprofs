@@ -21,7 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <NextUIProvider>
-          <UserProvider> {/* Wrap your app with UserProvider */}
+          <UserProvider>
             {children}
           </UserProvider>
         </NextUIProvider>

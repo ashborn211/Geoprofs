@@ -7,6 +7,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { Input, Button } from "@nextui-org/react";
 import { useUser } from "../context/UserContext"; // Import the User context
 import "./page.css";
+import SendEmailForm from "@/components/SendEmailForm";
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
@@ -89,6 +90,8 @@ const LoginPage = () => {
             </Button>
           </div>
         </form>
+        <SendEmailForm/>
+
       </div>
     </main>
   );

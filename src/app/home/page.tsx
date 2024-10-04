@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import VerlofComponent from "../../components/verlof";
-import CalendarComponent from "../../components/calendar";
-import "../../components/SearchBar.css"; 
-import { useUser } from "../../context/UserContext"; 
+import VerlofComponent from "@/components/verlof";
+import CalendarComponent from "@/components/calendar";
+import "@/components/SearchBar.css"; 
+import { useUser } from "@/context/UserContext"; 
 import { Link } from "@nextui-org/react";
 
 export default function Home() {
