@@ -2,29 +2,32 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { auth, db } from "../../FireBaseConfig";
+import { auth } from "../../FireBaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { Input, Button } from "@nextui-org/react";
-import { useUser } from "../context/UserContext"; // Import the User context
+import { useUser } from "../context/UserContext";
 import "./page.css";
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const { setUser } = useUser(); // Get the setUser method from the context
+  const { setUser } = useUser();
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log("Attempting to log in with:", email, password); // Debugging line
 
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
-        email,
-        password
+        email.trim(),
+        password.trim()
       );
       const user = userCredential.user;
+      console.log("Login successful:", user);
 
+      // Set user in context
       setUser({
         uid: user.uid,
         email: user.email!,
@@ -32,15 +35,24 @@ const LoginPage = () => {
       });
 
       alert("Login successful!");
-      router.push("/user"); // Redirect after login
+      router.push("/home");
     } catch (error: any) {
-      console.error(error.message);
-      if (error.code === "auth/user-not-found") {
-        alert("User does not exist. Contact support?");
-      } else if (error.code === "auth/wrong-password") {
-        alert("Incorrect password or email. Please try again.");
-      } else {
-        alert("Login failed. Please try again.");
+      console.error("Login Error:", error);
+      switch (error.code) {
+        case "auth/user-not-found":
+          alert("User does not exist. Contact support?");
+          break;
+        case "auth/wrong-password":
+          alert("Incorrect password or email. Please try again.");
+          break;
+        case "auth/invalid-credential":
+          alert(
+            "Invalid email or password format. Please check your credentials."
+          );
+          break;
+        default:
+          alert("Login failed. Please try again.");
+          break;
       }
     }
   };
@@ -49,7 +61,7 @@ const LoginPage = () => {
     <main className="">
       <div className="logo-container">
         <img
-          src="/images/Logo GeoProfs.png" // Corrected path for Next.js
+          src="/images/Logo GeoProfs.png"
           alt="GeoProfs Logo"
           className="logo"
         />
