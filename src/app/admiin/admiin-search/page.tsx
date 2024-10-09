@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Link } from "@nextui-org/react";
-import SearchBar from "../../../components/SearchBar";
-import ResultsTable from "../../../components/ResultsTable";
+import SearchBar from "@/components/SearchBar";
+import ResultsTable from "@/components/ResultsTable";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../../FireBaseConfig";
 export default function AdminSearchPage() {
