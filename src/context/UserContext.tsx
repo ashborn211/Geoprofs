@@ -1,12 +1,15 @@
-"use client"
+// context/UserContext.tsx
+
+"use client";
 import { createContext, useContext, useState, ReactNode } from "react";
 
 interface User {
-    uid: string;
-    email: string;
-    displayName: string | null; 
-  }
-  
+  uid: string;
+  email: string;
+  userName: string | null;
+  role: string | null;   // New property
+  team: string | null;   // New property
+}
 
 interface UserContextType {
   user: User | null;

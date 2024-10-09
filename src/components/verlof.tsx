@@ -1,29 +1,33 @@
 "use client";
 
 import { useState } from "react";
+import { useUser } from "../context/UserContext"; // Update the path accordingly
 import "./verlof.css";
-import { addDoc, collection, Timestamp } from "firebase/firestore"; // Import Timestamp
+import { addDoc, collection } from "firebase/firestore";
 import { db } from "../../FireBaseConfig";
 import { Button } from "@nextui-org/react";
 
 interface VerlofComponentProps {
-  selectedDate: Date; // Assuming this is a Date object
+  selectedDate: Date;
   onClose: () => void;
-  userId: string;   // New prop for user ID
-  name: string;     // New prop for user name
 }
 
-const VerlofComponent = ({ selectedDate, onClose, userId, name }: VerlofComponentProps) => {
+const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
+  const { user } = useUser(); // Access the user context
   const [reason, setReason] = useState<string>("");
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
-  const [startTime, setStartTime] = useState<Date>(new Date(selectedDate.setHours(10, 30))); // Set start time as Date
-  const [endTime, setEndTime] = useState<Date>(new Date(selectedDate.setHours(16, 30)));   // Set end time as Date
+  const [startTime, setStartTime] = useState<string>("10:30"); // State for start time
+  const [endTime, setEndTime] = useState<string>("16:30"); // State for end time
 
-  // Keep the formatted date string for Firestore
   const formattedDate = selectedDate.toLocaleDateString("nl-NL", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
+  });
+  const formattedTime = selectedDate.toLocaleTimeString("nl-NL", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
   });
 
   const handleButtonClick = (buttonType: string) => {
@@ -31,16 +35,16 @@ const VerlofComponent = ({ selectedDate, onClose, userId, name }: VerlofComponen
   };
 
   const handleSubmit = async () => {
-    if (selectedButton && reason) {
+    if (selectedButton && reason && user) { // Ensure user is defined
       try {
         await addDoc(collection(db, "verlof"), {
           type: selectedButton,
           reason,
-          startDate: selectedDate,                  // Save as Date object
-          startTime: Timestamp.fromDate(startTime), // Firestore timestamp
-          endTime: Timestamp.fromDate(endTime),     // Firestore timestamp
-          userId,                                    // Include the userId in the Firestore document
-          name,                                      // Include the user's name in the Firestore document
+          startDate: formattedDate,
+          startTime,
+          endTime,
+          uid: user.uid,   // Use uid from user context
+          name: user.userName, // Use name from user context
         });
         alert("Verlof/Vakantie request submitted!");
         onClose();
@@ -57,7 +61,7 @@ const VerlofComponent = ({ selectedDate, onClose, userId, name }: VerlofComponen
       <div className="verlof-popup">
         <div className="popup-header">
           <span className="date-range">
-            {formattedDate}
+            {formattedDate} {formattedTime}
           </span>
           <button className="close-button" onClick={onClose}>
             &times;
@@ -90,24 +94,14 @@ const VerlofComponent = ({ selectedDate, onClose, userId, name }: VerlofComponen
                 <label>Start Time:</label>
                 <input
                   type="time"
-                  value={startTime.toISOString().substr(11, 5)} // Convert to HH:mm format for input
-                  onChange={(e) => {
-                    const [hours, minutes] = e.target.value.split(":").map(Number);
-                    const updatedStartTime = new Date(startTime);
-                    updatedStartTime.setHours(hours, minutes);
-                    setStartTime(updatedStartTime);
-                  }} // Update start time
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
                 />
                 <label>End Time:</label>
                 <input
                   type="time"
-                  value={endTime.toISOString().substr(11, 5)} // Convert to HH:mm format for input
-                  onChange={(e) => {
-                    const [hours, minutes] = e.target.value.split(":").map(Number);
-                    const updatedEndTime = new Date(endTime);
-                    updatedEndTime.setHours(hours, minutes);
-                    setEndTime(updatedEndTime);
-                  }} // Update end time
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
                 />
               </div>
             </div>
