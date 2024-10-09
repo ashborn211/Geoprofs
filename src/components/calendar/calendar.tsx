@@ -11,6 +11,7 @@ import { collection, getDocs } from "firebase/firestore";
 export default function CalendarComponent() {
   const [value, setValue] = React.useState<DateValue | null>(null);
   const [startDates, setStartDates] = useState<number[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null); // Ref opnieuw toegevoegd
 
   useEffect(() => {
     const fetchAllStartDates = async () => {
@@ -32,64 +33,54 @@ export default function CalendarComponent() {
     fetchAllStartDates();
   }, []);
 
-  const EchteCalendar = () => {
-    const containerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const highlightMatchingSpans = () => {
+      if (containerRef.current) {
+        const spans = containerRef.current.querySelectorAll("span");
 
-    useEffect(() => {
-      const highlightMatchingSpans = () => {
-        if (containerRef.current) {
-          const innerHTML = containerRef.current.innerHTML;
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(innerHTML, "text/html");
-          const spans = doc.querySelectorAll("span");
+        // Loop door de startdatums en markeer de bijbehorende spans
+        startDates.forEach((date) => {
+          const matchingSpans = Array.from(spans).filter(
+            (span) => span.textContent === `${date}`
+          );
 
-          // Loop door de start datums en markeer de bijbehorende spans
-          startDates.forEach((date) => {
-            const matchingSpans = Array.from(spans).filter(
-              (span) => span.textContent === `${date}`
-            );
-
-            // Maak de achtergrondkleur van overeenkomende spans rood
-            matchingSpans.forEach((span) => {
-              span.style.backgroundColor = "red";
-              span.style.color = "white";
-            });
-
-            console.log(`Aantal spans met waarde "${date}": ${matchingSpans.length}`);
+          // Maak de achtergrondkleur van overeenkomende spans rood zonder de innerHTML te overschrijven
+          matchingSpans.forEach((span) => {
+            span.style.backgroundColor = "red";
+            span.style.color = "white";
           });
 
-          // Update de container met de gewijzigde innerHTML
-          containerRef.current.innerHTML = doc.body.innerHTML;
-        }
-      };
+          console.log(`Aantal spans met waarde "${date}": ${matchingSpans.length}`);
+        });
+      }
+    };
 
-      highlightMatchingSpans();
-    }, [containerRef, startDates]);
-
-    return (
-      <div className="flex justify-center items-center h-full">
-        <Calendar
-          ref={containerRef}
-          calendarWidth={1000}
-          aria-label="Date (Min Date Value)"
-          visibleMonths={1}
-          minValue={today(getLocalTimeZone())}
-          value={value}
-          onChange={(newValue) => setValue(newValue)}
-          style={{
-            fontSize: "23px",
-            boxShadow: "none",
-            textSizeAdjust: "larger",
-            backgroundColor: "rgba(255, 255, 255, 0.5)", // Standaard achtergrondkleur
-            height: "100%",
-            width: "100%",
-          }}
-        />
-      </div>
-    );
-  };
+    highlightMatchingSpans();
+  }, [startDates]);
 
   return (
-      <EchteCalendar />
+    <div className="flex justify-center items-center h-full">
+      <Calendar
+        ref={containerRef} // Ref toegevoegd om DOM manipulatie mogelijk te maken
+        calendarWidth={1000}
+        aria-label="Date (Min Date Value)"
+        visibleMonths={1}
+        minValue={today(getLocalTimeZone())}
+        value={value}
+        onChange={(newValue) => {
+          setValue(newValue);
+          console.log("Selected date:", newValue); // Log de geselecteerde datum
+          console.log("Date value object:", JSON.stringify(newValue)); // Inspecteer het newValue object
+        }}
+        style={{
+          fontSize: "23px",
+          boxShadow: "none",
+          textSizeAdjust: "larger",
+          backgroundColor: "rgba(255, 255, 255, 0.5)", // Standaard achtergrondkleur
+          height: "100%",
+          width: "100%",
+        }}
+      />
+    </div>
   );
 }
