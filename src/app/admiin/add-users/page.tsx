@@ -62,7 +62,7 @@ export default function AddUser() {
         email: email,
         team: team,
         role: role,
-        password: generatedPassword,
+        password: hashedPassword,
       });
       alert("User added successfully!");
 
