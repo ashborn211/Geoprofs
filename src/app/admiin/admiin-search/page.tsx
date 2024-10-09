@@ -1,6 +1,38 @@
+"use client";
+import { useEffect, useState } from "react";
 import { Link } from "@nextui-org/react";
-
+import SearchBar from "@/components/SearchBar";
+import ResultsTable from "@/components/ResultsTable";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../../../FireBaseConfig";
 export default function AdminSearchPage() {
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [allData, setAllData] = useState<any[]>([]);
+
+  // Fetch all data from Firestore when the page loads
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "verlof"));
+        const results: any[] = [];
+        querySnapshot.forEach((doc) => {
+          results.push({ id: doc.id, ...doc.data() });
+        });
+        setAllData(results);
+        setSearchResults(results); // Set the initial results to all data
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Filter the results based on the search query
+  const handleSearch = (filteredResults: any[]) => {
+    setSearchResults(filteredResults);
+  };
+
   return (
     <>
       <div className="flex h-screen overflow-hidden bg-custom-gray">
@@ -39,26 +71,14 @@ export default function AdminSearchPage() {
 
             {/* Admin Functions */}
             <div className="col-span-12 row-span-8 bg-custom-gray-500 p-8 flex flex-col space-y-4">
-              {/* Admin Search Container */}
-              <div className="bg-white border-2 border-black rounded-lg p-8 flex justify-between items-center">
-                <h2 className="text-2xl">Admin Search</h2>
-                <Link
-                  href="admiin-search"
-                  className="bg-blue-500 text-white rounded-lg py-2 px-4"
-                >
-                  Go to Admin Search
-                </Link>
+              {/* Search Bar */}
+              <div className="mb-6">
+                <SearchBar allData={allData} onSearch={handleSearch} />
               </div>
 
-              {/* Add Users Container */}
-              <div className="bg-white border-2 border-black rounded-lg p-8 flex justify-between items-center">
-                <h2 className="text-2xl">Add Users</h2>
-                <Link
-                  href="add-users"
-                  className="bg-blue-500 text-white rounded-lg py-2 px-4"
-                >
-                  Go to Add Users
-                </Link>
+              {/* Blue Table to Display Results */}
+              <div className="bg-blue-500 p-4 rounded-lg">
+                <ResultsTable data={searchResults} />
               </div>
             </div>
           </div>

@@ -4,8 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "../../FireBaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import { Input, Button } from "@nextui-org/react";
 import { useUser } from "../context/UserContext";
+import { db } from "../../FireBaseConfig"; // Import your Firestore instance
 import "./page.css";
 
 const LoginPage = () => {
@@ -19,6 +21,20 @@ const LoginPage = () => {
     return emailRegex.test(email);
   };
 
+  const fetchUserData = async (uid: string) => {
+    try {
+      const userDoc = await getDoc(doc(db, "users", uid)); // Adjust to your Firestore path
+      if (userDoc.exists()) {
+        return userDoc.data(); // Returns the user data as an object
+      } else {
+        throw new Error("No such user document");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return null;
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -28,6 +44,7 @@ const LoginPage = () => {
     }
 
     try {
+      // Authenticate user with email and password
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
@@ -35,15 +52,24 @@ const LoginPage = () => {
       );
       const user = userCredential.user;
 
-      // Set user in context
-      setUser({
-        uid: user.uid,
-        email: user.email!,
-        displayName: user.displayName || "Anonymous",
-      });
+      // Fetch additional user data from Firestore after successful login
+      const userData = await fetchUserData(user.uid);
 
-      alert("Login successful!");
-      router.push("/home");
+      if (userData) {
+        // Set user in context with additional data
+        setUser({
+          uid: user.uid,
+          email: user.email!,
+          userName: userData.userName || "Anonymous", // Use userName from Firestore
+          role: userData.role,
+          team: userData.team,
+        });
+
+        alert("Login successful!");
+        router.push("/home");
+      } else {
+        alert("Failed to fetch user details. Please try again.");
+      }
     } catch (error: any) {
       console.error(error.message);
       if (error.code === "auth/user-not-found") {
