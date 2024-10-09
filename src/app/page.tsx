@@ -2,20 +2,30 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { auth, db } from "../../FireBaseConfig";
+import { auth } from "../../FireBaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { Input, Button } from "@nextui-org/react";
-import { useUser } from "../context/UserContext"; // Import the User context
+import { useUser } from "../context/UserContext";
 import "./page.css";
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const { setUser } = useUser(); // Get the setUser method from the context
+  const { setUser } = useUser();
   const router = useRouter();
+
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!isValidEmail(email)) {
+      alert("Invalid email format");
+      return;
+    }
 
     try {
       const userCredential = await signInWithEmailAndPassword(
@@ -25,6 +35,7 @@ const LoginPage = () => {
       );
       const user = userCredential.user;
 
+      // Set user in context
       setUser({
         uid: user.uid,
         email: user.email!,
@@ -32,13 +43,13 @@ const LoginPage = () => {
       });
 
       alert("Login successful!");
-      router.push("/user"); // Redirect after login
+      router.push("/home");
     } catch (error: any) {
       console.error(error.message);
       if (error.code === "auth/user-not-found") {
-        alert("User does not exist. Contact support?");
+        alert("User does not exist. Do you want to register?");
       } else if (error.code === "auth/wrong-password") {
-        alert("Incorrect password or email. Please try again.");
+        alert("Incorrect password. Please try again.");
       } else {
         alert("Login failed. Please try again.");
       }
@@ -49,7 +60,7 @@ const LoginPage = () => {
     <main className="">
       <div className="logo-container">
         <img
-          src="/images/Logo GeoProfs.png" // Corrected path for Next.js
+          src="/images/Logo GeoProfs.png"
           alt="GeoProfs Logo"
           className="logo"
         />
@@ -65,7 +76,7 @@ const LoginPage = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setEmail(e.target.value)
               }
-              isRequired
+              required
               fullWidth
             />
           </div>
@@ -78,7 +89,7 @@ const LoginPage = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setPassword(e.target.value)
               }
-              isRequired
+              required
               fullWidth
             />
           </div>

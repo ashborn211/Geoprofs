@@ -5,6 +5,10 @@
       "dom.iterable",
       "esnext"
     ],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./@types"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -38,8 +42,9 @@
     ".next/types/**/*.ts",
     "src",
     "babel.config.ts",
-    "jest.config.ts"
-, "tailwind.config.ts"  ],
+    "jest.config.ts",
+    "tailwind.config.ts"
+, "FireBaseConfig.jsx"  ],
   "exclude": [
     "node_modules"
   ]
