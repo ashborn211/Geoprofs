@@ -14,18 +14,26 @@ const LoginPage = () => {
   const { setUser } = useUser();
   const router = useRouter();
 
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Attempting to log in with:", email, password); // Debugging line
+
+    if (!isValidEmail(email)) {
+      alert("Invalid email format");
+      return;
+    }
 
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
-        email.trim(),
-        password.trim()
+        email,
+        password
       );
       const user = userCredential.user;
-      console.log("Login successful:", user);
 
       // Set user in context
       setUser({
@@ -37,22 +45,13 @@ const LoginPage = () => {
       alert("Login successful!");
       router.push("/home");
     } catch (error: any) {
-      console.error("Login Error:", error);
-      switch (error.code) {
-        case "auth/user-not-found":
-          alert("User does not exist. Contact support?");
-          break;
-        case "auth/wrong-password":
-          alert("Incorrect password or email. Please try again.");
-          break;
-        case "auth/invalid-credential":
-          alert(
-            "Invalid email or password format. Please check your credentials."
-          );
-          break;
-        default:
-          alert("Login failed. Please try again.");
-          break;
+      console.error(error.message);
+      if (error.code === "auth/user-not-found") {
+        alert("User does not exist. Do you want to register?");
+      } else if (error.code === "auth/wrong-password") {
+        alert("Incorrect password. Please try again.");
+      } else {
+        alert("Login failed. Please try again.");
       }
     }
   };
@@ -77,7 +76,7 @@ const LoginPage = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setEmail(e.target.value)
               }
-              isRequired
+              required
               fullWidth
             />
           </div>
@@ -90,7 +89,7 @@ const LoginPage = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setPassword(e.target.value)
               }
-              isRequired
+              required
               fullWidth
             />
           </div>

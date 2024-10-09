@@ -1,8 +1,17 @@
 "use client";
 import { useState } from "react";
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "../../../../FireBaseConfig"; 
-import bcrypt from 'bcryptjs';
+import {
+  collection,
+  addDoc,
+  doc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+} from "firebase/firestore";
+import { auth, db } from "../../../../FireBaseConfig";
+import bcrypt from "bcryptjs";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 export default function AddUser() {
   const [naam, setNaam] = useState("");
@@ -30,12 +39,30 @@ export default function AddUser() {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     try {
-      await addDoc(collection(db, "users"), {
+      const emailQuery = query(
+        collection(db, "users"),
+        where("email", "==", email)
+      );
+      const emailQuerySnapshot = await getDocs(emailQuery);
+
+      if (!emailQuerySnapshot.empty) {
+        alert("Email already taken. Please use a different email.");
+        return;
+      }
+
+      const authUser = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      // Create a user document in Firestore
+      await setDoc(doc(db, "users", authUser.user.uid), {
         userName: naam,
         email: email,
         team: team,
         role: role,
-        password: generatedPassword, 
+        password: generatedPassword,
       });
       alert("User added successfully!");
 
