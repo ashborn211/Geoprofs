@@ -1,56 +1,50 @@
-"use client"
+"use client";
 import React, { useState } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../../FireBaseConfig"; // Adjust the path as needed
 
 interface SearchBarProps {
-    placeholder?: string;
-    onSearch: (results: any[]) => void;
-  }
-  
-  const SearchBar: React.FC<SearchBarProps> = ({ placeholder = "Search...", onSearch }) => {
-    const [queryText, setQueryText] = useState<string>("");
-  
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setQueryText(e.target.value);
-    };
-  
-    const handleSearch = async () => {
-      if (queryText.trim() === "") return;
-  
-      try {
-        const q = query(
-          collection(db, "verlof"), // Change "verlof" to your collection name
-          where("type", "==", queryText) // Searching by 'type' (e.g., "vakantie", "verlof")
-        );
-  
-        const querySnapshot = await getDocs(q);
-        const results: any[] = [];
-  
-        querySnapshot.forEach((doc) => {
-          results.push({ id: doc.id, ...doc.data() });
-        });
-  
-        onSearch(results); // Send the fetched results back to the parent component
-      } catch (error) {
-        console.error("Error fetching data: ", error);
-      }
-    };
-  
-    return (
-      <div className="search-bar">
-        <input
-          type="text"
-          placeholder={placeholder}
-          value={queryText}
-          onChange={handleInputChange}
-          className="search-input"
-        />
-        <button onClick={handleSearch} className="search-button">
-          Search
-        </button>
-      </div>
-    );
+  allData: any[];
+  onSearch: (results: any[]) => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ allData, onSearch }) => {
+  const [queryText, setQueryText] = useState<string>("");
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQueryText(e.target.value);
+    filterResults(e.target.value);
   };
-  
-  export default SearchBar;
+
+  const filterResults = (query: string) => {
+    if (query.trim() === "") {
+      onSearch(allData); // Show all data if no query
+      return;
+    }
+
+    const filteredResults = allData.filter((item) => {
+      const { name, type, startDate } = item;
+      const lowerQuery = query.toLowerCase();
+
+      return (
+        name.toLowerCase().includes(lowerQuery) ||
+        type.toLowerCase().includes(lowerQuery) ||
+        (startDate && new Date(startDate).toLocaleDateString().includes(query))
+      );
+    });
+
+    onSearch(filteredResults);
+  };
+
+  return (
+    <div className="search-bar flex space-x-2">
+      <input
+        type="text"
+        placeholder="Search by name, type, or date..."
+        value={queryText}
+        onChange={handleInputChange}
+        className="search-input p-2 border rounded-lg"
+      />
+    </div>
+  );
+};
+
+export default SearchBar;
