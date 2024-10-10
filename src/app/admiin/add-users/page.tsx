@@ -1,25 +1,50 @@
 "use client";
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import {
   collection,
-  addDoc,
-  doc,
   getDocs,
-  query,
+  doc,
   setDoc,
+  query,
   where,
 } from "firebase/firestore";
 import { auth, db } from "../../../../FireBaseConfig";
 import bcrypt from "bcryptjs";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
+interface Team {
+  id: string;
+  TeamName: string;
+}
+
 export default function AddUser() {
   const [naam, setNaam] = useState("");
   const [email, setEmail] = useState("");
   const [team, setTeam] = useState("");
+  const [teamList, setTeamList] = useState<Team[]>([]);
   const [role, setRole] = useState("");
   const [password, setPassword] = useState("");
   const [generatedPassword, setGeneratedPassword] = useState("");
+
+  // Fetch teams from Firestore
+  useEffect(() => {
+    const fetchTeams = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "Team"));
+        const teams = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          TeamName: doc.data().TeamName, // Ensure TeamName is retrieved
+        }));
+
+        setTeamList(teams);
+      } catch (error) {
+        console.error("Error fetching teams: ", error);
+      }
+    };
+
+    fetchTeams();
+  }, []);
 
   const generatePassword = () => {
     const newPassword = Math.random().toString(36).slice(-8);
@@ -56,11 +81,11 @@ export default function AddUser() {
         password
       );
 
-      // Create a user document in Firestore
+      // Create a user document in Firestore with team reference
       await setDoc(doc(db, "users", authUser.user.uid), {
         userName: naam,
         email: email,
-        team: team,
+        team: doc(db, "Team", team), // Set the team as a reference to the team collection
         role: role,
         password: hashedPassword,
       });
@@ -136,8 +161,11 @@ export default function AddUser() {
                     required
                   >
                     <option value="">Select a team</option>
-                    <option value="teamA">Team A</option>
-                    <option value="teamB">Team B</option>
+                    {teamList.map((teamItem) => (
+                      <option key={teamItem.id} value={teamItem.id}>
+                        {teamItem.TeamName}
+                      </option>
+                    ))}
                   </select>
                 </label>
 
