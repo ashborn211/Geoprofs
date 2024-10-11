@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext"; // Update the path accordingly
 import "./verlof.css";
-import { addDoc, collection, doc, getDoc, Timestamp } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { db } from "../../FireBaseConfig";
 import { Button } from "@nextui-org/react";
 
@@ -16,7 +16,6 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
   const { user } = useUser(); // Access the user context
   const [reason, setReason] = useState<string>("");
   const [leaveTypes, setLeaveTypes] = useState<string[]>([]); // State for leave types
-  const [verwerktDocId, setVerwerktDocId] = useState<string | null>(null); // Store document ID of the verwerkt document
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string>(
     selectedDate.toISOString().split("T")[0]
@@ -51,42 +50,23 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
       }
     };
 
-    const fetchVerwerktStatus = async () => {
-      try {
-        const docRef = doc(db, "verwerkt", "Y0PC7HGkiouILeUoDBJv"); // Replace with your actual document ID
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          setVerwerktDocId(docSnap.id); // Store the document ID
-        } else {
-          console.log("No such document!");
-        }
-      } catch (error) {
-        console.error("Error fetching verwerkt status: ", error);
-      }
-    };
-
     fetchLeaveTypes();
-    fetchVerwerktStatus();
   }, []); // Empty dependency array ensures this runs only once on mount
 
   const handleSubmit = async () => {
-    if (selectedButton && reason && user && verwerktDocId) {
+    if (selectedButton && reason && user) {
       try {
-        // Create Date objects from the input values
-        const startDateTime = new Date(`${startDate}T${startTime}`);
-        const endDateTime = new Date(`${endDate}T${endTime}`);
-
         await addDoc(collection(db, "verlof"), {
           type: selectedButton,
           reason,
-          startDate: Timestamp.fromDate(startDateTime), // Store as Firestore Timestamp
-          endDate: Timestamp.fromDate(endDateTime), // Store as Firestore Timestamp
+          startDate, // Submit start date
+          endDate, // Submit end date
+          startTime, // Submit start time
+          endTime, // Submit end time
           uid: user.uid, // Use uid from user context
           name: user.userName, // Use name from user context
-          verwerkt: doc(db, "verwerkt", verwerktDocId), // Reference to the processed document
+          status: 1, // Set status to a number value of 1
         });
-
         alert("Verlof/Vakantie request submitted!");
         onClose();
       } catch (error) {
