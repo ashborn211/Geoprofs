@@ -9,11 +9,12 @@ import { collection, getDocs } from "firebase/firestore";
 import "./calendar.css";
 
 interface CalendarComponentProps {
-  onDateSelect: (date: Date) => void; // Callback to send selected date to parent
+  onDateSelect: (date: Date) => void;
 }
 
-interface StartDate {
-  day: number;
+interface DateRange {
+  startDate: Date;
+  endDate: Date;
   status: number;
 }
 
@@ -21,33 +22,38 @@ export default function CalendarComponent({
   onDateSelect,
 }: CalendarComponentProps) {
   const [value, setValue] = useState<DateValue | null>(null);
-  const [startDates, setStartDates] = useState<StartDate[]>([]);
+  const [dateRanges, setDateRanges] = useState<DateRange[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fetchAllStartDates = async () => {
+    const fetchAllDates = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "verlof"));
-        const dates: StartDate[] = [];
+        const ranges: DateRange[] = [];
         querySnapshot.forEach((doc) => {
-          const startDate = new Date(doc.data().startDate.seconds * 1000);
-          const status = doc.data().status; // Get the status from the document
-          const documentId = doc.id;
+          const data = doc.data();
 
-          console.log(
-            `${documentId} heeft de startdatum: ${startDate.getDate()} met status: ${status}`
-          );
+          if (data.startDate?.seconds && data.endDate?.seconds) {
+            const startDate = new Date(data.startDate.seconds * 1000);
+            const endDate = new Date(data.endDate.seconds * 1000); // Get endDate
+            const status = data.status;
 
-          // Push the date and status as an object
-          dates.push({ day: startDate.getDate(), status });
+            console.log(
+              `Document ${doc.id} heeft de startdatum: ${startDate.getDate()} en einddatum: ${endDate.getDate()} met status: ${status}`
+            );
+
+            ranges.push({ startDate, endDate, status });
+          } else {
+            console.warn(`Document ${doc.id} mist startDate of endDate.`);
+          }
         });
-        setStartDates(dates);
+        setDateRanges(ranges);
       } catch (error) {
         console.error("Error fetching documents: ", error);
       }
     };
 
-    fetchAllStartDates();
+    fetchAllDates();
   }, []);
 
   useEffect(() => {
@@ -55,40 +61,45 @@ export default function CalendarComponent({
       if (containerRef.current) {
         const spans = containerRef.current.querySelectorAll("span");
 
-        startDates.forEach(({ day, status }) => {
-          const matchingSpans = Array.from(spans).filter(
-            (span) => span.textContent === `${day}`
-          );
+        dateRanges.forEach(({ startDate, endDate, status }) => {
+          // Loop through all days in the range between startDate and endDate
+          for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            const day = d.getDate();
+            const matchingSpans = Array.from(spans).filter(
+              (span) => span.textContent === `${day}`
+            );
 
-          matchingSpans.forEach((span) => {
-            // Set the color based on the status value
-            switch (status) {
-              case 1:
-                span.style.backgroundColor = "orange";
-                span.style.color = "white";
-                break;
-              case 2:
-                span.style.backgroundColor = "green";
-                span.style.color = "white";
-                break;
-              case 3:
-                span.style.backgroundColor = "red";
-                span.style.color = "white";
-                break;
-              default:
-                span.style.backgroundColor = "transparent";
-                span.style.color = "black";
-                break;
-            }
-          });
+            matchingSpans.forEach((span) => {
+              switch (status) {
+                case 1:
+                  span.style.backgroundColor = "orange";
+                  span.style.color = "white";
+                  break;
+                case 2:
+                  span.style.backgroundColor = "green";
+                  span.style.color = "white";
+                  break;
+                case 3:
+                  span.style.backgroundColor = "red";
+                  span.style.color = "white";
+                  break;
+                default:
+                  span.style.backgroundColor = "transparent";
+                  span.style.color = "black";
+                  break;
+              }
+            });
 
-          console.log(`Aantal spans met waarde "${day}" en status "${status}": ${matchingSpans.length}`);
+            console.log(
+              `Aantal spans met waarde "${day}" en status "${status}": ${matchingSpans.length}`
+            );
+          }
         });
       }
     };
 
     highlightMatchingSpans();
-  }, [startDates]);
+  }, [dateRanges]);
 
   const handleDateChange = (newValue: DateValue) => {
     setValue(newValue);
@@ -96,12 +107,15 @@ export default function CalendarComponent({
     const jsDate = new Date(newValue.toString());
     onDateSelect(jsDate);
 
-    // Check if the selected date is in the startDates array
-    const selectedDay = jsDate.getDate(); // Get the day of the month from the selected date
-    const selectedDate = startDates.find((date) => date.day === selectedDay);
+    // Check if the selected date is within any date range
+    const selectedDate = dateRanges.find(
+      ({ startDate, endDate }) => jsDate >= startDate && jsDate <= endDate
+    );
 
     if (selectedDate) {
-      console.log(`Deze datum staat al in de database: ${jsDate.toDateString()} met status: ${selectedDate.status}`);
+      console.log(
+        `Deze datum staat al in de database: ${jsDate.toDateString()} met status: ${selectedDate.status}`
+      );
     }
   };
 
