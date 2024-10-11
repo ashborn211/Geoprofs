@@ -51,9 +51,24 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
     fetchLeaveTypes();
   }, []); // Empty dependency array ensures this runs only once on mount
 
+  // Helper to format date in the "YYYY-MM-DDTHH:MM" format and adjust to the Netherlands timezone
   const formatDateForInput = (timestamp: Timestamp) => {
     const date = timestamp.toDate();
-    return date.toISOString().slice(0, 16); // Format for "datetime-local" input
+    // Format date for Europe/Amsterdam (Netherlands time zone)
+    return new Intl.DateTimeFormat("nl-NL", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "Europe/Amsterdam",
+      hour12: false,
+    })
+      .formatToParts(date)
+      .map((part) => part.value)
+      .join("")
+      .replace(", ", "T")
+      .slice(0, 16); // Format as YYYY-MM-DDTHH:MM
   };
 
   const handleSubmit = async () => {
