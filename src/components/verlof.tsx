@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext"; // Update the path accordingly
 import "./verlof.css";
-import { addDoc, collection, doc, getDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, Timestamp } from "firebase/firestore";
 import { db } from "../../FireBaseConfig";
 import { Button } from "@nextui-org/react";
 
@@ -17,12 +17,12 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
   const [reason, setReason] = useState<string>("");
   const [leaveTypes, setLeaveTypes] = useState<string[]>([]); // State for leave types
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
-  const [startDate, setStartDate] = useState<string>(
-    selectedDate.toISOString().slice(0, 16)
-  ); // Using datetime-local for start date
-  const [endDate, setEndDate] = useState<string>(
-    selectedDate.toISOString().slice(0, 16)
-  ); // Using datetime-local for end date
+  const [startDate, setStartDate] = useState<Timestamp>(
+    Timestamp.fromDate(selectedDate)
+  ); // Initialize as Firebase Timestamp
+  const [endDate, setEndDate] = useState<Timestamp>(
+    Timestamp.fromDate(selectedDate)
+  ); // Initialize as Firebase Timestamp
 
   // Fetch leave types from Firestore
   useEffect(() => {
@@ -57,8 +57,8 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
         await addDoc(collection(db, "verlof"), {
           type: selectedButton,
           reason,
-          startDate, // Submit start date with time
-          endDate, // Submit end date with time
+          startDate, // Submit start date as Firebase Timestamp
+          endDate, // Submit end date as Firebase Timestamp
           uid: user.uid, // Use uid from user context
           name: user.userName, // Use name from user context
           status: 1, // Set status to a number value of 1
@@ -73,12 +73,20 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
     }
   };
 
+  const handleDateChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    setter: (value: Timestamp) => void
+  ) => {
+    const newDate = new Date(event.target.value);
+    setter(Timestamp.fromDate(newDate));
+  };
+
   return (
     <div className="verlof-popup-overlay">
       <div className="verlof-popup">
         <div className="popup-header">
           <span className="date-range">
-            {startDate} {/* Display selected start date */}
+            {startDate.toDate().toLocaleString()} {/* Display start date */}
           </span>
           <button className="close-button" onClick={onClose}>
             &times;
@@ -109,14 +117,14 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
                 <label>Start Date and Time:</label>
                 <input
                   type="datetime-local"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
+                  value={startDate.toDate().toISOString().slice(0, 16)}
+                  onChange={(e) => handleDateChange(e, setStartDate)}
                 />
                 <label>End Date and Time:</label>
                 <input
                   type="datetime-local"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
+                  value={endDate.toDate().toISOString().slice(0, 16)}
+                  onChange={(e) => handleDateChange(e, setEndDate)}
                 />
               </div>
             </div>
