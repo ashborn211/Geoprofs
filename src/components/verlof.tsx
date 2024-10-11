@@ -51,6 +51,11 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
     fetchLeaveTypes();
   }, []); // Empty dependency array ensures this runs only once on mount
 
+  const formatDateForInput = (timestamp: Timestamp) => {
+    const date = timestamp.toDate();
+    return date.toISOString().slice(0, 16); // Format for "datetime-local" input
+  };
+
   const handleSubmit = async () => {
     if (selectedButton && reason && user) {
       try {
@@ -86,7 +91,7 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
       <div className="verlof-popup">
         <div className="popup-header">
           <span className="date-range">
-            {startDate.toDate().toLocaleString()} {/* Display start date */}
+            {formatDateForInput(startDate)} {/* Display formatted start date */}
           </span>
           <button className="close-button" onClick={onClose}>
             &times;
@@ -117,13 +122,13 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
                 <label>Start Date and Time:</label>
                 <input
                   type="datetime-local"
-                  value={startDate.toDate().toISOString().slice(0, 16)}
+                  value={formatDateForInput(startDate)}
                   onChange={(e) => handleDateChange(e, setStartDate)}
                 />
                 <label>End Date and Time:</label>
                 <input
                   type="datetime-local"
-                  value={endDate.toDate().toISOString().slice(0, 16)}
+                  value={formatDateForInput(endDate)}
                   onChange={(e) => handleDateChange(e, setEndDate)}
                 />
               </div>
