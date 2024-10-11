@@ -18,13 +18,11 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
   const [leaveTypes, setLeaveTypes] = useState<string[]>([]); // State for leave types
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string>(
-    selectedDate.toISOString().split("T")[0]
-  ); // Using date input for start date
+    selectedDate.toISOString().slice(0, 16)
+  ); // Using datetime-local for start date
   const [endDate, setEndDate] = useState<string>(
-    selectedDate.toISOString().split("T")[0]
-  ); // Using date input for end date
-  const [startTime, setStartTime] = useState<string>(""); // State for start time
-  const [endTime, setEndTime] = useState<string>(""); // State for end time
+    selectedDate.toISOString().slice(0, 16)
+  ); // Using datetime-local for end date
 
   // Fetch leave types from Firestore
   useEffect(() => {
@@ -59,10 +57,8 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
         await addDoc(collection(db, "verlof"), {
           type: selectedButton,
           reason,
-          startDate, // Submit start date
-          endDate, // Submit end date
-          startTime, // Submit start time
-          endTime, // Submit end time
+          startDate, // Submit start date with time
+          endDate, // Submit end date with time
           uid: user.uid, // Use uid from user context
           name: user.userName, // Use name from user context
           status: 1, // Set status to a number value of 1
@@ -110,29 +106,17 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
 
             <div className="time-section">
               <div className="time-input">
-                <label>Start Date:</label>
+                <label>Start Date and Time:</label>
                 <input
-                  type="date"
+                  type="datetime-local"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
-                <label>Start Time:</label>
+                <label>End Date and Time:</label>
                 <input
-                  type="time"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                />
-                <label>End Date:</label>
-                <input
-                  type="date"
+                  type="datetime-local"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                />
-                <label>End Time:</label>
-                <input
-                  type="time"
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
                 />
               </div>
             </div>
