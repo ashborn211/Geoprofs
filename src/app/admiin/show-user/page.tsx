@@ -6,6 +6,7 @@ import {
   getDocs,
   doc,
   getDoc,
+  deleteDoc,
   DocumentData,
 } from "firebase/firestore";
 import { db } from "../../../../FireBaseConfig";
@@ -72,6 +73,22 @@ export default function UserTable() {
     fetchUsersWithTeams();
   }, []);
 
+  // Delete user from Firestore with confirmation
+  const handleDelete = async (userId: string) => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this user?"
+    );
+    if (isConfirmed) {
+      try {
+        await deleteDoc(doc(db, "users", userId)); // Delete user document
+        setUsers(users.filter((user) => user.id !== userId)); // Remove user from local state
+        console.log(`User with ID ${userId} deleted successfully`);
+      } catch (error) {
+        console.error("Error deleting user: ", error);
+      }
+    }
+  };
+
   return (
     <>
       <div className="flex h-screen overflow-hidden bg-custom-gray">
@@ -97,23 +114,32 @@ export default function UserTable() {
                 <p>Loading users...</p>
               ) : (
                 <table className="min-w-full bg-white border-collapse">
-                  <thead>
+                  <thead className="bg-blue-500 text-white">
                     <tr>
                       <th className="border p-4">ID</th>
                       <th className="border p-4">Name</th>
                       <th className="border p-4">Email</th>
                       <th className="border p-4">Team</th>
                       <th className="border p-4">Role</th>
+                      <th className="border p-4">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {users.map((user) => (
-                      <tr key={user.id}>
+                      <tr key={user.id} className="hover:bg-blue-100">
                         <td className="border p-4">{user.id}</td>
                         <td className="border p-4">{user.userName}</td>
                         <td className="border p-4">{user.email}</td>
                         <td className="border p-4">{user.team}</td>
                         <td className="border p-4">{user.role}</td>
+                        <td className="border p-4">
+                          <button
+                            onClick={() => handleDelete(user.id)}
+                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
+                          >
+                            Delete
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
