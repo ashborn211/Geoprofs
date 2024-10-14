@@ -16,6 +16,7 @@ interface DateRange {
   startDate: Date;
   endDate: Date;
   status: number;
+  docId: string; // Voeg docId toe aan DateRange
 }
 
 export default function CalendarComponent({
@@ -42,7 +43,8 @@ export default function CalendarComponent({
               `Document ${doc.id} heeft de startdatum: ${startDate.getDate()} en einddatum: ${endDate.getDate()} met status: ${status}`
             );
 
-            ranges.push({ startDate, endDate, status });
+            // Voeg docId toe aan het DateRange object
+            ranges.push({ startDate, endDate, status, docId: doc.id });
           } else {
             console.warn(`Document ${doc.id} mist startDate of endDate.`);
           }
@@ -113,8 +115,9 @@ export default function CalendarComponent({
     );
 
     if (selectedDate) {
+      // Log de datum, status en docId
       console.log(
-        `Deze datum staat al in de database: ${jsDate.toDateString()} met status: ${selectedDate.status}`
+        `Deze datum van staat al in de database: ${jsDate.toDateString()} met status: ${selectedDate.status} en document ID: ${selectedDate.docId}`
       );
     }
   };
