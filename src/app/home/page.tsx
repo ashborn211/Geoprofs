@@ -1,12 +1,14 @@
 "use client";
 import { useState } from "react";
 import CalendarComponent from "../../components/calendar/calendar";
-import VerlofComponent from "../../components/verlof"; // Import your VerlofComponent
+import VerlofComponent from "../../components/verlof";
 import { Link } from "@nextui-org/react";
 import { useUser } from "../../context/UserContext"; // Import your user context
+import { useRouter } from "next/navigation"; // Import useRouter from Next.js
 
 export default function Home() {
   const { user } = useUser(); // Get user information from context
+  const router = useRouter(); // Ensure it's called correctly
 
   const [showPopup, setShowPopup] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -16,11 +18,14 @@ export default function Home() {
     setSelectedDate(date);
     setShowPopup(true); // Open popup when a date is selected
   };
-
+  // Navigate to the admin page
+  const handleAdminClick = () => {
+    router.push("/admiin"); // Adjust the path to your actual admin page
+  };
   return (
     <>
       <div className="flex h-screen overflow-hidden bg-custom-gray">
-        <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center h-full">
+        <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
           <Link href="./" className="text-white underline mb-[10px]">
             Log out
           </Link>
@@ -46,6 +51,17 @@ export default function Home() {
                     backgroundImage: "url('images/Logo GeoProfs.png')",
                   }}
                 ></div>
+
+                {/* Conditionally render the admin button */}
+                {user?.role === "admin" && (
+                  <button
+                    className="bg-blue-500 text-white border-2 border-black rounded-lg w-full h-[20%] mb-2"
+                    onClick={handleAdminClick} // Call function on click
+                  >
+                    <h1>Admin Action</h1>
+                  </button>
+                )}
+
                 <button className="bg-white border-2 border-black rounded-lg w-full h-[25%]">
                   <h1>Ziek Melden</h1>
                 </button>
