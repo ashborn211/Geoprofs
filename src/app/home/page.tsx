@@ -19,6 +19,7 @@ export default function Home() {
       reason: string;
       name: string;
       uid: string;
+      status: number; // Voeg status toe aan de type definitie
     }[]
   >([]); // Store existing date ranges
   const [selectedDateInfo, setSelectedDateInfo] = useState<{
@@ -26,6 +27,7 @@ export default function Home() {
     endDate: Date;
     reason: string;
     name: string;
+    status: number; // Voeg status toe aan de type definitie
   } | null>(null); // To store selected date info
 
   // Fetch existing date ranges from Firestore
@@ -38,18 +40,20 @@ export default function Home() {
         reason: string;
         name: string;
         uid: string;
+        status: number;
       }[] = [];
 
       querySnapshot.forEach((doc) => {
         // Log the entire document data for debugging
         console.log("Document data:", doc.data());
 
-        // Extract startDate, endDate, reason, name, and uid
+        // Extract startDate, endDate, reason, name, uid, and status
         const startDate = doc.data().startDate;
         const endDate = doc.data().endDate;
         const reason = doc.data().reason; // Fetch reason for leave
         const name = doc.data().name; // Fetch name of the person requesting leave
         const uid = doc.data().uid; // Fetch user ID of the person requesting leave
+        const status = doc.data().status; // Fetch status for leave
 
         if (startDate && endDate) {
           dateRanges.push({
@@ -58,6 +62,7 @@ export default function Home() {
             reason: reason || "", // Use empty string if reason is undefined
             name: name || "", // Use empty string if name is undefined
             uid: uid || "", // Use empty string if uid is undefined
+            status: status || 1, // Use status or default to 1 if undefined
           });
         } else {
           console.warn(
@@ -124,7 +129,29 @@ export default function Home() {
                         {selectedDateInfo.startDate.toLocaleDateString()} tot{" "}
                         {selectedDateInfo.endDate.toLocaleDateString()}
                       </h1>
-                      <div className="h-[120px] w-[120px] bg-orange-500"></div>{" "}
+                      {/* Status text based on status */}
+                      <h2>
+                        {selectedDateInfo.status === 1
+                          ? "Nog niet verwerkt"
+                          : selectedDateInfo.status === 2
+                          ? "Goedgekeurd"
+                          : selectedDateInfo.status === 3
+                          ? "Afgekeurd"
+                          : ""}
+                      </h2>
+                      <div
+                        className="h-[120px] w-[120px]"
+                        style={{
+                          backgroundColor:
+                            selectedDateInfo.status === 1
+                              ? "orange"
+                              : selectedDateInfo.status === 2
+                              ? "green"
+                              : selectedDateInfo.status === 3
+                              ? "red"
+                              : "gray", // Default naar grijs als er geen geldige status is
+                        }}
+                      ></div>{" "}
                     </>
                   ) : (
                     " "
