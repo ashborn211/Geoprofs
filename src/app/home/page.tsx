@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import CalendarComponent from "../../components/calendar/calendar";
+import CalendarComponent from "@/components/calendar/calendar";
 import VerlofComponent from "../../components/verlof";
 import { Link } from "@nextui-org/react";
 import { useUser } from "../../context/UserContext"; // Import your user context
