@@ -2,9 +2,8 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { getStorage, ref } from "firebase/storage";
-// Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Firebase config object
 const firebaseConfig = {
   apiKey: "AIzaSyCGPXI9a5y1kYgNmW-bd7kcEXtzPBrDC7M",
   authDomain: "geoprofs-3f4e4.firebaseapp.com",
@@ -16,9 +15,21 @@ const firebaseConfig = {
   measurementId: "G-ZFMSVSN97W"
 };
 
+// Initialize Firebase app
 const app = initializeApp(firebaseConfig);
+
+// Initialize Firebase services
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 const storage = getStorage();
 const storageRef = ref(storage);
 export const provider = new GoogleAuthProvider();
+
+// Ensure that authentication state is persistent across page reloads
+setPersistence(auth, browserLocalPersistence)
+  .then(() => {
+    console.log("Persistence set to local storage.");
+  })
+  .catch((error) => {
+    console.error("Error setting persistence:", error);
+  });

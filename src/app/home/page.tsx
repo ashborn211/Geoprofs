@@ -5,6 +5,7 @@ import VerlofComponent from "../../components/verlof";
 import { Link } from "@nextui-org/react";
 import { useUser } from "../../context/UserContext"; // Import your user context
 import { useRouter } from "next/navigation"; // Import useRouter from Next.js
+import Logout from "@/components/Logout";
 
 export default function Home() {
   const { user } = useUser(); // Get user information from context
@@ -26,9 +27,7 @@ export default function Home() {
     <>
       <div className="flex h-screen overflow-hidden bg-custom-gray">
         <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
-          <Link href="./" className="text-white underline mb-[10px]">
-            Log out
-          </Link>
+          <Logout />
         </div>
         <div className="w-[94vw] h-full">
           <div className="h-full grid grid-cols-12 grid-rows-12">
