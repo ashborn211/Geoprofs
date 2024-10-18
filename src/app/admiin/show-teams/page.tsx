@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../../../FireBaseConfig";
+import { db } from "@/FireBase/FireBaseConfig";
 
 interface User {
   id: string;

@@ -9,7 +9,7 @@ import {
   deleteDoc,
   DocumentData,
 } from "firebase/firestore";
-import { db } from "../../../../FireBaseConfig";
+import { db } from "@/FireBase/FireBaseConfig";
 
 interface User {
   id: string;

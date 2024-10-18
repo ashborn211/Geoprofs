@@ -1,5 +1,5 @@
 // src/utils/auth.ts
-import { auth } from '../../FireBaseConfig'; // Adjust the path as necessary
+import { auth } from '../FireBase/FireBaseConfig'; // Adjust the path as necessary
 import { sendPasswordResetEmail } from "firebase/auth";
 
 export const sendResetPasswordEmail = async (email: string): Promise<void> => {

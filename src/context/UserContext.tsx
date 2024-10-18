@@ -8,7 +8,7 @@ import {
 } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../../FireBaseConfig"; // Adjust the path as needed
+import { auth, db } from "@/FireBase/FireBaseConfig"; // Adjust the path as needed
 
 // Define User interface
 interface User {

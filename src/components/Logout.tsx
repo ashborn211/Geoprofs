@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { signOut } from "firebase/auth";
-import { auth } from "../../FireBaseConfig"; // Adjust path to your config file
+import { auth } from "@/FireBase/FireBaseConfig"; // Adjust path to your config file
 
 const Logout = () => {
   const handleLogout = async () => {
