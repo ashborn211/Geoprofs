@@ -15,7 +15,7 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",  // Changed to "node"
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -41,10 +41,11 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src",
-    "babel.config.ts",
-    "jest.config.ts",
-    "tailwind.config.ts"
-, "src/FireBase/FireBaseConfig.jsx"  ],
+    "babel.config.js",
+    "jest.config.js",
+    "tailwind.config.ts",
+    "src/FireBase/FireBaseConfig.jsx"
+, "jest.setup.js"  ],
   "exclude": [
     "node_modules"
   ]
