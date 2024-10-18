@@ -1,17 +1,36 @@
-export default {
-  preset: 'ts-jest', // Use ts-jest to transpile TypeScript
-  testEnvironment: 'jsdom', // Use jsdom for testing React components
+import type { Config } from 'jest';
+
+const config: Config = {
+  clearMocks: true,
+  collectCoverage: true,
+  coverageDirectory: "coverage",
+  coverageProvider: "v8",
+  testEnvironment: "jest-environment-jsdom", // For React component testing
+
+  // Automatically transform TypeScript files using ts-jest
   transform: {
-    '^.+\\.(ts|tsx|js|jsx)$': 'ts-jest', // Use ts-jest to handle both TypeScript and JavaScript
+    "^.+\\.(ts|tsx)$": "ts-jest",
   },
-  
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
+
+  // Customize module name mapping if you're using custom path aliases in Next.js
   moduleNameMapper: {
-    '\\.(css|less|scss|sass)$': 'identity-obj-proxy', // Handle CSS imports
+    "^@/(.*)$": "<rootDir>/src/$1",  // This assumes you have an `@` alias in Next.js
   },
+
+  // Ignore transforming node_modules
   transformIgnorePatterns: [
-    'node_modules/(?!(some-esm-library|other-esm-library)/)', // If you need to transform specific node_modules
+    "/node_modules/",
   ],
-  setupFilesAfterEnv: ['<rootDir>/src/app/jest.setup.ts'], // Make sure jest.setup.ts is included
-  extensionsToTreatAsEsm: ['.ts', '.tsx'], // Treat TypeScript files as ESM
+
+  // Configure file extensions Jest should be able to resolve
+  moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json", "node"],
+
+  // Coverage settings if you need specific folder coverage
+  collectCoverageFrom: [
+    "src/**/*.{ts,tsx}", // Adjust according to your project's folder structure
+  ],
+
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"], // Include any setup file like testing-library
 };
+
+export default config;
