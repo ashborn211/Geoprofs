@@ -5,7 +5,14 @@ import VerlofComponent from "../../components/verlof"; // Import your VerlofComp
 import { Link } from "@nextui-org/react";
 import { useUser } from "../../context/UserContext"; // Import your user context
 import { db } from "../../../FireBaseConfig";
-import { collection, getDocs } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  query,
+  where,
+  doc,
+} from "firebase/firestore"; // Verwijder functionaliteit toegevoegd
 
 export default function Home() {
   const { user } = useUser(); // Get user information from context
@@ -19,7 +26,8 @@ export default function Home() {
       reason: string;
       name: string;
       uid: string;
-      status: number; // Voeg status toe aan de type definitie
+      status: number;
+      docId: string; // Document ID toegevoegd
     }[]
   >([]); // Store existing date ranges
   const [selectedDateInfo, setSelectedDateInfo] = useState<{
@@ -27,7 +35,8 @@ export default function Home() {
     endDate: Date;
     reason: string;
     name: string;
-    status: number; // Voeg status toe aan de type definitie
+    status: number;
+    docId: string; // Document ID toegevoegd
   } | null>(null); // To store selected date info
 
   // Fetch existing date ranges from Firestore
@@ -41,73 +50,104 @@ export default function Home() {
         name: string;
         uid: string;
         status: number;
+        docId: string;
       }[] = [];
 
       querySnapshot.forEach((doc) => {
-        // Log the entire document data for debugging
-        console.log("Document data:", doc.data());
-
-        // Extract startDate, endDate, reason, name, uid, and status
         const startDate = doc.data().startDate;
         const endDate = doc.data().endDate;
-        const reason = doc.data().reason; // Fetch reason for leave
-        const name = doc.data().name; // Fetch name of the person requesting leave
-        const uid = doc.data().uid; // Fetch user ID of the person requesting leave
-        const status = doc.data().status; // Fetch status for leave
+        const reason = doc.data().reason;
+        const name = doc.data().name;
+        const uid = doc.data().uid;
+        const status = doc.data().status;
 
         if (startDate && endDate) {
           dateRanges.push({
-            startDate: startDate.toDate(), // Convert Timestamp to Date
-            endDate: endDate.toDate(), // Convert Timestamp to Date
-            reason: reason || "", // Use empty string if reason is undefined
-            name: name || "", // Use empty string if name is undefined
-            uid: uid || "", // Use empty string if uid is undefined
-            status: status || 1, // Use status or default to 1 if undefined
+            startDate: startDate.toDate(),
+            endDate: endDate.toDate(),
+            reason: reason || "",
+            name: name || "",
+            uid: uid || "",
+            status: status || 1,
+            docId: doc.id, // Sla het document ID op om later te kunnen verwijderen
           });
         } else {
           console.warn(
             "startDate or endDate field is undefined for document ID:",
             doc.id
-          ); // Log if any date is not defined
+          );
         }
       });
 
-      setExistingDateRanges(dateRanges); // Update state with fetched date ranges
-      console.log("Bestaande datums in de database:", dateRanges); // Log all existing date ranges
+      setExistingDateRanges(dateRanges);
     } catch (error) {
       console.error("Error fetching dates:", error);
     }
   };
 
   useEffect(() => {
-    fetchExistingDates(); // Fetch existing dates when the component mounts
+    fetchExistingDates();
   }, []);
 
-  // Handle the date selected from the calendar
   const handleDateSelect = (date: Date) => {
-    // Check if the selected date falls within any existing date range for the current user
     const existingDateInfo = existingDateRanges.find(
       ({ startDate, endDate, uid }) => {
-        return date >= startDate && date <= endDate && uid === user?.uid; // Check if selected date is between startDate and endDate and uid matches
+        return date >= startDate && date <= endDate && uid === user?.uid;
       }
     );
 
     if (existingDateInfo) {
-      console.log("De datum valt binnen een bestaand verlofperiode."); // Log if the date is within an existing range
-      setSelectedDateInfo(existingDateInfo); // Store selected date info
-      return; // Do not open the popup if the date falls within an existing range
+      setSelectedDateInfo(existingDateInfo);
+      return;
     }
 
-    setSelectedDate(date); // Set selected date
-    setShowPopup(true); // Open popup when a date is selected and not in the existing ranges
-    setSelectedDateInfo(null); // Reset selected date info if a new date is selected
+    setSelectedDate(date);
+    setShowPopup(true);
+    setSelectedDateInfo(null);
+  };
+
+  // Verlofaanvraag verwijderen
+  const handleDelete = async () => {
+    if (selectedDateInfo && selectedDateInfo.docId) {
+      try {
+        await deleteDoc(doc(db, "verlof", selectedDateInfo.docId)); // Verwijderen van document met docId
+        window.location.reload();
+        console.log("Verlofaanvraag succesvol verwijderd");
+
+        // Pagina herladen om de verwijdering weer te geven
+        fetchExistingDates();
+        setSelectedDateInfo(null); // Clear de geselecteerde data info na verwijderen
+      } catch (error) {
+        console.error("Fout bij het verwijderen van de verlofaanvraag:", error);
+      }
+    }
+  };
+
+  const formatDateWithTime = (date: Date) => {
+    return `${date.toLocaleDateString()} om ${date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}`;
   };
 
   return (
     <>
       <div className="flex h-screen overflow-hidden bg-custom-gray">
-        <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center h-full">
-          <Link href="./" className="text-white underline mb-[10px]">
+        <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-start items-center relative">
+          {/* Hamburger icon helemaal bovenaan */}
+          <div className="absolute top-4 w-[50px] h-[50px]">
+            <img
+              src="./images/Hamburger icon.png"
+              alt="Hamburger Menu Icon"
+              className="w-full h-full object-contain"
+            />
+          </div>
+
+          {/* Log out link */}
+          <Link
+            href="./"
+            className="text-white underline mb-[10px] absolute bottom-0"
+          >
             Log out
           </Link>
         </div>
@@ -125,10 +165,6 @@ export default function Home() {
                 <div className="h-full w-1/2 text-[large] flex items-center justify-center flex-col">
                   {selectedDateInfo ? (
                     <>
-                      <h1>
-                        {selectedDateInfo.startDate.toLocaleDateString()} tot{" "}
-                        {selectedDateInfo.endDate.toLocaleDateString()}
-                      </h1>
                       {/* Status text based on status */}
                       <h2>
                         {selectedDateInfo.status === 1
@@ -140,18 +176,24 @@ export default function Home() {
                           : ""}
                       </h2>
                       <div
-                        className="h-[120px] w-[120px]"
+                        className="h-[120px] w-[210px] flex flex-col items-center justify-center rounded-[8%]"
                         style={{
                           backgroundColor:
                             selectedDateInfo.status === 1
                               ? "orange"
                               : selectedDateInfo.status === 2
-                              ? "green"
+                              ? "greenyellow"
                               : selectedDateInfo.status === 3
                               ? "red"
-                              : "gray", // Default naar grijs als er geen geldige status is
+                              : "gray",
                         }}
-                      ></div>{" "}
+                      >
+                        <h1>
+                          {formatDateWithTime(selectedDateInfo.startDate)}
+                        </h1>
+                        <h1>t/m</h1>
+                        <h1>{formatDateWithTime(selectedDateInfo.endDate)}</h1>
+                      </div>
                     </>
                   ) : (
                     " "
@@ -159,9 +201,20 @@ export default function Home() {
                 </div>
 
                 {selectedDateInfo ? (
-                  <h1>
-                    {selectedDateInfo.name} - Reden: {selectedDateInfo.reason}
-                  </h1>
+                  <>
+                    <div className="flex flex-col items-center">
+                      <h1 className="text-[large]">
+                        Reden: {selectedDateInfo.reason}
+                      </h1>
+                      {/* Toevoegen van een knop onder de reden */}
+                      <button
+                        className="mt-4 h-[50px] w-[150px] bg-[white] border-[black] border-[solid] border-[2px] text-[x-large]"
+                        onClick={handleDelete} // Verwijder actie aan knop toegevoegd
+                      >
+                        Verwijderen
+                      </button>
+                    </div>
+                  </>
                 ) : (
                   <h1>Goedemorgen {user?.userName}</h1>
                 )}
