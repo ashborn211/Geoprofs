@@ -6,6 +6,8 @@ import "./verlof.css";
 import { addDoc, collection, doc, getDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/FireBase/FireBaseConfig";
 import { Button } from "@nextui-org/react";
+import { format } from "date-fns";
+import { toZonedTime } from "date-fns-tz"; // Import date-fns-tz for timezone handling
 
 interface VerlofComponentProps {
   selectedDate: Date;
@@ -54,21 +56,13 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
   // Helper to format date in the "YYYY-MM-DDTHH:MM" format and adjust to the Netherlands timezone
   const formatDateForInput = (timestamp: Timestamp) => {
     const date = timestamp.toDate();
-    // Format date for Europe/Amsterdam (Netherlands time zone)
-    return new Intl.DateTimeFormat("nl-NL", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZone: "Europe/Amsterdam",
-      hour12: false,
-    })
-      .formatToParts(date)
-      .map((part) => part.value)
-      .join("")
-      .replace(", ", "T")
-      .slice(0, 16); // Format as YYYY-MM-DDTHH:MM
+    const timeZone = "Europe/Amsterdam"; // Fixed timezone
+
+    // Convert the date to the Netherlands timezone
+    const zonedDate = toZonedTime(date, timeZone);
+
+    // Format it as YYYY-MM-DDTHH:MM (required by datetime-local input)
+    return format(zonedDate, "yyyy-MM-dd'T'HH:mm");
   };
 
   const handleSubmit = async () => {
