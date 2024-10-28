@@ -1,7 +1,12 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import AddUser from "@/app/admiin/add-users/page"; // Adjust the import path if necessary
 import { auth, db } from "@/FireBase/FireBaseConfig";
-import { collection, getDocs, setDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  setDoc,
+  doc,
+} from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
 // Mock Firebase functions
@@ -76,7 +81,7 @@ describe("AddUser Component", () => {
     });
 
     // Check that createUserWithEmailAndPassword was called correctly
-    expect(createUserWithEmailAndPassword).toHaveBeenCalled();
+    expect(createUserWithEmailAndPassword).toHaveBeenCalled(); // Ensure it was called at least once
     expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(
       auth,
       "john@example.com",
@@ -96,7 +101,7 @@ describe("AddUser Component", () => {
   test("shows an alert if the email is already taken", async () => {
     render(<AddUser />);
 
-    // Mock email check to simulate that email already exists
+    // Simulate that email already exists
     (getDocs as jest.Mock).mockResolvedValueOnce({
       empty: false, // Simulate that email exists
     });
@@ -114,15 +119,16 @@ describe("AddUser Component", () => {
       target: { value: "user" },
     });
 
-    // Submit the form
-    window.alert = jest.fn(); // Mock alert
+    // Mock alert
+    window.alert = jest.fn();
 
+    // Submit the form
     await act(async () => {
       fireEvent.click(screen.getByText(/Add User/i));
     });
 
     // Check if alert was called
-    expect(window.alert).toHaveBeenCalled();
+    expect(window.alert).toHaveBeenCalled(); // Ensure alert was called
     expect(window.alert).toHaveBeenCalledWith(
       "Email already taken. Please use a different email."
     );
