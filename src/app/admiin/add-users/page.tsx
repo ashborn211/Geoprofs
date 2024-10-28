@@ -9,7 +9,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { auth, db } from "../../../../FireBaseConfig";
+import { auth, db } from "@/FireBase/FireBaseConfig";
 import bcrypt from "bcryptjs";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 

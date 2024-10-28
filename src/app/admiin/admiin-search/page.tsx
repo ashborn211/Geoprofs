@@ -4,7 +4,7 @@ import { Link } from "@nextui-org/react";
 import SearchBar from "@/components/SearchBar";
 import ResultsTable from "@/components/ResultsTable";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../../../FireBaseConfig";
+import { db } from "@/FireBase/FireBaseConfig";
 export default function AdminSearchPage() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [allData, setAllData] = useState<any[]>([]);

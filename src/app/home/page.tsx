@@ -1,10 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
-import CalendarComponent from "../../components/calendar/calendar";
+import CalendarComponent from "@/components/calendar/calendar"; // Updated import path for consistency
 import VerlofComponent from "../../components/verlof"; // Import your VerlofComponent
 import { Link } from "@nextui-org/react";
 import { useUser } from "../../context/UserContext"; // Import your user context
-import { db } from "../../../FireBaseConfig";
+import { useRouter } from "next/navigation"; // Import useRouter from Next.js
+import Logout from "@/components/Logout";
+import { db } from "../../FireBase/FireBaseConfig";
 import {
   collection,
   getDocs,
@@ -16,20 +18,20 @@ import {
 
 export default function Home() {
   const { user } = useUser(); // Get user information from context
+  const router = useRouter(); // Ensure it's called correctly
 
   const [showPopup, setShowPopup] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [existingDateRanges, setExistingDateRanges] = useState<
-    {
-      startDate: Date;
-      endDate: Date;
-      reason: string;
-      name: string;
-      uid: string;
-      status: number;
-      docId: string; // Document ID toegevoegd
-    }[]
-  >([]); // Store existing date ranges
+  const [existingDateRanges, setExistingDateRanges] = useState<{
+    startDate: Date;
+    endDate: Date;
+    reason: string;
+    name: string;
+    uid: string;
+    status: number;
+    docId: string; // Document ID toegevoegd
+  }[]>([]); // Store existing date ranges
+
   const [selectedDateInfo, setSelectedDateInfo] = useState<{
     startDate: Date;
     endDate: Date;
@@ -129,27 +131,17 @@ export default function Home() {
       minute: "2-digit",
     })}`;
   };
+  
+  // Navigate to the admin page
+  const handleAdminClick = () => {
+    router.push("/admiin"); // Adjust the path to your actual admin page
+  };
 
   return (
     <>
       <div className="flex h-screen overflow-hidden bg-custom-gray">
-        <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-start items-center relative">
-          {/* Hamburger icon helemaal bovenaan */}
-          <div className="absolute top-4 w-[50px] h-[50px]">
-            <img
-              src="./images/Hamburger icon.png"
-              alt="Hamburger Menu Icon"
-              className="w-full h-full object-contain"
-            />
-          </div>
-
-          {/* Log out link */}
-          <Link
-            href="./"
-            className="text-white underline mb-[10px] absolute bottom-0"
-          >
-            Log out
-          </Link>
+        <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
+          <Logout />
         </div>
         <div className="w-[94vw] h-full">
           <div className="h-full grid grid-cols-12 grid-rows-12">
@@ -201,20 +193,18 @@ export default function Home() {
                 </div>
 
                 {selectedDateInfo ? (
-                  <>
-                    <div className="flex flex-col items-center">
-                      <h1 className="text-[large]">
-                        Reden: {selectedDateInfo.reason}
-                      </h1>
-                      {/* Toevoegen van een knop onder de reden */}
-                      <button
-                        className="mt-4 h-[50px] w-[150px] bg-[white] border-[black] border-[solid] border-[2px] text-[x-large]"
-                        onClick={handleDelete} // Verwijder actie aan knop toegevoegd
-                      >
-                        Verwijderen
-                      </button>
-                    </div>
-                  </>
+                  <div className="flex flex-col items-center">
+                    <h1 className="text-[large]">
+                      Reden: {selectedDateInfo.reason}
+                    </h1>
+                    {/* Toevoegen van een knop onder de reden */}
+                    <button
+                      className="mt-4 h-[50px] w-[150px] bg-[white] border-[black] border-[solid] border-[2px] text-[x-large]"
+                      onClick={handleDelete} // Verwijder actie aan knop toegevoegd
+                    >
+                      Verwijderen
+                    </button>
+                  </div>
                 ) : (
                   <h1>Goedemorgen {user?.userName}</h1>
                 )}
@@ -227,6 +217,17 @@ export default function Home() {
                     backgroundImage: "url('images/Logo GeoProfs.png')",
                   }}
                 ></div>
+
+                {/* Conditionally render the admin button */}
+                {user?.role === "admin" && (
+                  <button
+                    className="bg-blue-500 text-white border-2 border-black rounded-lg w-full h-[20%] mb-2"
+                    onClick={handleAdminClick} // Call function on click
+                  >
+                    <h1>Admin Action</h1>
+                  </button>
+                )}
+
                 <button className="bg-white border-2 border-black rounded-lg w-full h-[25%]">
                   <h1>Ziek Melden</h1>
                 </button>

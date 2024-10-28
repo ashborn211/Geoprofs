@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { auth } from "../../FireBaseConfig";
+import { auth } from "../FireBase/FireBaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { Input, Button } from "@nextui-org/react";
 import { useUser } from "../context/UserContext";
-import { db } from "../../FireBaseConfig"; // Import your Firestore instance
+import { db } from "@/FireBase/FireBaseConfig"; // Import your Firestore instance
 import "./page.css";
 
 const LoginPage = () => {

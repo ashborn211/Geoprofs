@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext"; // Update the path accordingly
 import "./verlof.css";
 import { addDoc, collection, doc, getDoc, Timestamp } from "firebase/firestore";
-import { db } from "../../FireBaseConfig";
+import { db } from "@/FireBase/FireBaseConfig";
 import { Button } from "@nextui-org/react";
 
 interface VerlofComponentProps {
