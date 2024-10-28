@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth, provider, db } from "../../FireBaseConfig";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { Input, Button, Link } from "@nextui-org/react"; // Using NextUI 2.0 components
 import "./page.css";
 import {
@@ -48,53 +48,22 @@ const LoginPage = () => {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      console.log("User:", user);
-
-      const userQuery = query(
-        collection(db, "users"),
-        where("email", "==", user.email)
-      );
-      const userQuerySnapshot = await getDocs(userQuery);
-
-      if (userQuerySnapshot.empty) {
-        await setDoc(doc(db, "users", user.uid), {
-          userId: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          profilePicture: user.photoURL || standardProfilePicture,
-        });
-      }
-
-      router.push("/home");
-    } catch (error: any) {
-      console.error("Google Sign-In error:", error);
-
-      alert(`Google Sign-In failed: ${error.message}`);
-    }
-  };
-
   return (
-    <main className="main">
-      <div className="container">
-        <div className="logo-container">
+    <main className="">
+              <div className="logo-container">
           <img
             src="/images/LogoGeoProfs.png" // Corrected path for Next.js
             alt="GeoProfs Logo"
             className="logo"
           />
         </div>
+        <div className="container">
         <h2 className="title">Inloggen</h2>
-
         <form onSubmit={handleLogin}>
           <div className="form-group">
             <Input
               type="email"
-              placeholder="Enter your email"
+              placeholder="E-mail..."
               value={email}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setEmail(e.target.value)
@@ -107,7 +76,7 @@ const LoginPage = () => {
           <div className="form-group">
             <Input
               type="password"
-              placeholder="Enter your password"
+              placeholder="****"
               value={password}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setPassword(e.target.value)
@@ -118,20 +87,10 @@ const LoginPage = () => {
           </div>
 
           <div className="button-group">
-            <Button
-              onClick={handleGoogleSignIn}
-              color="danger"
-              className="google-button"
-            >
-              Google
-            </Button>
+
             <Button type="submit" className="login-button" color="primary">
               Inloggen
             </Button>
-          </div>
-
-          <div className="signup-link">
-            <Link href="register">Or Sign Up Instead</Link>
           </div>
         </form>
       </div>
