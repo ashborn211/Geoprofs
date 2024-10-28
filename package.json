@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:all": "jest __tests__",
+    "test:AddUser": "jest __tests__/AddUser.test.tsx"
   },
   "dependencies": {
     "@fullcalendar/daygrid": "^6.1.15",
@@ -30,7 +32,7 @@
     "date-fns": "^4.1.0",
     "eslint": "8.57.0",
     "eslint-config-next": "14.2.3",
-    "firebase": "^10.14.0",
+    "firebase": "^11.0.1",
     "firebase-admin": "^12.1.1",
     "firebase-functions": "^5.0.1",
     "framer-motion": "^11.5.4",
