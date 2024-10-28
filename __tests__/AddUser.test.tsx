@@ -1,39 +1,26 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import AddUser from "@/app/admiin/add-users/page"; // Adjust the import path if necessary
 import { auth, db } from "@/FireBase/FireBaseConfig";
-import {
-  collection,
-  getDocs,
-  setDoc,
-  doc,
-  query,
-  where,
-} from "firebase/firestore";
+import { collection, getDocs, setDoc, doc } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
 // Mock Firebase functions
-jest.mock("firebase/firestore", () => {
-  return {
-    ...jest.requireActual("firebase/firestore"), // Keep actual implementations for other methods
-    getFirestore: jest.fn(() => ({})), // Mock getFirestore
-    collection: jest.fn(),
-    getDocs: jest.fn(),
-    setDoc: jest.fn(),
-    doc: jest.fn(),
-    query: jest.fn(),
-    where: jest.fn(),
-  };
-});
+jest.mock("firebase/firestore", () => ({
+  ...jest.requireActual("firebase/firestore"),
+  getFirestore: jest.fn(() => ({})),
+  collection: jest.fn(),
+  getDocs: jest.fn(),
+  setDoc: jest.fn(),
+  doc: jest.fn(),
+}));
 
-jest.mock("firebase/auth", () => {
-  return {
-    ...jest.requireActual("firebase/auth"), // Keep actual implementations for other methods
-    getAuth: jest.fn(() => ({
-      /* mock return value if needed */
-    })),
-    createUserWithEmailAndPassword: jest.fn(),
-  };
-});
+jest.mock("firebase/auth", () => ({
+  ...jest.requireActual("firebase/auth"),
+  getAuth: jest.fn(() => ({})),
+  createUserWithEmailAndPassword: jest.fn(),
+  setPersistence: jest.fn(() => Promise.resolve()),
+  browserLocalPersistence: {},
+}));
 
 describe("AddUser Component", () => {
   const mockTeam = {
@@ -56,14 +43,8 @@ describe("AddUser Component", () => {
     jest.clearAllMocks(); // Clear mocks after each test
   });
 
-  test("renders the form and submits successfully", async () => {
+  test("successfully creates a user", async () => {
     render(<AddUser />);
-
-    // Verify the form is rendered
-    expect(screen.getByLabelText(/Naam/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Team/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Role/i)).toBeInTheDocument();
 
     // Fill the form
     fireEvent.change(screen.getByLabelText(/Naam/i), {
@@ -90,27 +71,32 @@ describe("AddUser Component", () => {
     (setDoc as jest.Mock).mockResolvedValueOnce({});
 
     // Submit the form
-    await fireEvent.click(screen.getByText(/Add User/i));
+    await act(async () => {
+      fireEvent.click(screen.getByText(/Add User/i));
+    });
 
-    // Check that setDoc and createUserWithEmailAndPassword were called correctly
+    // Check that createUserWithEmailAndPassword was called correctly
+    expect(createUserWithEmailAndPassword).toHaveBeenCalled();
     expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(
       auth,
       "john@example.com",
-      expect.any(String)
+      expect.any(String) // Assuming the generated password is used here
     );
+
+    // Check that setDoc was called to create the user document in Firestore
     expect(setDoc).toHaveBeenCalledWith(doc(db, "users", "randomUserId"), {
       userName: "John Doe",
       email: "john@example.com",
       team: doc(db, "Team", mockTeam.id),
       role: "admin",
-      password: expect.any(String),
+      password: expect.any(String), // Assuming you have a password handling mechanism
     });
   });
 
   test("shows an alert if the email is already taken", async () => {
     render(<AddUser />);
 
-    // Mock email check
+    // Mock email check to simulate that email already exists
     (getDocs as jest.Mock).mockResolvedValueOnce({
       empty: false, // Simulate that email exists
     });
@@ -131,9 +117,12 @@ describe("AddUser Component", () => {
     // Submit the form
     window.alert = jest.fn(); // Mock alert
 
-    fireEvent.click(screen.getByText(/Add User/i));
+    await act(async () => {
+      fireEvent.click(screen.getByText(/Add User/i));
+    });
 
     // Check if alert was called
+    expect(window.alert).toHaveBeenCalled();
     expect(window.alert).toHaveBeenCalledWith(
       "Email already taken. Please use a different email."
     );
