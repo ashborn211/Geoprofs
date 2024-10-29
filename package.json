@@ -12,7 +12,8 @@
     "test:all": "jest __tests__",
     "test:AddUser": "jest __tests__/AddUser.test.tsx",
     "test:Home": "jest __tests__/Home.test.tsx",
-    "test:Search": "jest __tests__/SearchBar.test.tsx"
+    "test:Search": "jest __tests__/SearchBar.test.tsx",
+    "test:AdmiinSearch": "jest __tests__/AdminSearchPage.test.tsx"
   },
   "dependencies": {
     "@fullcalendar/daygrid": "^6.1.15",
