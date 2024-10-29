@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence } from "firebase/auth";
-import { getStorage, ref } from "firebase/storage";
+import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
+import { getStorage } from "firebase/storage";
 
 // Firebase config object
 const firebaseConfig = {
@@ -21,9 +21,7 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firebase services
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-const storage = getStorage();
-const storageRef = ref(storage);
-export const provider = new GoogleAuthProvider();
+export const storage = getStorage(app); // Exporting the storage directly
 
 // Ensure that authentication state is persistent across page reloads
 setPersistence(auth, browserLocalPersistence)
