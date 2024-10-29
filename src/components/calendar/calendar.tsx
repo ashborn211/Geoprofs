@@ -135,7 +135,7 @@ export default function CalendarComponent({
       <Calendar
         ref={containerRef}
         calendarWidth={1000}
-        aria-label="Date (Min Date Value)"
+        aria-label="Hij is er!"
         visibleMonths={1}
         minValue={today(getLocalTimeZone())}
         value={value}

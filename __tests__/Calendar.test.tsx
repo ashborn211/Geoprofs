@@ -10,6 +10,6 @@ describe("CalendarComponent", () => {
     render(<CalendarComponent onDateSelect={() => {}} />);
 
     // Controleer of het element met het label 'Date (Min Date Value)' in de document aanwezig is
-    expect(screen.getByLabelText("Date (Min Date Value)")).toBeInTheDocument();
+    expect(screen.getByLabelText("Hij is er!")).toBeInTheDocument();
   });
 });
