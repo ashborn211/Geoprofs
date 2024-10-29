@@ -1,13 +1,23 @@
-// jest.config.js
-module.exports = {
-  preset: "ts-jest",
-  testEnvironment: "jsdom",
-  transform: {
-    "^.+\\.(ts|tsx)$": "ts-jest",
-  },
+const nextJest = require('next/jest');
+
+/** @type {import('jest').Config} */
+const createJestConfig = nextJest({
+  dir: './',
+});
+
+const config = {
+  coverageProvider: 'v8',
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   moduleNameMapper: {
-    "\\.(css|less)$": "identity-obj-proxy", // Mock CSS imports
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
-  transformIgnorePatterns: ["<rootDir>/node_modules/"],
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"], // Optional, for setup
+  transform: {
+    '^.+\\.(ts|tsx|js|jsx)$': 'babel-jest',
+  },
+  testMatch: [
+    '<rootDir>/__tests__/*.[jt]s?(x)',
+  ],
 };
+
+module.exports = createJestConfig(config);

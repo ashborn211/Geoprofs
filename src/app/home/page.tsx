@@ -1,10 +1,20 @@
 "use client";
-import { useState } from "react";
-import CalendarComponent from "@/components/calendar/calendar";
-import VerlofComponent from "../../components/verlof";
+import { useState, useEffect } from "react";
+import CalendarComponent from "@/components/calendar/calendar"; // Updated import path for consistency
+import VerlofComponent from "../../components/verlof"; // Import your VerlofComponent
+import { Link } from "@nextui-org/react";
 import { useUser } from "../../context/UserContext"; // Import your user context
 import { useRouter } from "next/navigation"; // Import useRouter from Next.js
 import Logout from "@/components/Logout";
+import { db } from "../../FireBase/FireBaseConfig";
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  query,
+  where,
+  doc,
+} from "firebase/firestore"; // Verwijder functionaliteit toegevoegd
 
 export default function Home() {
   const { user } = useUser(); // Get user information from context
@@ -12,16 +22,121 @@ export default function Home() {
 
   const [showPopup, setShowPopup] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [existingDateRanges, setExistingDateRanges] = useState<{
+    startDate: Date;
+    endDate: Date;
+    reason: string;
+    name: string;
+    uid: string;
+    status: number;
+    docId: string; // Document ID toegevoegd
+  }[]>([]); // Store existing date ranges
 
-  // Handle the date selected from the calendar
-  const handleDateSelect = (date: Date) => {
-    setSelectedDate(date);
-    setShowPopup(true); // Open popup when a date is selected
+  const [selectedDateInfo, setSelectedDateInfo] = useState<{
+    startDate: Date;
+    endDate: Date;
+    reason: string;
+    name: string;
+    status: number;
+    docId: string; // Document ID toegevoegd
+  } | null>(null); // To store selected date info
+
+  // Fetch existing date ranges from Firestore
+  const fetchExistingDates = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "verlof")); // Use the "verlof" collection
+      const dateRanges: {
+        startDate: Date;
+        endDate: Date;
+        reason: string;
+        name: string;
+        uid: string;
+        status: number;
+        docId: string;
+      }[] = [];
+
+      querySnapshot.forEach((doc) => {
+        const startDate = doc.data().startDate;
+        const endDate = doc.data().endDate;
+        const reason = doc.data().reason;
+        const name = doc.data().name;
+        const uid = doc.data().uid;
+        const status = doc.data().status;
+
+        if (startDate && endDate) {
+          dateRanges.push({
+            startDate: startDate.toDate(),
+            endDate: endDate.toDate(),
+            reason: reason || "",
+            name: name || "",
+            uid: uid || "",
+            status: status || 1,
+            docId: doc.id, // Sla het document ID op om later te kunnen verwijderen
+          });
+        } else {
+          console.warn(
+            "startDate or endDate field is undefined for document ID:",
+            doc.id
+          );
+        }
+      });
+
+      setExistingDateRanges(dateRanges);
+    } catch (error) {
+      console.error("Error fetching dates:", error);
+    }
   };
+
+  useEffect(() => {
+    fetchExistingDates();
+  }, []);
+
+  const handleDateSelect = (date: Date) => {
+    const existingDateInfo = existingDateRanges.find(
+      ({ startDate, endDate, uid }) => {
+        return date >= startDate && date <= endDate && uid === user?.uid;
+      }
+    );
+
+    if (existingDateInfo) {
+      setSelectedDateInfo(existingDateInfo);
+      return;
+    }
+
+    setSelectedDate(date);
+    setShowPopup(true);
+    setSelectedDateInfo(null);
+  };
+
+  // Verlofaanvraag verwijderen
+  const handleDelete = async () => {
+    if (selectedDateInfo && selectedDateInfo.docId) {
+      try {
+        await deleteDoc(doc(db, "verlof", selectedDateInfo.docId)); // Verwijderen van document met docId
+        window.location.reload();
+        console.log("Verlofaanvraag succesvol verwijderd");
+
+        // Pagina herladen om de verwijdering weer te geven
+        fetchExistingDates();
+        setSelectedDateInfo(null); // Clear de geselecteerde data info na verwijderen
+      } catch (error) {
+        console.error("Fout bij het verwijderen van de verlofaanvraag:", error);
+      }
+    }
+  };
+
+  const formatDateWithTime = (date: Date) => {
+    return `${date.toLocaleDateString()} om ${date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}`;
+  };
+  
   // Navigate to the admin page
   const handleAdminClick = () => {
     router.push("/admiin"); // Adjust the path to your actual admin page
   };
+
   return (
     <>
       <div className="flex h-screen overflow-hidden bg-custom-gray">
@@ -39,7 +154,60 @@ export default function Home() {
                     "linear-gradient(90deg, rgba(255,255,255,1) 16%, rgba(90,209,254,1) 100%)",
                 }}
               >
-                <h1>Goedemorgen {user?.userName}</h1>
+                <div className="h-full w-1/2 text-[large] flex items-center justify-center flex-col">
+                  {selectedDateInfo ? (
+                    <>
+                      {/* Status text based on status */}
+                      <h2>
+                        {selectedDateInfo.status === 1
+                          ? "Nog niet verwerkt"
+                          : selectedDateInfo.status === 2
+                          ? "Goedgekeurd"
+                          : selectedDateInfo.status === 3
+                          ? "Afgekeurd"
+                          : ""}
+                      </h2>
+                      <div
+                        className="h-[120px] w-[210px] flex flex-col items-center justify-center rounded-[8%]"
+                        style={{
+                          backgroundColor:
+                            selectedDateInfo.status === 1
+                              ? "orange"
+                              : selectedDateInfo.status === 2
+                              ? "greenyellow"
+                              : selectedDateInfo.status === 3
+                              ? "red"
+                              : "gray",
+                        }}
+                      >
+                        <h1>
+                          {formatDateWithTime(selectedDateInfo.startDate)}
+                        </h1>
+                        <h1>t/m</h1>
+                        <h1>{formatDateWithTime(selectedDateInfo.endDate)}</h1>
+                      </div>
+                    </>
+                  ) : (
+                    " "
+                  )}
+                </div>
+
+                {selectedDateInfo ? (
+                  <div className="flex flex-col items-center">
+                    <h1 className="text-[large]">
+                      Reden: {selectedDateInfo.reason}
+                    </h1>
+                    {/* Toevoegen van een knop onder de reden */}
+                    <button
+                      className="mt-4 h-[50px] w-[150px] bg-[white] border-[black] border-[solid] border-[2px] text-[x-large]"
+                      onClick={handleDelete} // Verwijder actie aan knop toegevoegd
+                    >
+                      Verwijderen
+                    </button>
+                  </div>
+                ) : (
+                  <h1>Goedemorgen {user?.userName}</h1>
+                )}
               </div>
 
               <div style={{ width: "20%" }}>
