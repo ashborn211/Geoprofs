@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:reset": "jest __tests__/ResetPasswordForm.test.tsx",
+    "test:AddUser": "jest __tests__/AddUser.test.tsx",
+    "test:Home": "jest __tests__/Home.test.tsx"
   },
   "dependencies": {
     "@fullcalendar/daygrid": "^6.1.15",
@@ -56,6 +59,7 @@
     "@types/node": "^20.16.5",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/testing-library__jest-dom": "^5.14.9",
     "babel-jest": "^29.7.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.7",
