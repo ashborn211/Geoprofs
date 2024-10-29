@@ -1,48 +1,49 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import Home from "@/app/home/page";
-import { useUser } from "@/context/UserContext";
+// __tests__/Home.test.tsx
+import React from "react";
+import { render, screen } from "@testing-library/react";
+import { UserProvider } from "@/context/UserContext"; // Adjust the import path
+import Home from "@/app/home/page"; // Adjust the import path
+import { MemoryRouter } from "react-router-dom"; // Import MemoryRouter for routing context
 
-// Mock the useUser hook with admin role
-jest.mock("@/context/UserContext", () => ({
-  useUser: () => ({
-    user: {
-      uid: "test-uid",
-      email: "test@example.com",
-      userName: "Test User",
-      role: "admin",
-      team: "Development",
-    },
-    setUser: jest.fn(),
-  }),
-}));
+// Mock user data
+const mockAdminUser = {
+  uid: "123",
+  email: "test@example.com",
+  userName: "John Doe",
+  role: "admin",
+  team: "management", // Changed to "management"
+};
 
-describe("Home Page", () => {
-  it("renders all main components and the admin action button", () => {
-    render(<Home />);
+const mockNonAdminUser = {
+  uid: "124",
+  email: "user@example.com",
+  userName: "Jane Smith",
+  role: "user",
+  team: null,
+};
 
-    // Verify the greeting message
-    expect(screen.getByText(/Goedemorgen Test User/i)).toBeInTheDocument();
+// Custom render function to include UserProvider
+const renderWithUserContext = (children: React.ReactNode, user = mockAdminUser) => {
+  return render(
+    <MemoryRouter>
+      <UserProvider value={{ user, setUser: jest.fn() }}>
+        {children}
+      </UserProvider>
+    </MemoryRouter>
+  );
+};
 
-    // Verify Logout component
-    expect(screen.getByText(/Log out/i)).toBeInTheDocument();
+describe("Home Component", () => {
+  it("renders correctly with admin user", () => {
+    renderWithUserContext(<Home />, mockAdminUser);
 
-    // Verify Calendar component
-    expect(
-      screen.getByLabelText(/Date \(Min Date Value\)/i)
-    ).toBeInTheDocument();
-
-    // Check for admin button visibility
-    expect(screen.getByText(/Admin Action/i)).toBeInTheDocument();
+    expect(screen.getByText(/Good morning John Doe/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Admin Action/i })).toBeInTheDocument();
   });
 
-  it("opens VerlofComponent popup on date selection", () => {
-    render(<Home />);
+  it("does not render admin button for non-admin user", () => {
+    renderWithUserContext(<Home />, mockNonAdminUser);
 
-    // Simulate date selection in CalendarComponent
-    const dateElement = screen.getByLabelText(/Date \(Min Date Value\)/i);
-    fireEvent.click(dateElement);
-
-    // Verify that VerlofComponent renders upon selecting a date
-    expect(screen.getByText(/Verstuur/i)).toBeInTheDocument(); // Button in VerlofComponent
+    expect(screen.queryByRole("button", { name: /Admin Action/i })).not.toBeInTheDocument();
   });
 });

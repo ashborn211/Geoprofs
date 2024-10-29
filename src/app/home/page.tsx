@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import CalendarComponent from "@/components/calendar/calendar"; // Updated import path for consistency
 import VerlofComponent from "../../components/verlof"; // Import your VerlofComponent
-import { Link } from "@nextui-org/react";
+import { Link } from "@nextui-org/react"; // Ensure this import is necessary
 import { useUser } from "../../context/UserContext"; // Import your user context
 import { useRouter } from "next/navigation"; // Import useRouter from Next.js
 import Logout from "@/components/Logout";
@@ -11,10 +11,8 @@ import {
   collection,
   getDocs,
   deleteDoc,
-  query,
-  where,
   doc,
-} from "firebase/firestore"; // Verwijder functionaliteit toegevoegd
+} from "firebase/firestore"; // Remove unused imports
 
 export default function Home() {
   const { user } = useUser(); // Get user information from context
@@ -22,15 +20,17 @@ export default function Home() {
 
   const [showPopup, setShowPopup] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [existingDateRanges, setExistingDateRanges] = useState<{
-    startDate: Date;
-    endDate: Date;
-    reason: string;
-    name: string;
-    uid: string;
-    status: number;
-    docId: string; // Document ID toegevoegd
-  }[]>([]); // Store existing date ranges
+  const [existingDateRanges, setExistingDateRanges] = useState<
+    {
+      startDate: Date;
+      endDate: Date;
+      reason: string;
+      name: string;
+      uid: string;
+      status: number;
+      docId: string; // Document ID toegevoegd
+    }[]
+  >([]); // Store existing date ranges
 
   const [selectedDateInfo, setSelectedDateInfo] = useState<{
     startDate: Date;
@@ -71,7 +71,7 @@ export default function Home() {
             name: name || "",
             uid: uid || "",
             status: status || 1,
-            docId: doc.id, // Sla het document ID op om later te kunnen verwijderen
+            docId: doc.id, // Store document ID for deletion
           });
         } else {
           console.warn(
@@ -108,33 +108,28 @@ export default function Home() {
     setSelectedDateInfo(null);
   };
 
-  // Verlofaanvraag verwijderen
   const handleDelete = async () => {
     if (selectedDateInfo && selectedDateInfo.docId) {
       try {
-        await deleteDoc(doc(db, "verlof", selectedDateInfo.docId)); // Verwijderen van document met docId
-        window.location.reload();
-        console.log("Verlofaanvraag succesvol verwijderd");
-
-        // Pagina herladen om de verwijdering weer te geven
-        fetchExistingDates();
-        setSelectedDateInfo(null); // Clear de geselecteerde data info na verwijderen
+        await deleteDoc(doc(db, "verlof", selectedDateInfo.docId)); // Remove document by docId
+        fetchExistingDates(); // Refresh date ranges after deletion
+        setSelectedDateInfo(null); // Clear selected date info after deletion
       } catch (error) {
-        console.error("Fout bij het verwijderen van de verlofaanvraag:", error);
+        console.error("Error deleting leave request:", error);
       }
     }
   };
 
   const formatDateWithTime = (date: Date) => {
-    return `${date.toLocaleDateString()} om ${date.toLocaleTimeString([], {
+    return `${date.toLocaleDateString()} at ${date.toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     })}`;
   };
-  
+
   // Navigate to the admin page
   const handleAdminClick = () => {
-    router.push("/admiin"); // Adjust the path to your actual admin page
+    router.push("/admin"); // Adjust the path to your actual admin page
   };
 
   return (
@@ -157,14 +152,13 @@ export default function Home() {
                 <div className="h-full w-1/2 text-[large] flex items-center justify-center flex-col">
                   {selectedDateInfo ? (
                     <>
-                      {/* Status text based on status */}
                       <h2>
                         {selectedDateInfo.status === 1
-                          ? "Nog niet verwerkt"
+                          ? "Pending"
                           : selectedDateInfo.status === 2
-                          ? "Goedgekeurd"
+                          ? "Approved"
                           : selectedDateInfo.status === 3
-                          ? "Afgekeurd"
+                          ? "Denied"
                           : ""}
                       </h2>
                       <div
@@ -180,34 +174,27 @@ export default function Home() {
                               : "gray",
                         }}
                       >
-                        <h1>
-                          {formatDateWithTime(selectedDateInfo.startDate)}
-                        </h1>
-                        <h1>t/m</h1>
+                        <h1>{formatDateWithTime(selectedDateInfo.startDate)}</h1>
+                        <h1>to</h1>
                         <h1>{formatDateWithTime(selectedDateInfo.endDate)}</h1>
                       </div>
                     </>
                   ) : (
-                    " "
+                    <h1>Good morning, {user?.userName}</h1>
                   )}
                 </div>
 
                 {selectedDateInfo ? (
                   <div className="flex flex-col items-center">
-                    <h1 className="text-[large]">
-                      Reden: {selectedDateInfo.reason}
-                    </h1>
-                    {/* Toevoegen van een knop onder de reden */}
+                    <h1 className="text-[large]">Reason: {selectedDateInfo.reason}</h1>
                     <button
                       className="mt-4 h-[50px] w-[150px] bg-[white] border-[black] border-[solid] border-[2px] text-[x-large]"
-                      onClick={handleDelete} // Verwijder actie aan knop toegevoegd
+                      onClick={handleDelete}
                     >
-                      Verwijderen
+                      Remove
                     </button>
                   </div>
-                ) : (
-                  <h1>Goedemorgen {user?.userName}</h1>
-                )}
+                ) : null}
               </div>
 
               <div style={{ width: "20%" }}>
@@ -222,14 +209,14 @@ export default function Home() {
                 {user?.role === "admin" && (
                   <button
                     className="bg-blue-500 text-white border-2 border-black rounded-lg w-full h-[20%] mb-2"
-                    onClick={handleAdminClick} // Call function on click
+                    onClick={handleAdminClick}
                   >
                     <h1>Admin Action</h1>
                   </button>
                 )}
 
                 <button className="bg-white border-2 border-black rounded-lg w-full h-[25%]">
-                  <h1>Ziek Melden</h1>
+                  <h1>Report Sickness</h1>
                 </button>
               </div>
             </div>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface SearchBarProps {
   allData: any[];
@@ -8,6 +8,10 @@ interface SearchBarProps {
 
 const SearchBar: React.FC<SearchBarProps> = ({ allData, onSearch }) => {
   const [queryText, setQueryText] = useState<string>("");
+
+  useEffect(() => {
+    onSearch(allData); // Show all data when component mounts
+  }, [allData, onSearch]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQueryText(e.target.value);
