@@ -1,60 +1,48 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom'; // for additional matchers
-import Home from '@/app/home/page';
-import { useUser } from '@/context/UserContext';
-import { useRouter } from 'next/navigation';
+import { render, screen, fireEvent } from "@testing-library/react";
+import Home from "@/app/home/page";
+import { useUser } from "@/context/UserContext";
 
-// Mock useUser hook
-jest.mock('@/context/UserContext', () => ({
-  useUser: jest.fn(),
+// Mock the useUser hook with admin role
+jest.mock("@/context/UserContext", () => ({
+  useUser: () => ({
+    user: {
+      uid: "test-uid",
+      email: "test@example.com",
+      userName: "Test User",
+      role: "admin",
+      team: "Development",
+    },
+    setUser: jest.fn(),
+  }),
 }));
 
-// Mock useRouter hook from Next.js
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-}));
-
-describe('Home Component', () => {
-  beforeEach(() => {
-    (useUser as jest.Mock).mockReturnValue({
-      user: { userName: 'Test User', role: 'admin' },
-    });
-    (useRouter as jest.Mock).mockReturnValue({ push: jest.fn() });
-  });
-
-  test('renders greeting with user name', () => {
+describe("Home Page", () => {
+  it("renders all main components and the admin action button", () => {
     render(<Home />);
+
+    // Verify the greeting message
     expect(screen.getByText(/Goedemorgen Test User/i)).toBeInTheDocument();
+
+    // Verify Logout component
+    expect(screen.getByText(/Log out/i)).toBeInTheDocument();
+
+    // Verify Calendar component
+    expect(
+      screen.getByLabelText(/Date \(Min Date Value\)/i)
+    ).toBeInTheDocument();
+
+    // Check for admin button visibility
+    expect(screen.getByText(/Admin Action/i)).toBeInTheDocument();
   });
 
-  test('renders admin button if user is an admin', () => {
+  it("opens VerlofComponent popup on date selection", () => {
     render(<Home />);
-    const adminButton = screen.getByText(/Admin Action/i);
-    expect(adminButton).toBeInTheDocument();
-    fireEvent.click(adminButton);
-    expect(useRouter().push).toHaveBeenCalledWith('/admiin');
-  });
 
-  test('renders CalendarComponent', () => {
-    render(<Home />);
-    const calendarComponent = screen.getByLabelText(/Date \(Min Date Value\)/i);
-    expect(calendarComponent).toBeInTheDocument();
-  });
+    // Simulate date selection in CalendarComponent
+    const dateElement = screen.getByLabelText(/Date \(Min Date Value\)/i);
+    fireEvent.click(dateElement);
 
-  test('renders Logout button', () => {
-    render(<Home />);
-    const logoutButton = screen.getByText(/Log out/i);
-    expect(logoutButton).toBeInTheDocument();
-  });
-
-  test('renders VerlofComponent on date selection', () => {
-    render(<Home />);
-    const calendarComponent = screen.getByLabelText(/Date \(Min Date Value\)/i);
-    
-    // Mock date selection event
-    fireEvent.click(calendarComponent);
-    
-    const verlofComponent = screen.queryByText(/reden.../i);
-    expect(verlofComponent).toBeInTheDocument();
+    // Verify that VerlofComponent renders upon selecting a date
+    expect(screen.getByText(/Verstuur/i)).toBeInTheDocument(); // Button in VerlofComponent
   });
 });

@@ -1,16 +1,13 @@
+// jest.config.js
 module.exports = {
-  preset: 'ts-jest', // Uses ts-jest preset for TypeScript support
-  testEnvironment: 'jsdom', // Simulates a browser environment
-  moduleNameMapper: {
-    // Maps module imports for styles and assets to prevent errors
-    '\\.(css|scss)$': 'identity-obj-proxy',
-    '^@/(.*)$': '<rootDir>/src/$1', // Aliases @ to src folder
-  },
+  preset: "ts-jest",
+  testEnvironment: "jsdom",
   transform: {
-    '^.+\\.tsx?$': 'ts-jest', // Transforms .ts/.tsx files using ts-jest
-    '^.+\\.(js|jsx)$': 'babel-jest', // Transforms .js/.jsx files using Babel
+    "^.+\\.(ts|tsx)$": "ts-jest",
   },
-  transformIgnorePatterns: [
-    'node_modules/(?!(some-esm-package)/)', // Adjust this if you need to transpile ESM packages
-  ],
+  moduleNameMapper: {
+    "\\.(css|less)$": "identity-obj-proxy", // Mock CSS imports
+  },
+  transformIgnorePatterns: ["<rootDir>/node_modules/"],
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"], // Optional, for setup
 };
