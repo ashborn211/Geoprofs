@@ -9,6 +9,7 @@ import {
 } from "firebase/auth";
 import { getFirestore, setDoc, doc } from "firebase/firestore";
 import { getStorage, ref } from "firebase/storage";
+import '@testing-library/jest-dom';
 
 // Mock Firebase functions
 jest.mock("firebase/auth", () => ({

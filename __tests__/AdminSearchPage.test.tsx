@@ -3,6 +3,7 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import AdminSearchPage from "@/app/admiin/admiin-search/page"; // Adjust import path if necessary
 import { getDocs, collection } from "firebase/firestore";
+import '@testing-library/jest-dom';
 
 // Mock Firebase functions
 jest.mock("firebase/firestore", () => ({
