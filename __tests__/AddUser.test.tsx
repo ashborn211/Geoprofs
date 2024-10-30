@@ -9,7 +9,7 @@ import {
 } from "firebase/auth";
 import { getFirestore, setDoc, doc } from "firebase/firestore";
 import { getStorage, ref } from "firebase/storage";
-import '@testing-library/jest-dom';
+import "@testing-library/jest-dom";
 
 // Mock Firebase functions
 jest.mock("firebase/auth", () => ({
@@ -47,8 +47,8 @@ describe("AddUser Component", () => {
 
   it("submits the form and creates a user", async () => {
     const mockCreateUser = createUserWithEmailAndPassword as jest.Mock;
-    mockCreateUser.mockImplementation(() =>
-      Promise.resolve({ user: { uid: "test-uid" } })
+    mockCreateUser.mockImplementation(
+      () => Promise.resolve({ user: { uid: "mock-uid" } }) // Use a consistent mock UID
     );
 
     const mockSetDoc = setDoc as jest.Mock;
@@ -66,7 +66,7 @@ describe("AddUser Component", () => {
       target: { value: "john@example.com" },
     });
     fireEvent.change(screen.getByText(/Select a team/i), {
-      target: { value: "team-id" },
+      target: { value: "1" }, // Use Team ID = 1
     });
     fireEvent.change(screen.getByText(/Select a role/i), {
       target: { value: "admin" },
@@ -75,10 +75,13 @@ describe("AddUser Component", () => {
     // Generate a password
     fireEvent.click(screen.getByText(/Generate Password/i));
 
-    // Fill in the generated password field
-    const generatedPassword = "testPassword"; // Replace with the expected generated password
-    fireEvent.change(screen.getByPlaceholderText(/password/i), {
-      target: { value: generatedPassword },
+    // Assert that the generated password is displayed
+    const generatedPassword = screen.getByText(/^[a-z0-9]{8}$/i); // Assuming the generated password is 8 characters long and alphanumeric
+    expect(generatedPassword).toBeInTheDocument();
+
+    // Fill in the password field using the generated password text
+    fireEvent.change(screen.getByText(/password/i), {
+      target: { value: generatedPassword.textContent }, // Use the generated password from span
     });
 
     // Submit the form
@@ -89,14 +92,14 @@ describe("AddUser Component", () => {
       expect(mockCreateUser).toHaveBeenCalledWith(
         getAuth(),
         "john@example.com",
-        generatedPassword
+        generatedPassword.textContent // Use the generated password for checking
       );
       expect(mockSetDoc).toHaveBeenCalledWith(
-        doc(getFirestore(), "users", "test-uid"),
+        doc(getFirestore(), "users", "mock-uid"), // Use the consistent mock UID here
         {
           userName: "John Doe",
           email: "john@example.com",
-          team: doc(getFirestore(), "Team", "team-id"), // This should match your doc function
+          team: doc(getFirestore(), "Team", "1"), // Reference to the team with ID 1
           role: "admin",
           password: expect.any(String), // Check if a string is passed (hashed password)
         }
@@ -122,7 +125,7 @@ describe("AddUser Component", () => {
       target: { value: "jane@example.com" },
     });
     fireEvent.change(screen.getByText(/Select a team/i), {
-      target: { value: "team-id" },
+      target: { value: "1" }, // Use Team ID = 1
     });
     fireEvent.change(screen.getByText(/Select a role/i), {
       target: { value: "user" },
@@ -131,10 +134,13 @@ describe("AddUser Component", () => {
     // Generate a password
     fireEvent.click(screen.getByText(/Generate Password/i));
 
-    // Fill in the generated password field
-    const generatedPassword = "testPassword"; // Replace with the expected generated password
-    fireEvent.change(screen.getByPlaceholderText(/password/i), {
-      target: { value: generatedPassword },
+    // Assert that the generated password is displayed
+    const generatedPassword = screen.getByText(/^[a-z0-9]{8}$/i); // Assuming the generated password is 8 characters long and alphanumeric
+    expect(generatedPassword).toBeInTheDocument();
+
+    // Fill in the password field using the generated password text
+    fireEvent.change(screen.getByText(/password/i), {
+      target: { value: generatedPassword.textContent }, // Use the generated password from span
     });
 
     // Submit the form
