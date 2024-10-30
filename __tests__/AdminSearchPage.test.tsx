@@ -3,12 +3,25 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import AdminSearchPage from "@/app/admiin/admiin-search/page"; // Adjust import path if necessary
 import { getDocs, collection } from "firebase/firestore";
-import '@testing-library/jest-dom';
+import "@testing-library/jest-dom";
+jest.mock("firebase/auth", () => ({
+  getAuth: jest.fn(),
+  createUserWithEmailAndPassword: jest.fn(),
+  setPersistence: jest.fn().mockImplementation(() => Promise.resolve()), // Ensure this returns a promise
+  browserLocalPersistence: {},
+}));
 
-// Mock Firebase functions
 jest.mock("firebase/firestore", () => ({
+  getFirestore: jest.fn(),
+  setDoc: jest.fn(),
+  doc: jest.fn(),
   getDocs: jest.fn(),
   collection: jest.fn(),
+}));
+
+jest.mock("firebase/storage", () => ({
+  getStorage: jest.fn(),
+  ref: jest.fn(),
 }));
 
 const mockData = [
