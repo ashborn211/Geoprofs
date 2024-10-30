@@ -31,10 +31,6 @@ jest.mock("firebase/storage", () => ({
 }));
 
 describe("AddUser Component", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it("renders the form correctly", () => {
     render(<AddUser />);
     expect(screen.getByPlaceholderText(/Enter naam/i)).toBeInTheDocument();
