@@ -10,7 +10,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:all": "jest __tests__",
-    "test:AddUser": "jest __tests__/AddUser.test.tsx"
+    "test:verlof": "jest __tests__/Verlof.test.tsx"
   },
   "dependencies": {
     "@fullcalendar/daygrid": "^6.1.15",

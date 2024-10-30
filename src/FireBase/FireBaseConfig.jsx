@@ -23,7 +23,6 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 const storage = getStorage();
 const storageRef = ref(storage);
-export const provider = new GoogleAuthProvider();
 
 // Ensure that authentication state is persistent across page reloads
 setPersistence(auth, browserLocalPersistence)
