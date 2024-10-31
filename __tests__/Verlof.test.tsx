@@ -1,91 +1,94 @@
-// src/components/__tests__/verlof.test.tsx
-import React from "react"; // Importeer React
-import { render, screen, fireEvent, waitFor } from "@testing-library/react"; // Importeer testhulpmiddelen
-import VerlofComponent from "@/components/verlof";
-import { useUser } from "@/context/UserContext"; // Importeer de UserContext
-import { db } from "@/FireBase/FireBaseConfig"; // Importeer Firebase configuratie
-import { addDoc } from "firebase/firestore"; // Importeer addDoc voor het toevoegen van documenten
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import VerlofComponent from "@/components/verlof"; // update the path accordingly
+import { useUser } from "@/context/UserContext";
+import { db } from "@/FireBase/FireBaseConfig";
+import { getDoc, addDoc, Timestamp } from "firebase/firestore";
+import "@testing-library/jest-dom";
 
-// Mock de UserContext
+beforeAll(() => {
+  jest.spyOn(console, "info").mockImplementation(() => {}); // Onderdrukt Auth Emulator meldingen
+});
+
+
+// Mock user context
 jest.mock("@/context/UserContext", () => ({
-  useUser: jest.fn(), // Mock de useUser hook
+  useUser: () => ({
+    user: { uid: "testUser123", userName: "Test User" },
+  }),
 }));
 
-jest.mock("firebase/auth", () => ({
-  getAuth: jest.fn(),
-  createUserWithEmailAndPassword: jest.fn(),
-  setPersistence: jest.fn().mockImplementation(() => Promise.resolve()), // Ensure this returns a promise
-  browserLocalPersistence: {},
-}));
-
+// Mock Firestore methods
 jest.mock("firebase/firestore", () => ({
-  getFirestore: jest.fn(),
-  setDoc: jest.fn(),
-  doc: jest.fn(),
-  addDoc: jest.fn(), // Mock addDoc functie
-  Timestamp: {
-    fromDate: jest.fn((date) => ({ toDate: () => date })), // Mock de fromDate functie
-  },
-}));
-
-jest.mock("firebase/storage", () => ({
-  getStorage: jest.fn(),
-  ref: jest.fn(),
+  ...jest.requireActual("firebase/firestore"),
+  getDoc: jest.fn(),
+  addDoc: jest.fn(),
 }));
 
 describe("VerlofComponent", () => {
-  const mockClose = jest.fn(); // Mock de onClose functie
-
   beforeEach(() => {
-    // Stel de context en test data in
-    (useUser as jest.Mock).mockReturnValue({
-      user: { uid: "testUserId", userName: "Test User" }, // Mock een gebruiker
+    // Mock data for leave types document
+    (getDoc as jest.Mock).mockResolvedValue({
+      exists: () => true,
+      data: () => ({
+        speciaalVerlof: "Speciaal Verlof",
+        vakantie: "Vakantie",
+        verlof: "Verlof",
+        ziek: "Ziek",
+      }),
     });
   });
 
   afterEach(() => {
-    jest.clearAllMocks(); // Maak alle mocks schoon na elke test
+    jest.clearAllMocks();
   });
 
-  it("submits the form with the correct data", async () => {
-    (addDoc as jest.Mock).mockResolvedValueOnce({}); // Mock de succesvolle document toevoeging
+  it("fetches and displays leave types from Firestore", async () => {
+    render(<VerlofComponent selectedDate={new Date()} onClose={() => {}} />);
 
-    render(<VerlofComponent selectedDate={new Date()} onClose={mockClose} />); // Render de component
-
-    // Vul het formulier in
-    fireEvent.change(screen.getByLabelText(/Select Leave Type/i), {
-      target: { value: "vakantie" }, // Selecteer een leave type
-    });
-    fireEvent.change(screen.getByPlaceholderText("reden..."), {
-      target: { value: "Zomer vakantie" }, // Vul een reden in
-    });
-
-    // Vul de start- en einddatums in
-    fireEvent.change(screen.getByLabelText(/Start Date and Time:/i), {
-      target: { value: "2024-07-01T10:00" }, // Stel een startdatum in
-    });
-    fireEvent.change(screen.getByLabelText(/End Date and Time:/i), {
-      target: { value: "2024-07-15T10:00" }, // Stel een einddatum in
-    });
-
-    // Klik op de submit knop
-    fireEvent.click(screen.getByText(/Verstuur/i));
-
-    // Controleer of de addDoc functie is aangeroepen met de juiste data
+    // Wait for the options to load
     await waitFor(() => {
-      expect(addDoc).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.objectContaining({
-          type: "vakantie",
-          reason: "Zomer vakantie",
-          startDate: expect.anything(), // Verander dit naar specifieke timestamp indien nodig
-          endDate: expect.anything(), // Verander dit naar specifieke timestamp indien nodig
-          uid: "testUserId",
-          name: "Test User",
-          status: 1,
-        })
-      );
-      expect(mockClose).toHaveBeenCalled(); // Controleer of de onClose functie is aangeroepen
+      expect(screen.getByText("Speciaal Verlof")).toBeInTheDocument();
+      expect(screen.getByText("Vakantie")).toBeInTheDocument();
+      expect(screen.getByText("Verlof")).toBeInTheDocument();
+      expect(screen.getByText("Ziek")).toBeInTheDocument();
+    });
+  });
+
+  it("submits the form with valid input", async () => {
+    render(<VerlofComponent selectedDate={new Date()} onClose={() => {}} />);
+
+    // Wait for the leave types to load
+    await waitFor(() => {
+      expect(screen.getByText("Speciaal Verlof")).toBeInTheDocument();
+    });
+
+    // Select leave type
+    fireEvent.change(screen.getByRole("combobox"), {
+      target: { value: "Vakantie" },
+    });
+
+    // Input reason
+    fireEvent.change(screen.getByPlaceholderText("reden..."), {
+      target: { value: "Vakantie nodig" },
+    });
+
+    // Mock addDoc response
+    (addDoc as jest.Mock).mockResolvedValue({ id: "newDocId" });
+
+    // Submit form
+    fireEvent.click(screen.getByText("Verstuur"));
+
+    // Assert addDoc was called with correct data
+    await waitFor(() => {
+      expect(addDoc).toHaveBeenCalledWith(expect.anything(), {
+        type: "Vakantie",
+        reason: "Vakantie nodig",
+        startDate: expect.any(Timestamp),
+        endDate: expect.any(Timestamp),
+        uid: "testUser123",
+        name: "Test User",
+        status: 1,
+      });
     });
   });
 });

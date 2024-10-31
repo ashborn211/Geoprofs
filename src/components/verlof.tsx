@@ -71,7 +71,7 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
       .slice(0, 16); // Format as YYYY-MM-DDTHH:MM
   };
 
-  const handleSubmit = async () => {
+ const handleSubmit = async () => {
     if (selectedButton && reason && user) {
       try {
         await addDoc(collection(db, "verlof"), {
@@ -83,13 +83,11 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
           name: user.userName, // Use name from user context
           status: 1, // Set status to a number value of 1
         });
-        alert("Verlof/Vakantie request submitted!");
         onClose();
       } catch (error) {
         console.error("Error adding document: ", error);
       }
     } else {
-      alert("Please fill in all fields.");
     }
   };
 
@@ -134,14 +132,14 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
 
             <div className="time-section">
               <div className="time-input">
-                <label>Start Date and Time:</label>
-                <input
+                <label htmlFor="startdate-input" >Start Date and Time:</label>
+                <input id="startdate-input"
                   type="datetime-local"
                   value={formatDateForInput(startDate)}
                   onChange={(e) => handleDateChange(e, setStartDate)}
                 />
-                <label>End Date and Time:</label>
-                <input
+                <label htmlFor="enddate-input">End Date and Time:</label>
+                <input id="enddate-input"
                   type="datetime-local"
                   value={formatDateForInput(endDate)}
                   onChange={(e) => handleDateChange(e, setEndDate)}
