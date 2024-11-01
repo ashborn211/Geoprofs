@@ -1,32 +1,43 @@
-// __tests__/AddUser.test.tsx
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import AddUser from "@/app/admiin/add-users/page";
+import AddUser from "@/app/admiin/add-users/page"; // Ensure the path is correct
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { getDocs, setDoc } from "firebase/firestore";
-import { auth, db } from "@/FireBase/FireBaseConfig";
-import "@testing-library/jest-dom/extend-expect";
+import { setDoc, getDocs } from "firebase/firestore";
+import "@testing-library/jest-dom";
+import { act } from "@testing-library/react";
 
 // Mock Firebase functions
 jest.mock("firebase/auth", () => ({
+  getAuth: jest.fn(() => ({
+    currentUser: null,
+  })),
   createUserWithEmailAndPassword: jest.fn(),
+  setPersistence: jest.fn(() => Promise.resolve()),
+  browserLocalPersistence: {},
+  connectAuthEmulator: jest.fn(),
 }));
 
-jest.mock("firebase/firestore", () => ({
-  setDoc: jest.fn(),
-  getDocs: jest.fn(),
-  collection: jest.fn(),
-  query: jest.fn(),
-  where: jest.fn(),
-}));
+jest.mock("firebase/firestore", () => {
+  const actualFirestore = jest.requireActual("firebase/firestore");
+  return {
+    ...actualFirestore,
+    getFirestore: jest.fn(),
+    initializeFirestore: jest.fn(),
+    connectFirestoreEmulator: jest.fn(),
+    setDoc: jest.fn(() => Promise.resolve()),
+    getDocs: jest.fn(),
+    collection: jest.fn(),
+    query: jest.fn(),
+    where: jest.fn(),
+  };
+});
 
-// Mock team data
+// Mock teams data
 const mockTeams = [
   { id: "team1", TeamName: "Team One" },
   { id: "team2", TeamName: "Team Two" },
 ];
 
-// Mock Firestore data fetching
 (getDocs as jest.Mock).mockImplementation(() => {
   return Promise.resolve({
     docs: mockTeams.map((team) => ({ id: team.id, data: () => team })),
@@ -38,15 +49,17 @@ describe("AddUser Component", () => {
     jest.clearAllMocks();
   });
 
-  it('generates and displays a random password when the "Generate Password" button is clicked', () => {
+  it('generates and displays a random password when the "Generate Password" button is clicked', async () => {
     render(<AddUser />);
 
     const generatePasswordButton = screen.getByText("Generate Password");
     fireEvent.click(generatePasswordButton);
 
-    // Check if the generated password is displayed
-    const passwordDisplay = screen.getByText(/^[a-z0-9]{8}$/i); // Regex to match the expected random password format
-    expect(passwordDisplay).toBeInTheDocument(); // Check if the password is displayed
+    // Validate that the generated password appears on the screen
+    const passwordDisplay = await screen.findByText(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{10,}$/
+    );
+    expect(passwordDisplay).toBeInTheDocument();
   });
 
   it("adds a new user and stores it in Firestore with a hashed password", async () => {
@@ -73,13 +86,22 @@ describe("AddUser Component", () => {
     // Generate password
     const generatePasswordButton = screen.getByText("Generate Password");
     fireEvent.click(generatePasswordButton);
-    const generatedPassword = screen.getByText(/^[a-z0-9]{8}$/i);
 
-    // Submit the form
-    fireEvent.click(screen.getByText("Add User"));
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{10,}$/
+        )
+      ).toBeInTheDocument();
+    });
+
+    // Submit the form using the submit button
+    const submitButton = screen.getByRole("button", { name: /add user/i });
+    await waitFor(() => fireEvent.click(submitButton), { timeout: 20000 });
 
     // Wait for the document to be added
     await waitFor(() => {
+      expect(setDoc).toHaveBeenCalled(); // Check if setDoc was called
       expect(setDoc).toHaveBeenCalledWith(
         expect.any(Object), // Expect the document reference to be passed
         expect.objectContaining({
@@ -87,7 +109,6 @@ describe("AddUser Component", () => {
           email: "test@example.com",
           team: expect.any(Object), // Ensure this is a reference object
           role: "user",
-          // Password should be hashed, so we can use a regex here
           password: expect.stringMatching(/^\$2[ayb]\$.{56}$/), // bcrypt hash regex
         })
       );

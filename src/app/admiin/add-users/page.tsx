@@ -12,6 +12,7 @@ import {
 import { auth, db } from "@/FireBase/FireBaseConfig";
 import bcrypt from "bcryptjs";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { generatePassword } from "@/utils/passwordGenerator"; // Adjust the path as necessary
 
 interface Team {
   id: string;
@@ -46,10 +47,9 @@ export default function AddUser() {
     fetchTeams();
   }, []);
 
-  const generatePassword = () => {
-    const newPassword = Math.random().toString(36).slice(-8);
+  const handleGeneratePassword = () => {
+    const newPassword = generatePassword(10); // You can change the length if needed
     setPassword(newPassword);
-    setGeneratedPassword(newPassword);
   };
 
   const copyToClipboard = () => {
@@ -60,8 +60,22 @@ export default function AddUser() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Form submitted with values:", {
+      naam,
+      email,
+      team,
+      role,
+      password,
+    });
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    console.log("Form submitted with values:", {
+      naam,
+      email,
+      team,
+      role,
+      password,
+    });
 
     try {
       const emailQuery = query(
@@ -187,7 +201,7 @@ export default function AddUser() {
                 <div className="flex flex-col space-y-2">
                   <button
                     type="button"
-                    onClick={generatePassword}
+                    onClick={handleGeneratePassword}
                     className="p-2 bg-blue-500 text-white rounded"
                   >
                     Generate Password
