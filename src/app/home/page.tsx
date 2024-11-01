@@ -42,6 +42,9 @@ export default function Home() {
     docId: string; // Document ID toegevoegd
   } | null>(null); // To store selected date info
 
+  // State to control sick leave submission popup
+  const [sickLeaveSubmitted, setSickLeaveSubmitted] = useState(false);
+
   // Fetch existing date ranges from Firestore
   const fetchExistingDates = async () => {
     try {
@@ -156,6 +159,7 @@ export default function Home() {
           status: 1,
         });
         console.log("Sick leave submitted successfully");
+        setSickLeaveSubmitted(true); // Set the state to show popup
         fetchExistingDates(); // Refresh existing date ranges
       } catch (error) {
         console.error("Error submitting sick leave:", error);
@@ -284,6 +288,24 @@ export default function Home() {
           selectedDate={selectedDate}
           onClose={() => setShowPopup(false)}
         />
+      )}
+
+      {/* Popup for sick leave submission */}
+      {sickLeaveSubmitted && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-4 rounded shadow-md">
+            <h2 className="text-lg font-bold">Ziekmelding succesvol ingediend!</h2>
+            <button
+              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+              onClick={() => {
+                setSickLeaveSubmitted(false); // Close the popup
+                window.location.reload(); // Reload the page
+              }}
+            >
+              Ok
+            </button>
+          </div>
+        </div>
       )}
     </>
   );
