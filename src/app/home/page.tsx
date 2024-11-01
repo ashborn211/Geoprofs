@@ -11,6 +11,7 @@ import {
   collection,
   getDocs,
   deleteDoc,
+  addDoc, // Import addDoc to add documents
   query,
   where,
   doc,
@@ -131,10 +132,35 @@ export default function Home() {
       minute: "2-digit",
     })}`;
   };
-  
+
   // Navigate to the admin page
   const handleAdminClick = () => {
     router.push("/admiin"); // Adjust the path to your actual admin page
+  };
+
+  // Function to handle sick leave submission
+  const handleSickLeave = async () => {
+    if (user) {
+      const today = new Date();
+      const startDate = new Date(today); // Today's date
+      const endDate = new Date(today); // End date is also today
+
+      try {
+        await addDoc(collection(db, "verlof"), {
+          type: "ziek",
+          reason: "ik ben ziek vandaag",
+          startDate: startDate, // Firebase Timestamp will be handled automatically
+          endDate: endDate, // Firebase Timestamp will be handled automatically
+          uid: user.uid,
+          name: user.userName,
+          status: 1,
+        });
+        console.log("Sick leave submitted successfully");
+        fetchExistingDates(); // Refresh existing date ranges
+      } catch (error) {
+        console.error("Error submitting sick leave:", error);
+      }
+    }
   };
 
   return (
@@ -228,7 +254,10 @@ export default function Home() {
                   </button>
                 )}
 
-                <button className="bg-white border-2 border-black rounded-lg w-full h-[25%]">
+                <button
+                  className="bg-white border-2 border-black rounded-lg w-full h-[25%]"
+                  onClick={handleSickLeave} // Call sick leave function
+                >
                   <h1>Ziek Melden</h1>
                 </button>
               </div>
