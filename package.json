@@ -10,7 +10,7 @@
     "test": "NODE_ENV=development jest",
     "test:watch": "NODE_ENV=development jest --watch",
     "test:all": "NODE_ENV=development jest __tests__",
-    "test:AddUser": "cross-env NODE_ENV=development jest __tests__/AddUser.test.tsx",
+    "test:AddUser": "cross-env NODE_ENV=test jest __tests__/AddUser.test.tsx",
     "test:Home": "NODE_ENV=development jest __tests__/Home.test.tsx",
     "test:Search": "NODE_ENV=development jest __tests__/SearchBar.test.tsx",
     "test:AdmiinSearch": "NODE_ENV=development jest __tests__/AdminSearchPage.test.tsx"
