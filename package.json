@@ -51,6 +51,7 @@
     "@babel/preset-react": "^7.25.7",
     "@babel/preset-typescript": "^7.24.7",
     "@babel/register": "^7.24.6",
+    "@firebase/rules-unit-testing": "^4.0.0",
     "@jest/globals": "^29.7.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.2",
