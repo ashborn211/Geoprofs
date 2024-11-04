@@ -6,10 +6,12 @@ import {
   getDocs,
   doc,
   setDoc,
+  query,
+  where,
 } from "firebase/firestore";
 import { auth, db } from "@/FireBase/FireBaseConfig";
 import bcrypt from "bcryptjs";
-import { createUserWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { generatePassword } from "@/utils/passwordGenerator"; // Adjust the path as necessary
 
 interface Team {
@@ -58,58 +60,70 @@ export default function AddUser() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Form submitted with values:", {
+      naam,
+      email,
+      team,
+      role,
+      password,
+    });
 
+    // Check if email is already taken
     try {
-      // Create user and send password reset email
-      const response = await fetch("/api/sendVerificationEmail", {
+      const emailQuery = query(
+        collection(db, "users"),
+        where("email", "==", email)
+      );
+      const emailQuerySnapshot = await getDocs(emailQuery);
+
+      if (!emailQuerySnapshot.empty) {
+        alert("Email already taken. Please use a different email.");
+        return;
+      }
+
+      // Create the user with Firebase Authentication
+      const authUser = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      // Create the user document in Firestore with team reference
+      await setDoc(doc(db, "users", authUser.user.uid), {
+        userName: naam,
+        email: email,
+        team: doc(db, "Team", team), // Set the team as a reference to the team collection
+        role: role,
+        password: password, // Password can be sent for server-side hashing if needed
+      });
+
+      // Send a password reset email after user creation
+      const response = await fetch("/api/reset-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          naam,
-          email,
-          team,
-          role,
-          password,
-        }),
+        body: JSON.stringify({ email: email }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        alert(data.message);
-
-        // Send password reset email after user creation
-        const resetResponse = await fetch("/api/reset-password", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        });
-
-        const resetData = await resetResponse.json();
-
-        if (resetResponse.ok) {
-          alert(resetData.message);
-        } else {
-          alert(resetData.error);
-        }
-
-        // Reset form fields
-        setNaam("");
-        setEmail("");
-        setTeam("");
-        setRole("");
-        setPassword("");
-        setGeneratedPassword("");
+        alert("Password reset email sent successfully!");
       } else {
-        alert(data.error);
+        alert(data.message || "Failed to send password reset email.");
       }
+
+      // Reset form fields
+      setNaam("");
+      setEmail("");
+      setTeam("");
+      setRole("");
+      setPassword("");
+      setGeneratedPassword("");
     } catch (error) {
-      console.error("Error sending verification email:", error);
-      alert("An error occurred. Please try again.");
+      console.error("Error adding user: ", error);
+      alert("Failed to add user. Please try again.");
     }
   };
 

@@ -1,7 +1,6 @@
 // src/app/api/reset-password/route.ts
 import { NextResponse } from 'next/server';
-import { getAuth, sendPasswordResetEmail, sendSignInLinkToEmail } from 'firebase/auth';
-import { auth } from '@/FireBase/FireBaseConfig'; // Import your existing auth instance
+import { sendResetPasswordEmail } from '../../../utils/auth';
 
 export async function POST(request: Request) {
   const { email } = await request.json();
@@ -11,21 +10,9 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Send the password reset email
-    await sendPasswordResetEmail(auth, email);
-
-    // Create the action code settings for email verification
-    const actionCodeSettings = {
-      url: 'http://localhost:3000/finishSignUp', // Change to your verification URL
-      handleCodeInApp: true,
-    };
-
-    // Send the verification email
-    await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-
-    return NextResponse.json({ message: 'Password reset and verification emails sent' });
+    await sendResetPasswordEmail(email);
+    return NextResponse.json({ message: 'Password reset email sent' });
   } catch (error) {
-    console.error('Error sending emails:', error);
     return NextResponse.json({ message: 'Error sending email', error }, { status: 500 });
   }
 }
