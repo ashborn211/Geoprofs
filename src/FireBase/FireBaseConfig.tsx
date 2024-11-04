@@ -31,10 +31,6 @@ export const db = getFirestore(app);
 export const storage = getStorage(app);
 const database = getDatabase(app);
 
-// Check if running in emulator mode
-// if (process.env.NEXT_PUBLIC_USE_EMULATOR === "true") {
-//   connectFirestoreEmulator(db, "localhost", 8080);
-// }
 
 // Ensure that authentication state is persistent across page reloads
 setPersistence(auth, browserLocalPersistence)
