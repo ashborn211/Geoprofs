@@ -1,7 +1,8 @@
 // src/app/api/reset-password/route.ts
 import { NextResponse } from 'next/server';
-import { getAuth, sendPasswordResetEmail, sendSignInLinkToEmail } from 'firebase/auth';
+import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '@/FireBase/FireBaseConfig'; // Import your existing auth instance
+import { sendSignInLinkToEmail } from 'firebase/auth';
 
 export async function POST(request: Request) {
   const { email } = await request.json();

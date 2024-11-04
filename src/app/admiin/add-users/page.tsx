@@ -6,12 +6,10 @@ import {
   getDocs,
   doc,
   setDoc,
-  query,
-  where,
 } from "firebase/firestore";
 import { auth, db } from "@/FireBase/FireBaseConfig";
 import bcrypt from "bcryptjs";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { generatePassword } from "@/utils/passwordGenerator"; // Adjust the path as necessary
 
 interface Team {
@@ -60,60 +58,58 @@ export default function AddUser() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted with values:", {
-      naam,
-      email,
-      team,
-      role,
-      password,
-    });
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    console.log("Form submitted with values:", {
-      naam,
-      email,
-      team,
-      role,
-      password,
-    });
 
     try {
-      const emailQuery = query(
-        collection(db, "users"),
-        where("email", "==", email)
-      );
-      const emailQuerySnapshot = await getDocs(emailQuery);
-
-      if (!emailQuerySnapshot.empty) {
-        alert("Email already taken. Please use a different email.");
-        return;
-      }
-
-      const authUser = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
-      // Create a user document in Firestore with team reference
-      await setDoc(doc(db, "users", authUser.user.uid), {
-        userName: naam,
-        email: email,
-        team: doc(db, "Team", team), // Set the team as a reference to the team collection
-        role: role,
-        password: hashedPassword,
+      // Create user and send password reset email
+      const response = await fetch("/api/sendVerificationEmail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          naam,
+          email,
+          team,
+          role,
+          password,
+        }),
       });
-      alert("User added successfully!");
 
-      setNaam("");
-      setEmail("");
-      setTeam("");
-      setRole("");
-      setPassword("");
-      setGeneratedPassword("");
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(data.message);
+
+        // Send password reset email after user creation
+        const resetResponse = await fetch("/api/reset-password", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        const resetData = await resetResponse.json();
+
+        if (resetResponse.ok) {
+          alert(resetData.message);
+        } else {
+          alert(resetData.error);
+        }
+
+        // Reset form fields
+        setNaam("");
+        setEmail("");
+        setTeam("");
+        setRole("");
+        setPassword("");
+        setGeneratedPassword("");
+      } else {
+        alert(data.error);
+      }
     } catch (error) {
-      console.error("Error adding document: ", error);
-      alert("Failed to add user. Please try again.");
+      console.error("Error sending verification email:", error);
+      alert("An error occurred. Please try again.");
     }
   };
 
