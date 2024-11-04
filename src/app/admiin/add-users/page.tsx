@@ -95,6 +95,7 @@ export default function AddUser() {
         team: doc(db, "Team", team), // Set the team as a reference to the team collection
         role: role,
         password: password, // Password can be sent for server-side hashing if needed
+        emailVerified: false,
       });
 
       // Send a password reset email after user creation
