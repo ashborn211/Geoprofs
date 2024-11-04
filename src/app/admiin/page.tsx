@@ -37,9 +37,7 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* Admin Functions */}
             <div className="col-span-12 row-span-8 bg-custom-gray-500 p-8 flex flex-col space-y-4">
-              {/* Admin Search Container */}
               <div className="bg-white border-2 border-black rounded-lg p-8 flex justify-between items-center">
                 <h2 className="text-2xl">Admin Search</h2>
                 <Link
@@ -50,7 +48,6 @@ export default function AdminPage() {
                 </Link>
               </div>
 
-              {/* Add Users Container */}
               <div className="bg-white border-2 border-black rounded-lg p-8 flex justify-between items-center">
                 <h2 className="text-2xl">Add Users</h2>
                 <Link
@@ -58,6 +55,26 @@ export default function AdminPage() {
                   className="bg-blue-500 text-white rounded-lg py-2 px-4"
                 >
                   Go to Add Users
+                </Link>
+              </div>
+
+              <div className="bg-white border-2 border-black rounded-lg p-8 flex justify-between items-center">
+                <h2 className="text-2xl">Add Users</h2>
+                <Link
+                  href="./admiin/show-teams"
+                  className="bg-blue-500 text-white rounded-lg py-2 px-4"
+                >
+                  Go to teams
+                </Link>
+              </div>
+
+              <div className="bg-white border-2 border-black rounded-lg p-8 flex justify-between items-center">
+                <h2 className="text-2xl">Add Users</h2>
+                <Link
+                  href="./admiin/show-user"
+                  className="bg-blue-500 text-white rounded-lg py-2 px-4"
+                >
+                  Go to Users
                 </Link>
               </div>
             </div>
