@@ -13,7 +13,8 @@
     "test:AddUser": " dotenv -e .env.test -- jest __tests__/AddUser.test.tsx",
     "test:Home": "jest __tests__/Home.test.tsx",
     "test:Search": "jest __tests__/SearchBar.test.tsx",
-    "test:AdmiinSearch": "jest __tests__/AdminSearchPage.test.tsx"
+    "test:AdmiinSearch": "jest __tests__/AdminSearchPage.test.tsx",
+    "test:teams": "jest __tests__/show-teams.test.tsx"
   },
   "dependencies": {
     "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
@@ -43,6 +44,7 @@
     "framer-motion": "^11.5.4",
     "identity-obj-proxy": "^3.0.0",
     "next": "^14.2.13",
+    "node-fetch": "^3.3.2",
     "postcss": "8.4.38",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
@@ -53,6 +55,7 @@
     "@babel/preset-react": "^7.25.7",
     "@babel/preset-typescript": "^7.24.7",
     "@babel/register": "^7.24.6",
+    "@firebase/rules-unit-testing": "^4.0.0",
     "@jest/globals": "^29.7.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
