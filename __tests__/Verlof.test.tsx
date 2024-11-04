@@ -57,7 +57,7 @@ describe("VerlofComponent", () => {
   it("submits the form with valid input", async () => {
     render(<VerlofComponent selectedDate={new Date()} onClose={() => {}} />);
 
-    // Wait for the leave types to load
+    //wacht op de tekst
     await waitFor(() => {
       expect(screen.getByText("Speciaal Verlof")).toBeInTheDocument();
     });
