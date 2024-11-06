@@ -14,7 +14,7 @@ const VerifyPage = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/sendVerificationEmail', {
+      const response = await fetch('@/app/api/sendVerificationEmail', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
