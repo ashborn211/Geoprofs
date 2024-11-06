@@ -14,7 +14,7 @@ const ResetPasswordForm = () => {
     console.log('Form submitted with email:', email); // Debug log
 
     try {
-      const response = await fetch('/api/reset-password', {
+      const response = await fetch('@/app/api/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),

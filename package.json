@@ -15,7 +15,7 @@
     "test:Search": "jest __tests__/SearchBar.test.tsx",
     "test:AdmiinSearch": "jest __tests__/AdminSearchPage.test.tsx",
     "test:teams": "jest __tests__/show-teams.test.tsx",
-    "test:email": "jest __tests__/reset-password.test.tsx"
+    "test:password": "jest __tests__/reset-password.test.tsx"
   },
   "dependencies": {
     "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",

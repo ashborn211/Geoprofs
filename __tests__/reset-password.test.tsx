@@ -9,7 +9,7 @@ describe("ResetPasswordForm Integration Test", () => {
     global.fetch = jest.fn();
 
     (global.fetch as jest.Mock).mockImplementation((url: string) => {
-      if (url === "/api/reset-password") {
+      if (url === "@/app/api/reset-password") {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ message: "Password reset email sent" }),
@@ -37,7 +37,7 @@ describe("ResetPasswordForm Integration Test", () => {
 
     // Check that the fetch was called correctly
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith("/api/reset-password", {
+      expect(global.fetch).toHaveBeenCalledWith("@/app/api/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: "yosef1234568910@gmail.com" }),
