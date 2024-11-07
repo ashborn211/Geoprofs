@@ -156,13 +156,13 @@ export default function Home() {
           endDate: endDate, // Firebase Timestamp will be handled automatically
           uid: user.uid,
           name: user.userName,
-          status: 1,
+          status: 2,
         });
-        console.log("Sick leave submitted successfully");
+        console.log("ziekte is gemeld!");
         setSickLeaveSubmitted(true); // Set the state to show popup
         fetchExistingDates(); // Refresh existing date ranges
       } catch (error) {
-        console.error("Error submitting sick leave:", error);
+        console.error("Error voor ziekmelden:", error);
       }
     }
   };

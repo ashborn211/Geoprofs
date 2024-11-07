@@ -1,13 +1,12 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 import {
   getAuth,
   setPersistence,
   browserLocalPersistence,
-  connectAuthEmulator,
 } from "firebase/auth";
 import { getStorage } from "firebase/storage";
-import { getDatabase, connectDatabaseEmulator } from "firebase/database";
+import { getDatabase } from "firebase/database";
 
 // Firebase config object
 const firebaseConfig = {
@@ -31,15 +30,8 @@ export const db = getFirestore(app);
 export const storage = getStorage(app);
 const database = getDatabase(app);
 
-// Connect to the emulator if in development mode
-if (process.env.NODE_ENV === "development") {
-  // Connect Auth emulator
-  connectAuthEmulator(auth, "http://localhost:9099");
-  // Connect Firestore emulator
-  connectFirestoreEmulator(db, "localhost", 8080);
-  // Connect Realtime Database emulator
-  connectDatabaseEmulator(database, "localhost", 9000);
-}
+// Verbindt niet meer met de emulator, dus deze sectie is verwijderd
+// Als je in de toekomst de emulator wilt gebruiken, kun je deze sectie opnieuw toevoegen.
 
 // Ensure that authentication state is persistent across page reloads
 setPersistence(auth, browserLocalPersistence)
