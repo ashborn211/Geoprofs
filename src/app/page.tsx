@@ -52,6 +52,11 @@ const LoginPage = () => {
       );
       const user = userCredential.user;
 
+      // Check if the email is verified
+      if (!user.emailVerified) {
+        alert("Your email is not verified. Please check your inbox.");
+      }
+
       // Fetch additional user data from Firestore after successful login
       const userData = await fetchUserData(user.uid);
 
