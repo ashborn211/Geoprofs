@@ -1,8 +1,7 @@
-// src/components/ProtectedRoute.tsx
 "use client";
 
 import { useUser } from "@/context/UserContext";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation"; // Import usePathname
 import { useEffect } from "react";
 
 interface ProtectedRouteProps {
@@ -12,20 +11,21 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user } = useUser(); // Access the user context
   const router = useRouter();
+  const currentPath = usePathname(); // Get the current route path using usePathname()
 
   useEffect(() => {
-    // If no user is logged in, redirect to the login page
-    if (!user) {
+    // If no user is logged in and we're not on the login page, redirect to the login page
+    if (!user && currentPath !== "/") {
       router.push("/"); // Redirect to the login page
     }
-  }, [user, router]);
+  }, [user, router, currentPath]);
 
-  // While checking the user status, you can return a loading message or nothing at all
-  if (!user) {
-    return <div>Loading...</div>; // Or you can return nothing or a spinner
+  // If no user is logged in, nothing is rendered and the user is redirected to the login page
+  if (!user && currentPath !== "/") {
+    return null; // Don't render anything while redirecting to login
   }
 
-  // If user is logged in, render the children (protected content)
+  // If user is logged in or we're on the login page, render the children (protected content)
   return <>{children}</>;
 };
 
