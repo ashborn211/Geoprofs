@@ -1,36 +1,34 @@
-"use client";
-// src/components/ResetPasswordForm.tsx
-import { useState } from 'react';
+// src/components/VerifyEmailForm.tsx
+"use client"
+import { useState } from "react";
 
-const ResetPasswordForm = () => {
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+const VerifyEmailForm = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState(""); // For signing in
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage('');
-    setError('');
-    console.log('Form submitted with email:', email); // Debug log
+    setMessage("");
+    setError("");
 
     try {
-      const response = await fetch('api/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+      const response = await fetch("/api/verify-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
-      console.log('Response from API:', data); // Debug log
-
       if (response.ok) {
         setMessage(data.message);
       } else {
         setError(data.message);
       }
     } catch (err) {
-      console.error('Error sending request:', err); // Debug log
-      setError('An unexpected error occurred.');
+      console.error("Error sending verification request:", err);
+      setError("An unexpected error occurred.");
     }
   };
 
@@ -40,7 +38,7 @@ const ResetPasswordForm = () => {
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg shadow-md w-96"
       >
-        <h2 className="text-lg font-semibold mb-4">Reset Password</h2>
+        <h2 className="text-lg font-semibold mb-4">Verify Email</h2>
         <input
           type="email"
           value={email}
@@ -49,11 +47,19 @@ const ResetPasswordForm = () => {
           required
           className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Enter your password"
+          required
+          className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
         <button
           type="submit"
           className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
         >
-          Send Reset Email
+          Send Verification Email
         </button>
         {message && <p className="text-green-500 mt-4">{message}</p>}
         {error && <p className="text-red-500 mt-4">{error}</p>}
@@ -62,4 +68,4 @@ const ResetPasswordForm = () => {
   );
 };
 
-export default ResetPasswordForm;
+export default VerifyEmailForm;
