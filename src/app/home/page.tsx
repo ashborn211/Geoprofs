@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import CalendarComponent from "@/components/calendar/calendar"; // Updated import path for consistency
 import VerlofComponent from "../../components/verlof"; // Import your VerlofComponent
-import { Link } from "@nextui-org/react"; // Ensure this import is necessary
 import { useUser } from "../../context/UserContext"; // Import your user context
 import { useRouter } from "next/navigation"; // Import useRouter from Next.js
 import Logout from "@/components/Logout";
@@ -129,7 +128,7 @@ export default function Home() {
 
   // Navigate to the admin page
   const handleAdminClick = () => {
-    router.push("/admin"); // Adjust the path to your actual admin page
+    router.push("/admiin"); // Adjust the path to your actual admin page
   };
 
   return (

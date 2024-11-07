@@ -5,6 +5,7 @@ import SearchBar from "@/components/SearchBar";
 import ResultsTable from "@/components/ResultsTable";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/FireBase/FireBaseConfig";
+import Logout from "@/components/Logout";
 export default function AdminSearchPage() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [allData, setAllData] = useState<any[]>([]);
@@ -36,11 +37,8 @@ export default function AdminSearchPage() {
   return (
     <>
       <div className="flex h-screen overflow-hidden bg-custom-gray">
-        {/* Sidebar */}
         <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
-          <Link href="./" className="text-white underline mb-4">
-            Log out
-          </Link>
+        <Logout />
         </div>
 
         {/* Main Content */}

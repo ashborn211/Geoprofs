@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/FireBase/FireBaseConfig";
+import Logout from "@/components/Logout";
 
 interface User {
   id: string;
@@ -75,7 +76,9 @@ export default function TeamUserTable() {
   return (
     <>
       <div className="flex h-screen overflow-hidden bg-custom-gray">
-        <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center"></div>
+        <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
+        <Logout />
+        </div>
         <div className="w-[94vw] h-full">
           <div className="h-full grid grid-cols-12 grid-rows-12">
             <div className="col-span-12 row-span-4 col-start-1 bg-custom-gray-500 flex justify-around p-4">
