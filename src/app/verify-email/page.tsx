@@ -1,5 +1,5 @@
-// src/app/verify/page.tsx
-import VerifyEmailForm from "@/components/VerifyEmailForm";
+// src/app/verify-email/page.tsx
+import VerifyEmailForm from '@/components/VerifyEmailForm';
 
 const VerifyEmailPage = () => {
   return (

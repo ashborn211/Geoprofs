@@ -1,10 +1,10 @@
 // src/components/VerifyEmailForm.tsx
-"use client";
-
+"use client"
 import { useState } from "react";
 
 const VerifyEmailForm = () => {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState(""); // For signing in
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -14,23 +14,20 @@ const VerifyEmailForm = () => {
     setError("");
 
     try {
-      const response = await fetch("/api/sendVerificationEmail", {
+      const response = await fetch("/api/verify-email", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
-
       if (response.ok) {
         setMessage(data.message);
       } else {
-        setError(data.message || "An unexpected error occurred.");
+        setError(data.message);
       }
     } catch (err) {
-      console.error("Error sending request:", err);
+      console.error("Error sending verification request:", err);
       setError("An unexpected error occurred.");
     }
   };
@@ -41,12 +38,20 @@ const VerifyEmailForm = () => {
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg shadow-md w-96"
       >
-        <h2 className="text-lg font-semibold mb-4">Verify Your Email</h2>
+        <h2 className="text-lg font-semibold mb-4">Verify Email</h2>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email"
+          required
+          className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Enter your password"
           required
           className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
