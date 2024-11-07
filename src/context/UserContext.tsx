@@ -15,19 +15,19 @@ interface User {
   uid: string;
   email: string;
   userName: string | null;
-  role: string | null; // New property
-  team: string | null; // New property
+  role: string | null;
+  team: string | null;
 }
 
+// Extend UserContextType to include `isLoading` state
 interface UserContextType {
   user: User | null;
   setUser: (user: User | null) => void;
+  isLoading: boolean; // Add isLoading to the context type
 }
 
 // Create the UserContext
-export const UserContext = createContext<UserContextType | undefined>(
-  undefined
-);
+export const UserContext = createContext<UserContextType | undefined>(undefined);
 
 // Custom hook to use the UserContext
 export const useUser = () => {
@@ -41,6 +41,7 @@ export const useUser = () => {
 // UserProvider component
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUserState] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true); // Add isLoading state
 
   // Fetch user data from db when user is authenticated
   useEffect(() => {
@@ -59,13 +60,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             team: userData.team || null,
           });
         } else {
-          // User does not exist in Firestore
           console.error("No user document found for the authenticated user.");
         }
       } else {
-        // User is logged out
         setUserState(null);
       }
+      setIsLoading(false); // Once the authentication check is done, stop loading
     });
 
     // Cleanup listener on unmount
@@ -75,7 +75,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const setUser = (user: User | null) => setUserState(user);
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser, isLoading }}>
       {children}
     </UserContext.Provider>
   );
