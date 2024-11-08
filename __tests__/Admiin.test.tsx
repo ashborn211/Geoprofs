@@ -21,7 +21,7 @@ describe("AdminPage", () => {
     expect(welcomeText).toBeInTheDocument();
 
     // Check if the logo image is rendered correctly
-    const logoImage = screen.getByLabelText("nigga"); 
+    const logoImage = screen.getByLabelText("img"); 
     expect(logoImage).toBeInTheDocument();
   });
 
@@ -55,7 +55,7 @@ describe("AdminPage", () => {
     
 
     // Check if the logo has the expected background image
-    const logo = screen.getByLabelText("nigga");
+    const logo = screen.getByLabelText("img");
     expect(logo).toHaveStyle("background-image: url('/images/Logo GeoProfs.png')");
   });
 

@@ -28,7 +28,7 @@ export default function AdminPage() {
               </div>
 
               <div className="w-[20%]">
-                <div aria-label="nigga"
+                <div aria-label="img"
                   className="w-full h-[75%] bg-cover bg-center"
                   style={{
                     backgroundImage: "url('/images/Logo GeoProfs.png')",
