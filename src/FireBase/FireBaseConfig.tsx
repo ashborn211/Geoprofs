@@ -32,6 +32,7 @@ export const storage = getStorage(app);
 const database = getDatabase(app);
 
 
+
 // Ensure that authentication state is persistent across page reloads
 setPersistence(auth, browserLocalPersistence)
   .then(() => console.log("Persistence set to local storage."))
