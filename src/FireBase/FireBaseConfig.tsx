@@ -1,6 +1,5 @@
-// FireBaseConfig.tsx
 import { initializeApp } from "firebase/app";
-import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 import {
   getAuth,
   setPersistence,
@@ -31,11 +30,14 @@ export const db = getFirestore(app);
 export const storage = getStorage(app);
 const database = getDatabase(app);
 
-
+// Verbindt niet meer met de emulator, dus deze sectie is verwijderd
+// Als je in de toekomst de emulator wilt gebruiken, kun je deze sectie opnieuw toevoegen.
 
 // Ensure that authentication state is persistent across page reloads
 setPersistence(auth, browserLocalPersistence)
-  .then(() => console.log("Persistence set to local storage."))
-  .catch((error) => console.error("Error setting persistence:", error));
-
-export default firebaseConfig;
+  .then(() => {
+    console.log("Persistence set to local storage.");
+  })
+  .catch((error) => {
+    console.error("Error setting persistence:", error);
+  });

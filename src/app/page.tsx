@@ -92,7 +92,7 @@ const LoginPage = () => {
         />
       </div>
       <div className="container">
-        <h2 className="title">Inloggen</h2>
+        <h2 className="title">login</h2>
         <form onSubmit={handleLogin}>
           <div className="form-group">
             <Input
