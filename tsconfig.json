@@ -5,13 +5,17 @@
       "dom.iterable",
       "esnext"
     ],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./@types"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",  // Changed to "node"
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -37,9 +41,11 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src",
-    "babel.config.ts",
-    "jest.config.ts"
-, "tailwind.config.ts"  ],
+    "babel.config.js",
+    "jest.config.js",
+    "tailwind.config.ts",
+    "src/FireBase/FireBaseConfig.tsx"
+, "jest.setup.js"  ],
   "exclude": [
     "node_modules"
   ]

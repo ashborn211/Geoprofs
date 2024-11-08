@@ -1,8 +1,10 @@
 // src/app/layout.tsx
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { NextUIProvider } from '@nextui-org/react'; // Add this import
+import { NextUIProvider } from "@nextui-org/react";
+import { UserProvider } from "../context/UserContext"; // Import UserProvider
 import "./globals.css";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +22,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <NextUIProvider>
-          {children}
+          <UserProvider>
+            <ProtectedRoute>{children}</ProtectedRoute>
+          </UserProvider>
         </NextUIProvider>
       </body>
     </html>

@@ -2,44 +2,83 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { auth, provider, db } from "../../FireBaseConfig";
+import { auth } from "../FireBase/FireBaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { Input, Button, Link } from "@nextui-org/react"; // Using NextUI 2.0 components
+import { doc, getDoc } from "firebase/firestore";
+import { Input, Button } from "@nextui-org/react";
+import { useUser } from "../context/UserContext";
+import { db } from "@/FireBase/FireBaseConfig"; // Import your Firestore instance
 import "./page.css";
-import {
-  query,
-  collection,
-  where,
-  getDocs,
-  setDoc,
-  doc,
-} from "firebase/firestore";
-
-const standardProfilePicture =
-  "https://hongkongfp.com/wp-content/uploads/2023/06/20230610_164958-Copy.jpg";
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-
+  const { setUser } = useUser();
   const router = useRouter();
+
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const fetchUserData = async (uid: string) => {
+    try {
+      const userDoc = await getDoc(doc(db, "users", uid)); // Adjust to your Firestore path
+      if (userDoc.exists()) {
+        return userDoc.data(); // Returns the user data as an object
+      } else {
+        throw new Error("No such user document");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return null;
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (!isValidEmail(email)) {
+      alert("Invalid email format");
+      return;
+    }
+
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      alert("Login successful!");
-      router.push("/user");
+      // Authenticate user with email and password
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      // Check if the email is verified
+      if (!user.emailVerified) {
+        alert("Your email is not verified. Please verify it.");
+      }
+
+      // Fetch additional user data from Firestore after successful login
+      const userData = await fetchUserData(user.uid);
+
+      if (userData) {
+        // Set user in context with additional data
+        setUser({
+          uid: user.uid,
+          email: user.email!,
+          userName: userData.userName || "Anonymous", // Use userName from Firestore
+          role: userData.role,
+          team: userData.team,
+        });
+
+        alert("Login successful!");
+        router.push("/home");
+      } else {
+        alert("Failed to fetch user details. Please try again.");
+      }
     } catch (error: any) {
       console.error(error.message);
       if (error.code === "auth/user-not-found") {
-        const register = confirm(
-          "User does not exist. Do you want to register?"
-        );
-        if (register) {
-          router.push("/register");
-        }
+        alert("User does not exist. Do you want to register?");
       } else if (error.code === "auth/wrong-password") {
         alert("Incorrect password. Please try again.");
       } else {
@@ -50,14 +89,14 @@ const LoginPage = () => {
 
   return (
     <main className="">
-              <div className="logo-container">
-          <img
-            src="/images/LogoGeoProfs.png" // Corrected path for Next.js
-            alt="GeoProfs Logo"
-            className="logo"
-          />
-        </div>
-        <div className="container">
+      <div className="logo-container">
+        <img
+          src="/images/Logo GeoProfs.png"
+          alt="GeoProfs Logo"
+          className="logo"
+        />
+      </div>
+      <div className="container">
         <h2 className="title">Inloggen</h2>
         <form onSubmit={handleLogin}>
           <div className="form-group">
@@ -68,7 +107,7 @@ const LoginPage = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setEmail(e.target.value)
               }
-              isRequired
+              required
               fullWidth
             />
           </div>
@@ -81,13 +120,12 @@ const LoginPage = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setPassword(e.target.value)
               }
-              isRequired
+              required
               fullWidth
             />
           </div>
 
           <div className="button-group">
-
             <Button type="submit" className="login-button" color="primary">
               Inloggen
             </Button>
