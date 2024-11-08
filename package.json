@@ -18,7 +18,8 @@
     "test:email": "jest __tests__/reset-password.test.tsx",
     "test:login": "jest __tests__/Login.test.tsx",
     "test:users": "jest __tests__/Show-users.test.tsx",
-    "test:loginPage": "jest __tests__/LoginPage.test.tsx --coverage --runTestsByPath"
+    "test:loginPage": "jest __tests__/LoginPage.test.tsx --coverage --runTestsByPath",
+    "test:Admiin": "jest __tests__/admiin.test.tsx --coverage --runTestsByPath"
   
 
   },

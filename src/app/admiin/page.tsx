@@ -5,7 +5,7 @@ export default function AdminPage() {
     <>
       <div className="flex h-screen overflow-hidden bg-custom-gray">
         {/* Sidebar */}
-        <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
+        <div  aria-label="sidebar1" className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
           <Link href="./" className="text-white underline mb-4">
             Log out
           </Link>
@@ -28,7 +28,7 @@ export default function AdminPage() {
               </div>
 
               <div className="w-[20%]">
-                <div
+                <div aria-label="nigga"
                   className="w-full h-[75%] bg-cover bg-center"
                   style={{
                     backgroundImage: "url('/images/Logo GeoProfs.png')",
