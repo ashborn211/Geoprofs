@@ -11,7 +11,7 @@
     "test:watch": "cross-env NODE_ENV=development jest --watch",
     "test:all": "cross-env NODE_ENV=development jest __tests__",
     "test:calendar": "jest __tests__/Calendar.test.tsx --runTestsByPath --coverage",
-    "test:verlof": "cross-env NODE_ENV=development jest __tests__/Verlof.test.tsx --runTestsByPath --coverage"
+    "test:verlof": "cross-env NODE_ENV=development jest __tests__/Verlof.test.tsx --runTestsByPath"
   },
   "dependencies": {
     "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
