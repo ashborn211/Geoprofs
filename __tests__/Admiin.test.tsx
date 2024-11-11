@@ -51,7 +51,7 @@ describe("AdminPage", () => {
     );
 
     const sidebar = screen.getByLabelText("sidebar1");
-    // Check the sidebar width is as expected (6vw)
+   
     
 
     // Check if the logo has the expected background image
@@ -61,7 +61,7 @@ describe("AdminPage", () => {
 
   test("should display the correct number of sections", () => {
     const sections = screen.getAllByRole("link");
-    expect(sections).toHaveLength(5); // since there are 4 links
+    expect(sections).toHaveLength(5); // since there are 5 links
   });
 
   test("should navigate to the correct pages on link click", () => {
