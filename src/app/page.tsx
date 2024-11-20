@@ -8,11 +8,13 @@ import { doc, getDoc } from "firebase/firestore";
 import { Input, Button } from "@nextui-org/react";
 import { useUser } from "../context/UserContext";
 import { db } from "@/FireBase/FireBaseConfig"; // Import your Firestore instance
+import ReCAPTCHA from "react-google-recaptcha";
 import "./page.css";
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const { setUser } = useUser();
   const router = useRouter();
 
@@ -35,11 +37,34 @@ const LoginPage = () => {
     }
   };
 
+  const handleCaptchaChange = (token: string | null) => {
+    setCaptchaToken(token);
+  };
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!isValidEmail(email)) {
       alert("Invalid email format");
+      return;
+    }
+
+    if (!captchaToken) {
+      alert("Please complete the CAPTCHA.");
+      return;
+    }
+
+    // Verify CAPTCHA token on the server
+    const captchaResponse = await fetch("/api/verify-captcha", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: captchaToken }),
+    });
+
+    const captchaResult = await captchaResponse.json();
+
+    if (!captchaResult.success) {
+      alert("CAPTCHA verification failed. Please try again.");
       return;
     }
 
@@ -55,6 +80,7 @@ const LoginPage = () => {
       // Check if the email is verified
       if (!user.emailVerified) {
         alert("Your email is not verified. Please verify it.");
+        return;
       }
 
       // Fetch additional user data from Firestore after successful login
@@ -97,7 +123,7 @@ const LoginPage = () => {
         />
       </div>
       <div className="container">
-        <h2 className="title">login</h2>
+        <h2 className="title">Login</h2>
         <form onSubmit={handleLogin}>
           <div className="form-group">
             <Input
@@ -122,6 +148,13 @@ const LoginPage = () => {
               }
               required
               fullWidth
+            />
+          </div>
+
+          <div className="form-group">
+            <ReCAPTCHA
+              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+              onChange={handleCaptchaChange}
             />
           </div>
 

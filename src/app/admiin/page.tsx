@@ -59,7 +59,7 @@ export default function AdminPage() {
               </div>
 
               <div className="bg-white border-2 border-black rounded-lg p-8 flex justify-between items-center">
-                <h2 className="text-2xl">Add Users</h2>
+                <h2 className="text-2xl">teams</h2>
                 <Link
                   href="./admiin/show-teams"
                   className="bg-blue-500 text-white rounded-lg py-2 px-4"
@@ -69,7 +69,7 @@ export default function AdminPage() {
               </div>
 
               <div className="bg-white border-2 border-black rounded-lg p-8 flex justify-between items-center">
-                <h2 className="text-2xl">Add Users</h2>
+                <h2 className="text-2xl">Users</h2>
                 <Link
                   href="./admiin/show-user"
                   className="bg-blue-500 text-white rounded-lg py-2 px-4"
