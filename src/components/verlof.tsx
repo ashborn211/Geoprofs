@@ -53,9 +53,10 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
     fetchLeaveTypes();
   }, []); // Empty dependency array ensures this runs only once on mount
 
-  // Helper to format date in the "YYYY-MM-DDTHH:MM" format and adjust to the Netherlands timezone
+  // Helper to format date for "datetime-local" input
   const formatDateForInput = (timestamp: Timestamp) => {
     const date = timestamp.toDate();
+<<<<<<< HEAD
     const timeZone = "Europe/Amsterdam"; // Fixed timezone
 
     // Convert the date to the Netherlands timezone
@@ -63,35 +64,54 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
 
     // Format it as YYYY-MM-DDTHH:MM (required by datetime-local input)
     return format(zonedDate, "yyyy-MM-dd'T'HH:mm");
+=======
+    return date.toISOString().slice(0, 16); // Formatted as YYYY-MM-DDTHH:mm
+>>>>>>> verlof-component-fixes
   };
 
+  // Handle form submission
   const handleSubmit = async () => {
     if (selectedButton && reason && user) {
       try {
+        console.log("Submitting:", {
+          type: selectedButton,
+          reason,
+          startDate: startDate.toDate(), // Debug log
+          endDate: endDate.toDate(),     // Debug log
+          uid: user.uid,
+          name: user.userName,
+          status: 1,
+        });
+
         await addDoc(collection(db, "verlof"), {
           type: selectedButton,
           reason,
           startDate, // Submit start date as Firebase Timestamp
-          endDate, // Submit end date as Firebase Timestamp
+          endDate,   // Submit end date as Firebase Timestamp
           uid: user.uid, // Use uid from user context
           name: user.userName, // Use name from user context
           status: 1, // Set status to a number value of 1
         });
-        alert("Verlof/Vakantie request submitted!");
+
         onClose();
+        window.location.reload();
       } catch (error) {
         console.error("Error adding document: ", error);
       }
     } else {
-      alert("Please fill in all fields.");
+      console.warn("Missing required fields");
+      if (!selectedButton) alert("Selecteer een verloftype.");
+      if (!reason) alert("Geef een reden op.");
     }
   };
 
+  // Handle changes to date inputs
   const handleDateChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     setter: (value: Timestamp) => void
   ) => {
     const newDate = new Date(event.target.value);
+    console.log("Selected date:", newDate); // Debug log
     setter(Timestamp.fromDate(newDate));
   };
 
@@ -128,14 +148,16 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
 
             <div className="time-section">
               <div className="time-input">
-                <label>Start Date and Time:</label>
+                <label htmlFor="startdate-input">Start Date and Time:</label>
                 <input
+                  id="startdate-input"
                   type="datetime-local"
                   value={formatDateForInput(startDate)}
                   onChange={(e) => handleDateChange(e, setStartDate)}
                 />
-                <label>End Date and Time:</label>
+                <label htmlFor="enddate-input">End Date and Time:</label>
                 <input
+                  id="enddate-input"
                   type="datetime-local"
                   value={formatDateForInput(endDate)}
                   onChange={(e) => handleDateChange(e, setEndDate)}

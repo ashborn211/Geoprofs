@@ -26,6 +26,8 @@ export default function CalendarComponent({
 }: CalendarComponentProps) {
   const [value, setValue] = useState<DateValue | null>(null);
   const [dateRanges, setDateRanges] = useState<DateRange[]>([]);
+  const [visibleMonth, setVisibleMonth] = useState<number>(new Date().getMonth());
+  const [visibleYear, setVisibleYear] = useState<number>(new Date().getFullYear());
   const containerRef = useRef<HTMLDivElement>(null);
   const auth = getAuth(); // Haal de huidige ingelogde gebruiker op
   const currentUser = auth.currentUser; // Controleer of er een ingelogde gebruiker is
@@ -71,7 +73,7 @@ export default function CalendarComponent({
         dateRanges.forEach(({ startDate, endDate, status, uid }) => {
           // Alleen doorlopen als de uid overeenkomt met de huidige gebruiker
           if (uid === currentUser.uid) {
-            // Loop through all days in the range between startDate and endDate
+            // Loop door alle dagen in het bereik tussen startDate en endDate
             for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
               const day = d.getDate();
               const matchingSpans = Array.from(spans).filter(
@@ -117,7 +119,21 @@ export default function CalendarComponent({
     const jsDate = new Date(newValue.toString());
     onDateSelect(jsDate);
 
-    // Check if the selected date is within any date range
+    // Controleer of de zichtbare maand is veranderd
+    const newMonth = jsDate.getMonth();
+    const newYear = jsDate.getFullYear();
+
+    if (newMonth !== visibleMonth || newYear !== visibleYear) {
+      console.log(
+        `De maand is veranderd naar: ${jsDate.toLocaleString("default", {
+          month: "long",
+        })} ${newYear}`
+      );
+      setVisibleMonth(newMonth);
+      setVisibleYear(newYear);
+    }
+
+    // Controleer of de geselecteerde datum binnen een van de datumbereiken valt
     const selectedDate = dateRanges.find(
       ({ startDate, endDate, uid }) =>
         jsDate >= startDate && jsDate <= endDate && uid === currentUser?.uid
@@ -130,16 +146,32 @@ export default function CalendarComponent({
     }
   };
 
+  // Gebruik onVisibleRangeChange om de pagina te herladen bij navigeren naar een andere maand
+  const handleVisibleRangeChange = ({ start, end }: { start: Date; end: Date }) => {
+    // Als de maand verandert (door navigatie met de pijltjes), herlaad de pagina
+    const newMonth = start.getMonth();
+    const newYear = start.getFullYear();
+
+    if (newMonth !== visibleMonth || newYear !== visibleYear) {
+      console.log(`De maand is veranderd naar: ${newMonth + 1}/${newYear}. De pagina wordt herladen.`);
+      window.location.reload(); // Herlaad de pagina
+    }
+
+    setVisibleMonth(newMonth);
+    setVisibleYear(newYear);
+  };
+
   return (
     <div className="flex justify-center items-center h-full">
       <Calendar
-        ref={containerRef}
+        ref={containerRef} // Koppel de kalender aan de ref
         calendarWidth={1000}
-        aria-label="Hij is er!"
-        visibleMonths={1}
-        minValue={today(getLocalTimeZone())}
-        value={value}
-        onChange={handleDateChange}
+        aria-label="Hij is er!" // Toegankelijkheid label
+        visibleMonths={1} // Toon 1 maand per keer
+        minValue={today(getLocalTimeZone())} // De minimale datum die kan worden geselecteerd is vandaag
+        value={value} // De geselecteerde waarde
+        onChange={handleDateChange} // De functie die wordt aangeroepen bij wijziging van de geselecteerde datum
+        onVisibleRangeChange={handleVisibleRangeChange} // De functie die wordt aangeroepen bij wijziging van de zichtbare maand
         style={{
           fontSize: "23px",
           boxShadow: "none",

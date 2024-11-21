@@ -1,9 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-<<<<<<< HEAD
 <<<<<<<< HEAD:src/FireBase/FireBaseConfig.tsx
-=======
->>>>>>> verlof-component-fixes
 import {
   getAuth,
   setPersistence,
@@ -11,7 +8,6 @@ import {
 } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 import { getDatabase } from "firebase/database";
-<<<<<<< HEAD
 ========
 import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { getStorage, ref } from "firebase/storage";
@@ -19,10 +15,6 @@ import { getStorage, ref } from "firebase/storage";
 // https://firebase.google.com/docs/web/setup#available-libraries
 >>>>>>>> verlof-component-fixes:FireBaseConfig.jsx
 
-=======
-
-// Firebase config object
->>>>>>> verlof-component-fixes
 const firebaseConfig = {
   apiKey: "AIzaSyCGPXI9a5y1kYgNmW-bd7kcEXtzPBrDC7M",
   authDomain: "geoprofs-3f4e4.firebaseapp.com",
@@ -35,13 +27,8 @@ const firebaseConfig = {
   measurementId: "G-ZFMSVSN97W",
 };
 
-<<<<<<< HEAD
 const app = initializeApp(firebaseConfig);
 <<<<<<<< HEAD:src/FireBase/FireBaseConfig.tsx
-=======
-// Initialize Firebase app
-const app = initializeApp(firebaseConfig);
->>>>>>> verlof-component-fixes
 
 // Initialize Firebase services
 export const auth = getAuth(app);
@@ -60,7 +47,6 @@ setPersistence(auth, browserLocalPersistence)
   .catch((error) => {
     console.error("Error setting persistence:", error);
   });
-<<<<<<< HEAD
 ========
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -68,5 +54,3 @@ const storage = getStorage();
 const storageRef = ref(storage);
 const provider = new GoogleAuthProvider();
 >>>>>>>> verlof-component-fixes:FireBaseConfig.jsx
-=======
->>>>>>> verlof-component-fixes
