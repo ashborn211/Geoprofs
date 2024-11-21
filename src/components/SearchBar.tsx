@@ -18,9 +18,8 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
     setter(value); // Update the corresponding query state
   };
 
-  // Trigger search when the user changes the input
   const handleSearch = () => {
-    onSearch(nameQuery, typeQuery, dateQuery);
+    onSearch(nameQuery, typeQuery, dateQuery); // Trigger search with current queries
   };
 
   return (
@@ -41,7 +40,7 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
       />
       <input
         type="text"
-        placeholder="Search by date"
+        placeholder="Search by date (mm/dd/yyy)"
         value={dateQuery}
         onChange={(e) => handleInputChange(e, setDateQuery)}
         className="search-input p-2 border rounded-lg"

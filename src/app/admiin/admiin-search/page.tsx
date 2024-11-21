@@ -22,8 +22,8 @@ export default function AdminSearchPage() {
             id: doc.id,
             name: data.name,
             reason: data.reason,
-            startDate: data.startDate,
-            endDate: data.endDate,
+            startDate: data.startDate, // Firestore timestamp
+            endDate: data.endDate, // Assuming endDate exists, or null if missing
             status: data.status,
             type: data.type,
             uid: data.uid,
@@ -39,7 +39,7 @@ export default function AdminSearchPage() {
     fetchData();
   }, []);
 
-  // Filter the results based on the search query
+  // Filter the results based on the search queries
   const handleSearch = (nameQuery: string, typeQuery: string, dateQuery: string) => {
     const filteredResults = allData.filter((item) => {
       const lowerName = nameQuery.toLowerCase();
@@ -48,22 +48,18 @@ export default function AdminSearchPage() {
       const itemName = item.name.toLowerCase();
       const itemType = item.type.toLowerCase();
 
-      // Convert Firestore timestamp to string (YYYY-MM-DD) for comparison
-      const itemStartDate = item.startDate.seconds
-        ? new Date(item.startDate.seconds * 1000).toLocaleDateString()
-        : "Invalid Date";
+      // Convert Firestore timestamp to string (MM/DD)
+      const itemStartDate = new Date(item.startDate.seconds * 1000).toLocaleDateString();
 
+      // Match name, type, and date (startDate) with the queries
+      const matchesName = nameQuery ? itemName.includes(lowerName) : true;
       const matchesType = typeQuery ? itemType.includes(lowerType) : true;
-      const matchesDate = dateQuery ? itemStartDate.includes(lowerDate) : true;
+      const matchesDate = dateQuery ? itemStartDate.startsWith(lowerDate) : true;
 
-      return (
-        itemName.includes(lowerName) &&
-        matchesType &&
-        matchesDate
-      );
+      return matchesName && matchesType && matchesDate;
     });
 
-    setSearchResults(filteredResults);
+    setSearchResults(filteredResults); // Update the search results
   };
 
   return (
