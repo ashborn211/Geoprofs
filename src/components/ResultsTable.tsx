@@ -9,11 +9,30 @@ const ResultsTable: React.FC<ResultsTableProps> = ({ data }) => {
     return <p className="text-white">No results found.</p>;
   }
 
-  // Convert Firestore timestamp to readable date
-  const convertTimestamp = (timestamp: any) => {
-    if (!timestamp) return "";
-    const date = timestamp.toDate(); // Convert Firestore timestamp to JS Date
-    return date.toLocaleDateString();
+  // Check and convert Firestore timestamp to readable date string
+  const convertTimestampToString = (timestamp: any) => {
+    if (!timestamp) {
+      console.error("Invalid timestamp:", timestamp); // Log invalid timestamp
+      return "Invalid Date"; // Return a fallback message if timestamp is missing
+    }
+
+    // Check if the timestamp is a Firestore Timestamp
+    if (
+      timestamp.seconds === undefined ||
+      timestamp.nanoseconds === undefined
+    ) {
+      console.error("Invalid Firestore Timestamp:", timestamp); // Log invalid Firestore Timestamp
+      return "Invalid Date"; // Return a fallback message if not a valid Firestore Timestamp
+    }
+
+    // Convert Firestore timestamp to JavaScript Date
+    const date = new Date(timestamp.seconds * 1000); // Firestore Timestamp to JS Date
+    if (isNaN(date.getTime())) {
+      console.error("Invalid Date object:", date); // Log if date conversion fails
+      return "Invalid Date"; // Return a fallback message if conversion fails
+    }
+
+    return date.toLocaleDateString(); // Convert to local date string
   };
 
   return (
@@ -24,21 +43,21 @@ const ResultsTable: React.FC<ResultsTableProps> = ({ data }) => {
             <th className="p-2 text-left">Name</th>
             <th className="p-2 text-left">Type</th>
             <th className="p-2 text-left">Reason</th>
-            <th className="p-2 text-left">Time</th>
-            <th className="p-2 text-left">User ID</th> {/* Change ID to User ID */}
+            <th className="p-2 text-left">Start Date - End Date</th>
+            <th className="p-2 text-left">User ID</th>
           </tr>
         </thead>
         <tbody>
           {data.map((item) => (
-            <tr key={item.userId} className="bg-blue-600 border-b border-blue-800">
+            <tr key={item.id} className="bg-blue-600 border-b border-blue-800">
               <td className="p-2">{item.name}</td>
               <td className="p-2">{item.type}</td>
               <td className="p-2">{item.reason}</td>
               <td className="p-2">
-                {item.startTime} - {item.endTime},{" "}
-                {convertTimestamp(item.startDate)} {/* Convert timestamp */}
+                {convertTimestampToString(item.startDate)} -{" "}
+                {convertTimestampToString(item.endDate)}
               </td>
-              <td className="p-2">{item.userId}</td> {/* Display userId */}
+              <td className="p-2">{item.uid}</td>
             </tr>
           ))}
         </tbody>
