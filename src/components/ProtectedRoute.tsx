@@ -23,7 +23,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
     // If no user is logged in, redirect to the login page
     if (!user) {
-      router.push("/login");
+      router.push("/");
     } else {
       setIsChecking(false);
     }

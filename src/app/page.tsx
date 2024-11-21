@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "../FireBase/FireBaseConfig";
@@ -7,12 +6,15 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { Input, Button } from "@nextui-org/react";
 import { useUser } from "../context/UserContext";
-import { db } from "@/FireBase/FireBaseConfig"; // Import your Firestore instance
+import { db } from "@/FireBase/FireBaseConfig"; 
+import HCaptcha from "@hcaptcha/react-hcaptcha"; 
 import "./page.css";
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false); 
   const { setUser } = useUser();
   const router = useRouter();
 
@@ -23,9 +25,9 @@ const LoginPage = () => {
 
   const fetchUserData = async (uid: string) => {
     try {
-      const userDoc = await getDoc(doc(db, "users", uid)); // Adjust to your Firestore path
+      const userDoc = await getDoc(doc(db, "users", uid)); 
       if (userDoc.exists()) {
-        return userDoc.data(); // Returns the user data as an object
+        return userDoc.data(); 
       } else {
         throw new Error("No such user document");
       }
@@ -35,16 +37,44 @@ const LoginPage = () => {
     }
   };
 
+  const handleCaptchaChange = (token: string | null) => {
+    setCaptchaToken(token);
+  };
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (isSubmitting) return; 
+    setIsSubmitting(true); 
+
     if (!isValidEmail(email)) {
       alert("Invalid email format");
+      setIsSubmitting(false); 
+      return;
+    }
+
+    if (!captchaToken) {
+      alert("Please complete the CAPTCHA.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Verify CAPTCHA token on the server
+    const captchaResponse = await fetch("/api/verify-captcha", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: captchaToken }),
+    });
+
+    const captchaResult = await captchaResponse.json();
+
+    if (!captchaResult.success) {
+      alert("CAPTCHA verification failed. Please try again.");
+      setIsSubmitting(false);
       return;
     }
 
     try {
-      // Authenticate user with email and password
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
@@ -52,16 +82,13 @@ const LoginPage = () => {
       );
       const user = userCredential.user;
 
-      // Check if the email is verified
       if (!user.emailVerified) {
-        alert("Your email is not verified. Please verify it.");
+        alert("Your email is not verified. You may continue using the app.");
       }
 
-      // Fetch additional user data from Firestore after successful login
       const userData = await fetchUserData(user.uid);
 
       if (userData) {
-        // Set user in context with additional data
         setUser({
           uid: user.uid,
           email: user.email!,
@@ -84,11 +111,13 @@ const LoginPage = () => {
       } else {
         alert("Login failed. Please try again.");
       }
+    } finally {
+      setIsSubmitting(false); 
     }
   };
 
   return (
-    <main className="">
+    <main>
       <div className="logo-container">
         <img
           src="/images/Logo GeoProfs.png"
@@ -97,7 +126,7 @@ const LoginPage = () => {
         />
       </div>
       <div className="container">
-        <h2 className="title">login</h2>
+        <h2 className="title">Login</h2>
         <form onSubmit={handleLogin}>
           <div className="form-group">
             <Input
@@ -125,8 +154,20 @@ const LoginPage = () => {
             />
           </div>
 
+          <div className="form-group">
+            <HCaptcha
+              sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!} // hCaptcha site key
+              onVerify={handleCaptchaChange} // Callback function for token
+            />
+          </div>
+
           <div className="button-group">
-            <Button type="submit" className="login-button" color="primary">
+            <Button
+              type="submit"
+              className="login-button"
+              color="primary"
+              disabled={isSubmitting} // Disable the button while submitting
+            >
               Inloggen
             </Button>
           </div>
