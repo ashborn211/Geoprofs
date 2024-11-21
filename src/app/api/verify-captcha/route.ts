@@ -1,43 +1,30 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
-// Example API route that verifies the reCAPTCHA token
 export async function POST(request: Request) {
-    const { token } = await request.json();
+  const body = await request.json();
+  const captchaToken = body.token;
 
-    const secretKey = process.env.GOOGLE_API_KEY; // Use the environment variable
+  if (!captchaToken) {
+    return NextResponse.json({ success: false, error: "No captcha token provided" }, { status: 400 });
+  }
 
-    if (!secretKey) {
-        return NextResponse.json(
-            { success: false, error: "Secret key is missing" },
-            { status: 500 }
-        );
-    }
+  const secretKey = process.env.HCAPTCHA_SECRET_KEY;
 
-    try {
-        const response = await fetch(
-            `https://www.google.com/recaptcha/api/siteverify`,
-            {
-                method: "POST",
-                body: new URLSearchParams({
-                    secret: secretKey,
-                    response: token,
-                }),
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            }
-        );
+  if (!secretKey) {
+    return NextResponse.json({ success: false, error: "Missing hCaptcha secret key" }, { status: 500 });
+  }
 
-        const data = await response.json();
+  const verifyUrl = `https://hcaptcha.com/siteverify?secret=${secretKey}&response=${captchaToken}`;
+  
+  const verifyResponse = await fetch(verifyUrl, {
+    method: 'POST',
+  });
 
-        if (data.success) {
-            return NextResponse.json({ success: true });
-        } else {
-            return NextResponse.json({ success: false });
-        }
-    } catch (error) {
-        console.error("Error verifying CAPTCHA:", error);
-        return NextResponse.json(
-            { success: false, error: "Verification failed" },
-            { status: 500 }
-        );
-    }
+  const verifyData = await verifyResponse.json();
+
+  if (verifyData.success) {
+    return NextResponse.json({ success: true });
+  } else {
+    return NextResponse.json({ success: false, error: "Captcha verification failed" }, { status: 400 });
+  }
 }

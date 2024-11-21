@@ -27,6 +27,7 @@
     "@fullcalendar/react": "^6.1.15",
     "@fullcalendar/timegrid": "^6.1.15",
     "@google-cloud/recaptcha-enterprise": "^5.13.0",
+    "@hcaptcha/react-hcaptcha": "^1.11.0",
     "@internationalized/date": "^3.5.5",
     "@nextui-org/calendar": "^2.0.12",
     "@nextui-org/react": "^2.4.8",
@@ -38,6 +39,7 @@
     "@types/react": "18.3.2",
     "@types/react-dom": "18.3.0",
     "autoprefixer": "10.4.19",
+    "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "date-fns": "^4.1.0",
@@ -53,8 +55,7 @@
     "node-fetch": "^3.3.2",
     "postcss": "8.4.38",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-google-recaptcha": "^3.1.0"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
