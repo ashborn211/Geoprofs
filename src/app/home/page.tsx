@@ -119,6 +119,7 @@ export default function Home() {
         await deleteDoc(doc(db, "verlof", selectedDateInfo.docId)); // Remove document by docId
         fetchExistingDates(); // Refresh date ranges after deletion
         setSelectedDateInfo(null); // Clear selected date info after deletion
+        window.location.reload();
       } catch (error) {
         console.error("Error deleting leave request:", error);
       }
