@@ -56,7 +56,6 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
   // Helper to format date for "datetime-local" input
   const formatDateForInput = (timestamp: Timestamp) => {
     const date = timestamp.toDate();
-<<<<<<< HEAD
     const timeZone = "Europe/Amsterdam"; // Fixed timezone
 
     // Convert the date to the Netherlands timezone
@@ -64,9 +63,6 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
 
     // Format it as YYYY-MM-DDTHH:MM (required by datetime-local input)
     return format(zonedDate, "yyyy-MM-dd'T'HH:mm");
-=======
-    return date.toISOString().slice(0, 16); // Formatted as YYYY-MM-DDTHH:mm
->>>>>>> verlof-component-fixes
   };
 
   // Handle form submission
