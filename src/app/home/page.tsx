@@ -10,8 +10,10 @@ import {
   collection,
   getDocs,
   deleteDoc,
+  addDoc, // Import addDoc to add documents
+  query,
+  where,
   doc,
-  addDoc,
 } from "firebase/firestore"; // Remove unused imports
 
 export default function Home() {
@@ -203,9 +205,7 @@ export default function Home() {
                               : "gray",
                         }}
                       >
-                        <h1>
-                          {formatDateWithTime(selectedDateInfo.startDate)}
-                        </h1>
+                        <h1>{formatDateWithTime(selectedDateInfo.startDate)}</h1>
                         <h1>to</h1>
                         <h1>{formatDateWithTime(selectedDateInfo.endDate)}</h1>
                       </div>
@@ -217,9 +217,7 @@ export default function Home() {
 
                 {selectedDateInfo ? (
                   <div className="flex flex-col items-center">
-                    <h1 className="text-[large]">
-                      Reason: {selectedDateInfo.reason}
-                    </h1>
+                    <h1 className="text-[large]">Reason: {selectedDateInfo.reason}</h1>
                     <button
                       className="mt-4 h-[50px] w-[150px] bg-[white] border-[black] border-[solid] border-[2px] text-[x-large]"
                       onClick={handleDelete}
@@ -248,8 +246,11 @@ export default function Home() {
                   </button>
                 )}
 
-                <button className="bg-white border-2 border-black rounded-lg w-full h-[25%]">
-                  <h1>Report Sickness</h1>
+                <button
+                  className="bg-white border-2 border-black rounded-lg w-full h-[25%]"
+                  onClick={handleSickLeave} // Call sick leave function
+                >
+                  <h1>Ziek Melden</h1>
                 </button>
               </div>
             </div>
@@ -281,9 +282,7 @@ export default function Home() {
       {sickLeaveSubmitted && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-4 rounded shadow-md">
-            <h2 className="text-lg font-bold">
-              Ziekmelding succesvol ingediend!
-            </h2>
+            <h2 className="text-lg font-bold">Ziekmelding succesvol ingediend!</h2>
             <button
               className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
               onClick={() => {
