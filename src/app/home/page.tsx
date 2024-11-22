@@ -10,12 +10,9 @@ import {
   collection,
   getDocs,
   deleteDoc,
-<<<<<<< HEAD
-=======
   addDoc, // Import addDoc to add documents
   query,
   where,
->>>>>>> verlof-component-fixes
   doc,
 } from "firebase/firestore"; // Remove unused imports
 
@@ -249,16 +246,11 @@ export default function Home() {
                   </button>
                 )}
 
-<<<<<<< HEAD
-                <button className="bg-white border-2 border-black rounded-lg w-full h-[25%]">
-                  <h1>Report Sickness</h1>
-=======
                 <button
                   className="bg-white border-2 border-black rounded-lg w-full h-[25%]"
                   onClick={handleSickLeave} // Call sick leave function
                 >
                   <h1>Ziek Melden</h1>
->>>>>>> verlof-component-fixes
                 </button>
               </div>
             </div>
