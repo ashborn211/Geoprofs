@@ -1,40 +1,39 @@
 "use client";
 
 import { useUser } from "@/context/UserContext"; // Access the user context
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation"; // Get current pathname
 import { useEffect, useState } from "react";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, isLoading } = useUser(); // Get user and loading state from context
   const router = useRouter();
+  const pathname = usePathname(); // Get the current URL path
 
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    // Wait for the user state to be loaded and updated (due to persistence)
     if (isLoading) {
       setIsChecking(true);
       return;
     }
 
-    // If no user is logged in, redirect to the login page
-    if (!user) {
-      router.push("/");
+    if (!user && pathname !== "/") {
+      router.push("/"); // Redirect only if not already on "/"
     } else {
       setIsChecking(false);
     }
-  }, [user, isLoading, router]);
+  }, [user, isLoading, pathname, router]);
 
-  // If still checking the user state (loading from persistence), you can return nothing or a loading message
+  // If still checking the user state (loading from persistence), display a loading message
   if (isChecking) {
-    return <div>Loading...</div>; // Or you can return a spinner or nothing at all
+    return <div>Loading...</div>; // Or use a spinner or skeleton UI
   }
 
-  // If user is logged in, render the protected content
+  // If the user is logged in, render the protected content
   return <>{children}</>;
 };
 
