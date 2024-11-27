@@ -54,7 +54,10 @@
     "identity-obj-proxy": "^3.0.0",
     "next": "^14.2.13",
     "node-fetch": "^3.3.2",
+    "otplib": "^12.0.1",
     "postcss": "8.4.38",
+    "qrcode": "^1.5.4",
+    "qrcode.react": "^4.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
@@ -71,6 +74,7 @@
     "@testing-library/react": "^16.0.1",
     "@types/jest": "^29.5.13",
     "@types/node": "^20.16.5",
+    "@types/qrcode": "^1.5.5",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/react-google-recaptcha": "^2.1.9",

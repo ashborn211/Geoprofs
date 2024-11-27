@@ -6,15 +6,17 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { Input, Button } from "@nextui-org/react";
 import { useUser } from "../context/UserContext";
-import { db } from "@/FireBase/FireBaseConfig"; 
-import HCaptcha from "@hcaptcha/react-hcaptcha"; 
+import { db } from "@/FireBase/FireBaseConfig";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
+import { QRCode } from "qrcode.react";
 import "./page.css";
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false); 
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null); // To hold the QR Code URL
   const { setUser } = useUser();
   const router = useRouter();
 
@@ -25,9 +27,9 @@ const LoginPage = () => {
 
   const fetchUserData = async (uid: string) => {
     try {
-      const userDoc = await getDoc(doc(db, "users", uid)); 
+      const userDoc = await getDoc(doc(db, "users", uid));
       if (userDoc.exists()) {
-        return userDoc.data(); 
+        return userDoc.data();
       } else {
         throw new Error("No such user document");
       }
@@ -44,12 +46,12 @@ const LoginPage = () => {
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (isSubmitting) return; 
-    setIsSubmitting(true); 
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
     if (!isValidEmail(email)) {
       alert("Invalid email format");
-      setIsSubmitting(false); 
+      setIsSubmitting(false);
       return;
     }
 
@@ -97,8 +99,17 @@ const LoginPage = () => {
           team: userData.team,
         });
 
-        alert("Login successful!");
-        router.push("/home");
+        // Check if 2FA is enabled
+        if (userData.is2FAEnabled) {
+          // 2FA is enabled, show QR Code for authentication
+          const otpauthUrl = userData.otpauthUrl || ""; // Get OTP URL from Firestore (you should store this when enabling 2FA)
+          setQrCodeUrl(otpauthUrl);
+          router.push("/home");
+        } else {
+          // If 2FA is not enabled, proceed to home page
+          alert("Login successful!");
+          router.push("/setting/enable-2fa");
+        }
       } else {
         alert("Failed to fetch user details. Please try again.");
       }
@@ -112,7 +123,7 @@ const LoginPage = () => {
         alert("Login failed. Please try again.");
       }
     } finally {
-      setIsSubmitting(false); 
+      setIsSubmitting(false);
     }
   };
 
@@ -172,6 +183,14 @@ const LoginPage = () => {
             </Button>
           </div>
         </form>
+
+        {/* Display the QR code if 2FA is enabled */}
+        {qrCodeUrl && (
+          <div>
+            <h3>Scan the QR code with your authenticator app</h3>
+            <QRCode value={qrCodeUrl} size={256} />
+          </div>
+        )}
       </div>
     </main>
   );
