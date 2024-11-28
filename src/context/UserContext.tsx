@@ -28,7 +28,9 @@ interface UserContextType {
 }
 
 // Create the UserContext
-export const UserContext = createContext<UserContextType | undefined>(undefined);
+export const UserContext = createContext<UserContextType | undefined>(
+  undefined
+);
 
 // Custom hook to use the UserContext
 export const useUser = () => {
@@ -44,7 +46,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUserState] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true); // Add isLoading state
 
-  // Fetch user data from db when user is authenticated
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
@@ -59,7 +60,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             userName: userData.userName || null,
             role: userData.role || null,
             team: userData.team || null,
-            is2FAEnabled: userData.is2FAEnabled,
+            is2FAEnabled: userData.is2FAEnabled || false, // Ensure this is set correctly
           });
         } else {
           console.error("No user document found for the authenticated user.");
@@ -70,7 +71,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(false); // Once the authentication check is done, stop loading
     });
 
-    // Cleanup listener on unmount
     return () => unsubscribe();
   }, []);
 

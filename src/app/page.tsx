@@ -8,7 +8,6 @@ import { Input, Button } from "@nextui-org/react";
 import { useUser } from "../context/UserContext";
 import { db } from "@/FireBase/FireBaseConfig";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
-import ReactQR from "react-qr-code"; // Importing ReactQR
 import "./page.css";
 
 const LoginPage = () => {
@@ -184,13 +183,6 @@ const LoginPage = () => {
             </Button>
           </div>
         </form>
-
-        {qrCodeUrl && (
-          <div>
-            <h3>Scan the QR code with your authenticator app</h3>
-            <ReactQR value={qrCodeUrl} size={256} />
-          </div>
-        )}
       </div>
     </main>
   );

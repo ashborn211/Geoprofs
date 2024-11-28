@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import {
   collection,
@@ -10,7 +9,6 @@ import {
   where,
 } from "firebase/firestore";
 import { auth, db } from "@/FireBase/FireBaseConfig";
-import bcrypt from "bcryptjs";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { generatePassword } from "@/utils/passwordGenerator"; // Adjust the path as necessary
 import Logout from "@/components/Logout";
@@ -62,16 +60,9 @@ export default function AddUser() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted with values:", {
-      naam,
-      email,
-      team,
-      role,
-      password,
-    });
 
-    // Check if email is already taken
     try {
+      // Check if email is already taken
       const emailQuery = query(
         collection(db, "users"),
         where("email", "==", email)
@@ -94,11 +85,11 @@ export default function AddUser() {
       await setDoc(doc(db, "users", authUser.user.uid), {
         userName: naam,
         email: email,
-        team: doc(db, "Team", team), // Set the team as a reference to the team collection
+        team: doc(db, "Team", team),
         role: role,
         password: password, // Password can be sent for server-side hashing if needed
         emailVerified: false,
-        is2FAEnabled: is2FAEnabled,  // Add the 2FA enabled flag
+        is2FAEnabled: is2FAEnabled, // Add the 2FA enabled flag
       });
 
       // Send a password reset email after user creation
@@ -153,7 +144,6 @@ export default function AddUser() {
               </div>
             </div>
 
-            {/* Input Form */}
             <div className="col-span-12 row-span-8 col-start-1 p-8">
               <form
                 className="flex flex-col space-y-4 w-1/3 mx-auto"
@@ -214,7 +204,6 @@ export default function AddUser() {
                   </select>
                 </label>
 
-                {/* Password section */}
                 <div className="flex flex-col space-y-2">
                   <button
                     type="button"
@@ -230,27 +219,25 @@ export default function AddUser() {
                       <button
                         type="button"
                         onClick={copyToClipboard}
-                        className="p-2 bg-gray-500 text-white rounded"
+                        className="text-blue-500"
                       >
-                        Copy Password
+                        Copy
                       </button>
                     </div>
                   )}
                 </div>
 
-                {/* 2FA Checkbox */}
-                <div className="flex flex-col space-y-2">
-                  <label className="flex items-center space-x-2">
+                <div>
+                  <label>
+                    Enable 2FA:
                     <input
                       type="checkbox"
                       checked={is2FAEnabled}
                       onChange={() => setIs2FAEnabled(!is2FAEnabled)}
                     />
-                    <span>Enable 2FA</span>
                   </label>
                 </div>
 
-                {/* Submit button */}
                 <button
                   type="submit"
                   className="p-2 bg-green-500 text-white rounded"

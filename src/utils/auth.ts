@@ -1,4 +1,3 @@
-// src/utils/auth.ts
 import { auth } from '../FireBase/FireBaseConfig'; // Adjust the path as necessary
 import { sendPasswordResetEmail, signInWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 

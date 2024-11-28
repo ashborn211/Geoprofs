@@ -1,70 +1,52 @@
-"use client";
-import { useState } from "react";
-import ReactQR from "react-qr-code";
-import { useUser } from "@/context/UserContext";
+"use client"
+import { useState } from 'react';
+import ReactQR from 'react-qr-code';
 
-const Enable2FA = () => {
-  const { user, isLoading } = useUser();
-  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
-  const [secret, setSecret] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+export default function Setup2FA() {
+  const [email, setEmail] = useState('');
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!user) return <div>You must be logged in to enable 2FA.</div>;
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  const handleGenerate2FA = async () => {
-    setIsSubmitting(true);
-    setError(null);
+    const response = await fetch('/api/setup-2fa', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-    try {
-      const response = await fetch("/api/generate-2fa", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ uid: user.uid }),
-      });
+    const data = await response.json();
 
-      if (!response.ok)
-        throw new Error("Failed to generate 2FA. Please try again.");
-      const data = await response.json();
-
-      if (data.otpauthUrl && data.secret) {
-        setQrCodeUrl(data.otpauthUrl);
-        setSecret(data.secret);
-
-        await fetch("/api/set-2fa", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ uid: user.uid, is2FAEnabled: true }),
-        });
-      } else {
-        setError("Invalid response from server.");
-      }
-    } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "Something went wrong."
-      );
-    } finally {
-      setIsSubmitting(false);
+    if (data.otpauthUrl) {
+      setQrCodeUrl(data.otpauthUrl);
+    } else {
+      alert('Error: ' + data.error);
     }
   };
 
   return (
-    <div className="container">
-      <h2>Enable 2FA</h2>
-      <button onClick={handleGenerate2FA} disabled={isSubmitting}>
-        {isSubmitting ? "Generating..." : "Generate 2FA QR Code"}
-      </button>
+    <div className="max-w-md mx-auto p-4">
+      <form onSubmit={handleEmailSubmit} className="space-y-4">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Enter your email"
+          className="w-full p-2 border border-gray-300 rounded"
+        />
+        <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded">
+          Generate QR Code
+        </button>
+      </form>
 
-      {error && <p className="error">{error}</p>}
       {qrCodeUrl && (
-        <div>
-          <h3>Scan the QR code with your authenticator app</h3>
+        <div className="mt-4">
+          <h2 className="text-xl">Scan with Google Authenticator</h2>
           <ReactQR value={qrCodeUrl} size={256} />
         </div>
       )}
     </div>
   );
-};
-
-export default Enable2FA;
+}
