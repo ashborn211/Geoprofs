@@ -18,67 +18,58 @@ interface User {
   role: string | null;
   team: string | null;
   is2FAEnabled: boolean;
+  secretKey: string | null; // Add secretKey
 }
 
 // Extend UserContextType to include `isLoading` state
 interface UserContextType {
   user: User | null;
   setUser: (user: User | null) => void;
-  isLoading: boolean; // Add isLoading to the context type
+  isLoading: boolean;
 }
 
-// Create the UserContext
-export const UserContext = createContext<UserContextType | undefined>(
-  undefined
-);
+const UserContext = createContext<UserContextType | undefined>(undefined);
 
-// Custom hook to use the UserContext
-export const useUser = () => {
-  const context = useContext(UserContext);
-  if (!context) {
-    throw new Error("useUser must be used within a UserProvider");
-  }
-  return context;
-};
-
-// UserProvider component
-export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUserState] = useState<User | null>(null);
+export function UserProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true); // Add isLoading state
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        const userDocRef = doc(db, "users", firebaseUser.uid);
-        const userDoc = await getDoc(userDocRef);
-
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setUserState({
-            uid: firebaseUser.uid,
-            email: firebaseUser.email!,
-            userName: userData.userName || null,
-            role: userData.role || null,
-            team: userData.team || null,
-            is2FAEnabled: userData.is2FAEnabled || false, // Ensure this is set correctly
+    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
+      if (authUser) {
+        const userDoc = doc(db, "users", authUser.uid);
+        const userSnap = await getDoc(userDoc);
+        if (userSnap.exists()) {
+          setUser({
+            uid: authUser.uid,
+            email: authUser.email || "",
+            userName: userSnap.data().userName,
+            role: userSnap.data().role,
+            team: userSnap.data().team,
+            is2FAEnabled: userSnap.data().is2FAEnabled,
+            secretKey: userSnap.data().secretKey || "", // Add secretKey
           });
-        } else {
-          console.error("No user document found for the authenticated user.");
         }
       } else {
-        setUserState(null);
+        setUser(null);
       }
-      setIsLoading(false); // Once the authentication check is done, stop loading
+      setIsLoading(false); // Update loading state
     });
 
     return () => unsubscribe();
   }, []);
-
-  const setUser = (user: User | null) => setUserState(user);
 
   return (
     <UserContext.Provider value={{ user, setUser, isLoading }}>
       {children}
     </UserContext.Provider>
   );
-};
+}
+
+export function useUser() {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error("useUser must be used within a UserProvider");
+  }
+  return context;
+}

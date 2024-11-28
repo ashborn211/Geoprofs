@@ -9,9 +9,10 @@ export const sendResetPasswordEmail = async (email: string): Promise<void> => {
   try {
     await sendPasswordResetEmail(auth, email);
     console.log('Password reset email sent.');
-  } catch (error) {
+    alert('Password reset email sent! Check your inbox.');
+  } catch (error: any) {
     console.error('Error sending password reset email:', error);
-    throw error;
+    alert(error.message || 'Failed to send reset email. Please try again.');
   }
 };
 
@@ -28,9 +29,10 @@ export const sendVerificationEmail = async (email: string, password: string): Pr
     if (user) {
       await sendEmailVerification(user);
       console.log('Verification email sent.');
+      alert('Verification email sent! Please check your inbox.');
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error sending verification email:', error);
-    throw error;
+    alert(error.message || 'Failed to send verification email. Please try again.');
   }
 };

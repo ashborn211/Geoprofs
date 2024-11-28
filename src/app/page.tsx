@@ -97,6 +97,7 @@ const LoginPage = () => {
           role: userData.role,
           team: userData.team,
           is2FAEnabled: userData.is2FAEnabled,
+          secretKey: userData.secretKey,
         });
 
         // Check if 2FA is enabled

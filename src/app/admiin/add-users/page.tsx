@@ -27,6 +27,7 @@ export default function AddUser() {
   const [password, setPassword] = useState("");
   const [generatedPassword, setGeneratedPassword] = useState("");
   const [is2FAEnabled, setIs2FAEnabled] = useState(false); // New state for 2FA
+  const [secretKey, setSecretKey] = useState(""); // New state for secretKey
 
   // Fetch teams from Firestore
   useEffect(() => {
@@ -81,6 +82,9 @@ export default function AddUser() {
         password
       );
 
+      console.log("Created user with email: ", email);
+      console.log("User details: ", authUser.user);
+
       // Create the user document in Firestore with team reference
       await setDoc(doc(db, "users", authUser.user.uid), {
         userName: naam,
@@ -90,6 +94,16 @@ export default function AddUser() {
         password: password, // Password can be sent for server-side hashing if needed
         emailVerified: false,
         is2FAEnabled: is2FAEnabled, // Add the 2FA enabled flag
+        secretKey: secretKey, // Save the secret key
+      });
+
+      console.log("User document created in Firestore:", {
+        userName: naam,
+        email,
+        team,
+        role,
+        is2FAEnabled,
+        secretKey,
       });
 
       // Send a password reset email after user creation
@@ -104,8 +118,10 @@ export default function AddUser() {
       const data = await response.json();
 
       if (response.ok) {
+        console.log("Password reset email sent successfully!");
         alert("Password reset email sent successfully!");
       } else {
+        console.error("Failed to send password reset email:", data.message);
         alert(data.message || "Failed to send password reset email.");
       }
 
@@ -117,6 +133,7 @@ export default function AddUser() {
       setPassword("");
       setGeneratedPassword("");
       setIs2FAEnabled(false); // Reset the 2FA state
+      setSecretKey(""); // Reset the secret key
     } catch (error) {
       console.error("Error adding user: ", error);
       alert("Failed to add user. Please try again.");
