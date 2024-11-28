@@ -8,7 +8,7 @@ import { Input, Button } from "@nextui-org/react";
 import { useUser } from "../context/UserContext";
 import { db } from "@/FireBase/FireBaseConfig";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
-import { QRCode } from "qrcode.react";
+import ReactQR from "react-qr-code"; // Importing ReactQR
 import "./page.css";
 
 const LoginPage = () => {
@@ -97,18 +97,19 @@ const LoginPage = () => {
           userName: userData.userName || "Anonymous", // Use userName from Firestore
           role: userData.role,
           team: userData.team,
+          is2FAEnabled: userData.is2FAEnabled,
         });
 
         // Check if 2FA is enabled
         if (userData.is2FAEnabled) {
           // 2FA is enabled, show QR Code for authentication
-          const otpauthUrl = userData.otpauthUrl || ""; // Get OTP URL from Firestore (you should store this when enabling 2FA)
+          const otpauthUrl = userData.otpauthUrl || ""; // Get OTP URL from Firestore
           setQrCodeUrl(otpauthUrl);
-          router.push("/home");
+          alert("2FA is enabled!");
         } else {
-          // If 2FA is not enabled, proceed to home page
-          alert("Login successful!");
-          router.push("/setting/enable-2fa");
+          // If 2FA is not enabled, proceed to enable page
+          alert("Login successful! Proceed to enable 2FA.");
+          router.push("/settings/enable-2fa");
         }
       } else {
         alert("Failed to fetch user details. Please try again.");
@@ -167,8 +168,8 @@ const LoginPage = () => {
 
           <div className="form-group">
             <HCaptcha
-              sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!} // hCaptcha site key
-              onVerify={handleCaptchaChange} // Callback function for token
+              sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+              onVerify={handleCaptchaChange}
             />
           </div>
 
@@ -177,18 +178,17 @@ const LoginPage = () => {
               type="submit"
               className="login-button"
               color="primary"
-              disabled={isSubmitting} // Disable the button while submitting
+              disabled={isSubmitting}
             >
               Inloggen
             </Button>
           </div>
         </form>
 
-        {/* Display the QR code if 2FA is enabled */}
         {qrCodeUrl && (
           <div>
             <h3>Scan the QR code with your authenticator app</h3>
-            <QRCode value={qrCodeUrl} size={256} />
+            <ReactQR value={qrCodeUrl} size={256} />
           </div>
         )}
       </div>

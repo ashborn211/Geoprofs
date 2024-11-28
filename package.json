@@ -59,7 +59,9 @@
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.1.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-qr-code": "^2.0.15",
+    "speakeasy": "^2.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -78,6 +80,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/react-google-recaptcha": "^2.1.9",
+    "@types/speakeasy": "^2.0.10",
     "babel-jest": "^29.7.0",
     "cross-env": "^7.0.3",
     "dotenv-cli": "^7.4.2",

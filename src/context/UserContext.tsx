@@ -17,6 +17,7 @@ interface User {
   userName: string | null;
   role: string | null;
   team: string | null;
+  is2FAEnabled: boolean;
 }
 
 // Extend UserContextType to include `isLoading` state
@@ -58,6 +59,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             userName: userData.userName || null,
             role: userData.role || null,
             team: userData.team || null,
+            is2FAEnabled: userData.is2FAEnabled,
           });
         } else {
           console.error("No user document found for the authenticated user.");

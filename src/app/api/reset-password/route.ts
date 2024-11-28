@@ -12,7 +12,8 @@ export async function POST(request: Request) {
   try {
     await sendResetPasswordEmail(email);
     return NextResponse.json({ message: 'Password reset email sent' });
-  } catch (error) {
-    return NextResponse.json({ message: 'Error sending email', error }, { status: 500 });
+  } catch (error: any) {
+    console.error('Error sending password reset email:', error);
+    return NextResponse.json({ message: 'Error sending email', error: error.message }, { status: 500 });
   }
 }

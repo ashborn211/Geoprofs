@@ -1,19 +1,22 @@
-import { NextResponse } from 'next/server';
-import { authenticator } from 'otplib';
+import { NextApiRequest, NextApiResponse } from "next";
+import speakeasy from "speakeasy";
 
-// Backend route to generate the 2FA secret and URL
-export async function POST(req: Request) {
-  const { email } = await req.json(); // Get the user's email from the request body
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
 
-  if (!email) {
-    return NextResponse.json({ message: 'Email is required' }, { status: 400 });
+  const { uid } = req.body;
+
+  try {
+    const secret = speakeasy.generateSecret({ length: 20 });
+    const otpauthUrl = speakeasy.otpauthURL({
+      secret: secret.base32,
+      label: `MyApp (${uid})`,
+      algorithm: "sha256",
+    });
+
+    return res.status(200).json({ secret: secret.base32, otpauthUrl });
+  } catch (error) {
+    console.error("Error generating 2FA secret:", error);
+    return res.status(500).json({ message: "Failed to generate 2FA secret" });
   }
-
-  // Generate a new secret key for 2FA
-  const secret = authenticator.generateSecret();
-
-  // Generate a URL for the authenticator app (e.g., Google Authenticator)
-  const otpauthUrl = authenticator.keyuri(email, 'GeoProfsApp', secret);
-
-  return NextResponse.json({ secret, otpauthUrl });
 }

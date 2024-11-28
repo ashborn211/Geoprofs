@@ -28,6 +28,7 @@ export default function AddUser() {
   const [role, setRole] = useState("");
   const [password, setPassword] = useState("");
   const [generatedPassword, setGeneratedPassword] = useState("");
+  const [is2FAEnabled, setIs2FAEnabled] = useState(false); // New state for 2FA
 
   // Fetch teams from Firestore
   useEffect(() => {
@@ -97,6 +98,7 @@ export default function AddUser() {
         role: role,
         password: password, // Password can be sent for server-side hashing if needed
         emailVerified: false,
+        is2FAEnabled: is2FAEnabled,  // Add the 2FA enabled flag
       });
 
       // Send a password reset email after user creation
@@ -123,6 +125,7 @@ export default function AddUser() {
       setRole("");
       setPassword("");
       setGeneratedPassword("");
+      setIs2FAEnabled(false); // Reset the 2FA state
     } catch (error) {
       console.error("Error adding user: ", error);
       alert("Failed to add user. Please try again.");
@@ -133,7 +136,7 @@ export default function AddUser() {
     <>
       <div className="flex h-screen overflow-hidden bg-custom-gray">
         <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center h-full">
-        <Logout />
+          <Logout />
         </div>
         <div className="w-[94vw] h-full">
           <div className="h-full grid grid-cols-12 grid-rows-12">
@@ -233,6 +236,18 @@ export default function AddUser() {
                       </button>
                     </div>
                   )}
+                </div>
+
+                {/* 2FA Checkbox */}
+                <div className="flex flex-col space-y-2">
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={is2FAEnabled}
+                      onChange={() => setIs2FAEnabled(!is2FAEnabled)}
+                    />
+                    <span>Enable 2FA</span>
+                  </label>
                 </div>
 
                 {/* Submit button */}

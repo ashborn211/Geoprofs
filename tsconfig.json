@@ -44,7 +44,8 @@
     "babel.config.js",
     "jest.config.js",
     "tailwind.config.ts",
-    "src/FireBase/FireBaseConfig.tsx"
+    "src/FireBase/FireBaseConfig.tsx",
+    "src/types/**/*.d.ts"
 , "jest.setup.js"  ],
   "exclude": [
     "node_modules"
