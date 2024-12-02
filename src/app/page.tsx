@@ -6,15 +6,14 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { Input, Button } from "@nextui-org/react";
 import { useUser } from "../context/UserContext";
-import { db } from "@/FireBase/FireBaseConfig"; 
-import HCaptcha from "@hcaptcha/react-hcaptcha"; 
-import "./page.css";
+import { db } from "@/FireBase/FireBaseConfig";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false); 
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const { setUser } = useUser();
   const router = useRouter();
 
@@ -25,9 +24,9 @@ const LoginPage = () => {
 
   const fetchUserData = async (uid: string) => {
     try {
-      const userDoc = await getDoc(doc(db, "users", uid)); 
+      const userDoc = await getDoc(doc(db, "users", uid));
       if (userDoc.exists()) {
-        return userDoc.data(); 
+        return userDoc.data();
       } else {
         throw new Error("No such user document");
       }
@@ -44,12 +43,12 @@ const LoginPage = () => {
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (isSubmitting) return; 
-    setIsSubmitting(true); 
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
     if (!isValidEmail(email)) {
       alert("Invalid email format");
-      setIsSubmitting(false); 
+      setIsSubmitting(false);
       return;
     }
 
@@ -92,7 +91,7 @@ const LoginPage = () => {
         setUser({
           uid: user.uid,
           email: user.email!,
-          userName: userData.userName || "Anonymous", // Use userName from Firestore
+          userName: userData.userName || "Anonymous",
           role: userData.role,
           team: userData.team,
         });
@@ -112,66 +111,68 @@ const LoginPage = () => {
         alert("Login failed. Please try again.");
       }
     } finally {
-      setIsSubmitting(false); 
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <main>
-      <div className="logo-container">
-        <img
-          src="/images/Logo GeoProfs.png"
-          alt="GeoProfs Logo"
-          className="logo"
-        />
-      </div>
-      <div className="container">
-        <h2 className="title">Login</h2>
-        <form onSubmit={handleLogin}>
-          <div className="form-group">
-            <Input
-              type="email"
-              placeholder="E-mail..."
-              value={email}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setEmail(e.target.value)
-              }
-              required
-              fullWidth
+    <main className="relative h-screen w-screen bg-cover bg-center bg-no-repeat">
+      {/* Black transparent overlay */}
+      <div className="absolute inset-0 bg-[url('/images/the_starry_night.jpg')] brightness-50"></div>
+      
+      <div className="flex items-center justify-center h-full relative">
+        <div className="bg-black bg-opacity-90 shadow-md w-2/4 h-full">
+          <div className="text-center mb-6">
+            <img
+              src="/images/Logo GeoProfs.png"
+              alt="GeoProfs Logo"
+              className="mx-auto h-32"
             />
           </div>
-
-          <div className="form-group">
-            <Input
-              type="password"
-              placeholder="****"
-              value={password}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setPassword(e.target.value)
-              }
-              required
-              fullWidth
-            />
-          </div>
-
-          <div className="form-group">
-            <HCaptcha
-              sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!} // hCaptcha site key
-              onVerify={handleCaptchaChange} // Callback function for token
-            />
-          </div>
-
-          <div className="button-group">
-            <Button
-              type="submit"
-              className="login-button"
-              color="primary"
-              disabled={isSubmitting} // Disable the button while submitting
-            >
-              Inloggen
-            </Button>
-          </div>
-        </form>
+          <h2 className="text-center text-2xl font-semibold mb-4">Inloggen</h2>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <Input
+                type="email"
+                placeholder="E-mail..."
+                value={email}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setEmail(e.target.value)
+                }
+                required
+                className="w-1/2"
+              />
+            </div>
+            <div>
+              <Input
+                type="password"
+                placeholder="****"
+                value={password}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setPassword(e.target.value)
+                }
+                required
+                className="w-1/2"
+              />
+            </div>
+            <div>
+              <HCaptcha
+                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+                onVerify={handleCaptchaChange}
+              />
+            </div>
+            <div>
+              <Button
+                type="submit"
+                className="w-full"
+                color="primary"
+                disabled={isSubmitting}
+              >
+                Inloggen
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </main>
   );
