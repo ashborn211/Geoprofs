@@ -1,19 +1,24 @@
 // src/app/api/verify-email/route.ts
+
 import { NextResponse } from 'next/server';
-import { sendVerificationEmail } from '@/utils/auth';
+import { sendVerificationEmail } from '@/utils/auth'; // Ensure correct path
 
 export async function POST(request: Request) {
-  const { email, password } = await request.json();
-
-  if (!email || !password) {
-    return NextResponse.json({ message: 'Email and password are required' }, { status: 400 });
-  }
+  console.log("Received POST request for verify-email");
 
   try {
-    await sendVerificationEmail(email, password);
-    return NextResponse.json({ message: 'Verification email sent' });
-  } catch (error) {
-    console.error('Error sending verification email:', error);
-    return NextResponse.json({ message: 'Error sending verification email', error }, { status: 500 });
+    // Parse the email from the request body
+    const { email } = await request.json();
+
+    // Call the helper function to send the verification email
+    await sendVerificationEmail(email);
+    
+    return NextResponse.json({ message: 'Verification email sent.' });
+  } catch (error: any) {
+    console.error('Error in sending email:', error);
+    return NextResponse.json(
+      { message: error.message || 'Internal Server Error' }, 
+      { status: 500 }
+    );
   }
 }

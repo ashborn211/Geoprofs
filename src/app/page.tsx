@@ -109,7 +109,8 @@ const LoginPage = () => {
         } else {
           // If 2FA is not enabled, proceed to enable page
           alert("Login successful! Proceed to enable 2FA.");
-          router.push("/settings/enable-2fa");
+          router.push("/verify-email");
+          // router.push("/settings/enable-2fa");
         }
       } else {
         alert("Failed to fetch user details. Please try again.");

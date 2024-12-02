@@ -1,10 +1,10 @@
 // src/components/VerifyEmailForm.tsx
-"use client"
+
+"use client";
 import { useState } from "react";
 
 const VerifyEmailForm = () => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState(""); // For signing in
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -17,7 +17,7 @@ const VerifyEmailForm = () => {
       const response = await fetch("/api/verify-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email }), // Send email to the API route
       });
 
       const data = await response.json();
@@ -44,14 +44,6 @@ const VerifyEmailForm = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email"
-          required
-          className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter your password"
           required
           className="w-full p-2 mb-4 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />

@@ -1,6 +1,6 @@
 import { auth } from '../FireBase/FireBaseConfig'; // Adjust the path as necessary
 import { sendPasswordResetEmail, signInWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
-
+import { auth } from '@/FireBase/firebaseAdmin'; // Ensure correct path
 /**
  * Sends a password reset email to the provided email address.
  * @param email - The email address to send the reset email to.
@@ -16,23 +16,28 @@ export const sendResetPasswordEmail = async (email: string): Promise<void> => {
   }
 };
 
-/**
- * Sends a verification email to the user's email address after signing in.
- * @param email - The user's email address.
- * @param password - The user's password (needed to sign in before sending verification).
- */
-export const sendVerificationEmail = async (email: string, password: string): Promise<void> => {
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+// src/utils/auth.ts
 
-    if (user) {
-      await sendEmailVerification(user);
+
+
+/**
+ * Sends a verification email to a specific user.
+ * @param email - The user's email address.
+ */
+export const sendVerificationEmail = async (email: string): Promise<void> => {
+  try {
+    // Use Firebase Admin SDK to get the user by email
+    const userRecord = await auth.getUserByEmail(email);
+    
+    if (userRecord) {
+      // Send verification email to the user
+      await sendEmailVerification(userRecord);
       console.log('Verification email sent.');
-      alert('Verification email sent! Please check your inbox.');
+    } else {
+      throw new Error('User not found');
     }
   } catch (error: any) {
     console.error('Error sending verification email:', error);
-    alert(error.message || 'Failed to send verification email. Please try again.');
+    throw new Error(error.message || 'Failed to send verification email.');
   }
 };
