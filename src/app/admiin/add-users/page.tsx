@@ -10,7 +10,7 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "@/FireBase/FireBaseConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { generatePassword } from "@/utils/passwordGenerator"; // Adjust the path as necessary
+import { generatePassword } from "@/utils/passwordGenerator"; 
 import Logout from "@/components/Logout";
 
 interface Team {
@@ -26,9 +26,7 @@ export default function AddUser() {
   const [role, setRole] = useState("");
   const [password, setPassword] = useState("");
   const [generatedPassword, setGeneratedPassword] = useState("");
-  const [is2FAEnabled, setIs2FAEnabled] = useState(false); // New state for 2FA
-  const [secretKey, setSecretKey] = useState(""); // New state for secretKey
-
+  
   // Fetch teams from Firestore
   useEffect(() => {
     const fetchTeams = async () => {
@@ -36,9 +34,8 @@ export default function AddUser() {
         const querySnapshot = await getDocs(collection(db, "Team"));
         const teams = querySnapshot.docs.map((doc) => ({
           id: doc.id,
-          TeamName: doc.data().TeamName, // Ensure TeamName is retrieved
+          TeamName: doc.data().TeamName,
         }));
-
         setTeamList(teams);
       } catch (error) {
         console.error("Error fetching teams: ", error);
@@ -49,7 +46,7 @@ export default function AddUser() {
   }, []);
 
   const handleGeneratePassword = () => {
-    const newPassword = generatePassword(10); // You can change the length if needed
+    const newPassword = generatePassword(10); 
     setPassword(newPassword);
   };
 
@@ -91,10 +88,8 @@ export default function AddUser() {
         email: email,
         team: doc(db, "Team", team),
         role: role,
-        password: password, // Password can be sent for server-side hashing if needed
+        password: password, 
         emailVerified: false,
-        is2FAEnabled: is2FAEnabled, // Add the 2FA enabled flag
-        secretKey: secretKey, // Save the secret key
       });
 
       console.log("User document created in Firestore:", {
@@ -102,11 +97,9 @@ export default function AddUser() {
         email,
         team,
         role,
-        is2FAEnabled,
-        secretKey,
       });
 
-      // Send a password reset email after user creation
+      // Send a password reset email after user creation using the API
       const response = await fetch("/api/reset-password", {
         method: "POST",
         headers: {
@@ -132,8 +125,6 @@ export default function AddUser() {
       setRole("");
       setPassword("");
       setGeneratedPassword("");
-      setIs2FAEnabled(false); // Reset the 2FA state
-      setSecretKey(""); // Reset the secret key
     } catch (error) {
       console.error("Error adding user: ", error);
       alert("Failed to add user. Please try again.");
@@ -242,17 +233,6 @@ export default function AddUser() {
                       </button>
                     </div>
                   )}
-                </div>
-
-                <div>
-                  <label>
-                    Enable 2FA:
-                    <input
-                      type="checkbox"
-                      checked={is2FAEnabled}
-                      onChange={() => setIs2FAEnabled(!is2FAEnabled)}
-                    />
-                  </label>
                 </div>
 
                 <button

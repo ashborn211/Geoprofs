@@ -17,8 +17,6 @@ interface User {
   userName: string | null;
   role: string | null;
   team: string | null;
-  is2FAEnabled: boolean;
-  secretKey: string | null; // Add secretKey
 }
 
 // Extend UserContextType to include `isLoading` state
@@ -46,8 +44,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
             userName: userSnap.data().userName,
             role: userSnap.data().role,
             team: userSnap.data().team,
-            is2FAEnabled: userSnap.data().is2FAEnabled,
-            secretKey: userSnap.data().secretKey || "", // Add secretKey
           });
         }
       } else {

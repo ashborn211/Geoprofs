@@ -1,21 +1,23 @@
 // app/api/reset-password/route.ts
 
-import { NextResponse } from 'next/server';
+import { sendResetPasswordEmail } from "@/utils/auth"; // Adjust the import path if needed
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  const { email } = await req.json();
+
+  if (!email) {
+    return NextResponse.json({ success: false, message: "Email is required." }, { status: 400 });
+  }
+
   try {
-    const data = await req.json();
-    const { email } = data;
-
-    if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+    const response = await sendResetPasswordEmail(email);
+    if (response.success) {
+      return NextResponse.json({ success: true, message: response.message });
+    } else {
+      return NextResponse.json({ success: false, message: response.message }, { status: 400 });
     }
-
-    // Add logic to handle password reset here
-    // Example: await sendResetPasswordEmail(email);
-
-    return NextResponse.json({ message: 'Password reset email sent' });
   } catch (error) {
-    return NextResponse.json({ error: 'Error sending password reset email' }, { status: 500 });
+    return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
   }
 }
