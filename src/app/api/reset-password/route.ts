@@ -1,34 +1,28 @@
 // app/api/reset-password/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '@/FireBase/FireBaseConfig';  // Adjust the import if needed
 
-import { sendResetPasswordEmail } from "@/utils/auth"; // Adjust the import path if needed
-import { NextRequest, NextResponse } from "next/server";
+
 
 export async function POST(req: NextRequest) {
   try {
-    const { email } = await req.json(); // Get email from body
+    // Get the email from the request body
+    const { email } = await req.json();
 
     if (!email) {
-      return NextResponse.json(
-        { success: false, message: "Email is required." },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: 'Email is required.' }, { status: 400 });
     }
 
-    // Call the utility function to send the reset password email
-    const response = await sendResetPasswordEmail(email);
+    // Send the password reset email
+    await sendPasswordResetEmail(auth, email);
 
-    if (response.success) {
-      return NextResponse.json({ success: true, message: response.message });
-    } else {
-      return NextResponse.json(
-        { success: false, message: response.message },
-        { status: 400 }
-      );
-    }
+    // Respond with success
+    return NextResponse.json({ message: 'Password reset email sent successfully.' }, { status: 200 });
   } catch (error) {
-    console.error("Error in API route:", error);
+    console.error('Error sending password reset email:', error);
     return NextResponse.json(
-      { success: false, message: "Internal Server Error" },
+      { message: 'Failed to send password reset email. Please try again.' },
       { status: 500 }
     );
   }

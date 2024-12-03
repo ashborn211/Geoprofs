@@ -1,13 +1,13 @@
-// utils/auth.ts
+// src/utils/auth.ts
+import { auth } from '@/FireBase/FireBaseConfig'; // Adjust the path as necessary
+import { sendPasswordResetEmail } from "firebase/auth";
 
-import { getAuth, sendPasswordResetEmail } from "firebase/auth";
-import { auth } from "@/FireBase/FireBaseConfig";
-
-export const sendResetPasswordEmail = async (email: string) => {
+export const sendResetPasswordEmail = async (email: string): Promise<void> => {
   try {
     await sendPasswordResetEmail(auth, email);
-    return { success: true, message: "Password reset email sent successfully!" };
+    console.log('Password reset email sent.');
   } catch (error) {
-    return { success: false, message: "Failed to send password reset email. Please try again." };
+    console.error('Error sending password reset email:', error);
+    throw error; // Rethrow the error for handling in the calling component
   }
 };

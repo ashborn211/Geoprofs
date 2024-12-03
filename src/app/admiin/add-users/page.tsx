@@ -9,8 +9,11 @@ import {
   where,
 } from "firebase/firestore";
 import { auth, db } from "@/FireBase/FireBaseConfig";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { generatePassword } from "@/utils/passwordGenerator"; 
+import {
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+} from "firebase/auth";
+import { generatePassword } from "@/utils/passwordGenerator";
 import Logout from "@/components/Logout";
 
 interface Team {
@@ -26,7 +29,7 @@ export default function AddUser() {
   const [role, setRole] = useState("");
   const [password, setPassword] = useState("");
   const [generatedPassword, setGeneratedPassword] = useState("");
-  
+
   // Fetch teams from Firestore
   useEffect(() => {
     const fetchTeams = async () => {
@@ -46,7 +49,7 @@ export default function AddUser() {
   }, []);
 
   const handleGeneratePassword = () => {
-    const newPassword = generatePassword(10); 
+    const newPassword = generatePassword(10);
     setPassword(newPassword);
   };
 
@@ -88,7 +91,7 @@ export default function AddUser() {
         email: email,
         team: doc(db, "Team", team),
         role: role,
-        password: password, 
+        password: password,
         emailVerified: false,
       });
 
@@ -99,24 +102,11 @@ export default function AddUser() {
         role,
       });
 
-      // Send a password reset email after user creation using the API
-      const response = await fetch("/api/reset-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: email }),
-      });
+      // Send a password reset email after user creation using Firebase Auth
+      await sendPasswordResetEmail(auth, email);
 
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log("Password reset email sent successfully!");
-        alert("Password reset email sent successfully!");
-      } else {
-        console.error("Failed to send password reset email:", data.message);
-        alert(data.message || "Failed to send password reset email.");
-      }
+      console.log("Password reset email sent to:", email);
+      alert("Password reset email sent successfully!");
 
       // Reset form fields
       setNaam("");
