@@ -5,6 +5,7 @@ import VerlofComponent from "../../components/verlof"; // Import your VerlofComp
 import { useUser } from "../../context/UserContext"; // Import your user context
 import { useRouter } from "next/navigation"; // Import useRouter from Next.js
 import Logout from "@/components/Logout";
+import NavBar from "@/components/navBar/navBar";
 import { db } from "../../FireBase/FireBaseConfig";
 import {
   collection,
@@ -168,7 +169,7 @@ export default function Home() {
     <>
       <div className="flex h-screen overflow-hidden bg-custom-gray">
         <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
-          <Logout />
+        <NavBar />
         </div>
         <div className="w-[94vw] h-full">
           <div className="h-full grid grid-cols-12 grid-rows-12">
