@@ -1,9 +1,17 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHouse } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faHouse,
+  faClock,
+  faPlaneDeparture,
+  faUser,
+  faFile,
+  faUserPlus,
+  faRightFromBracket,
+} from "@fortawesome/free-solid-svg-icons";
 
 export default function NavBar() {
   return (
-    <nav className="bg-red-500 w-full h-screen flex flex-col justify-between">
+    <nav className="bg-[#2E56A2] w-full h-screen flex flex-col justify-between">
       {/* Bovenkant: Achtergrondafbeelding en tekst */}
       <div className="flex flex-col items-center mt-4">
         {/* Achtergrondafbeelding */}
@@ -12,20 +20,31 @@ export default function NavBar() {
           style={{ backgroundImage: "url('images/Logo GeoProfs.png')" }}
         />
         {/* Individuele tekstitems */}
-        <p className="text-white text-lg mb-2">
+        <p className="text-white text-2xl mb-8">
           <FontAwesomeIcon icon={faHouse} />
         </p>
-        <p className="text-white text-lg mb-4">i2</p>
-        <p className="text-white text-lg mb-4">i3</p>
-        <p className="text-white text-lg mb-4">i4</p>
-        <p className="text-white text-lg mb-4">i5</p>
-        <p className="text-white text-lg mb-4">i6</p>
-        <p className="text-white text-lg mb-4">i7</p>
+        <p className="text-white text-2xl mb-8">
+          <FontAwesomeIcon icon={faClock} />
+        </p>
+        <p className="text-white text-2xl mb-8">
+          <FontAwesomeIcon icon={faPlaneDeparture} />
+        </p>
+        <p className="text-white text-2xl mb-8">
+          <FontAwesomeIcon icon={faUser} />
+        </p>
+        <p className="text-white text-2xl mb-8">
+          <FontAwesomeIcon icon={faFile} />
+        </p>
+        <p className="text-white text-2xl mb-8">
+          <FontAwesomeIcon icon={faUserPlus} />
+        </p>
       </div>
 
       {/* Onderkant: "E" */}
       <div className="flex justify-center mb-4">
-        <p className="text-white text-lg">E</p>
+        <p className="text-white text-2xl">
+          <FontAwesomeIcon icon={faRightFromBracket} />
+        </p>
       </div>
     </nav>
   );
