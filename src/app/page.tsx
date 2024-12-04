@@ -15,7 +15,6 @@ const LoginPage = () => {
   const [password, setPassword] = useState<string>("");
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null); // To hold the QR Code URL
   const { setUser } = useUser();
   const router = useRouter();
 
@@ -96,23 +95,16 @@ const LoginPage = () => {
           userName: userData.userName || "Anonymous", // Use userName from Firestore
           role: userData.role,
           team: userData.team,
-
         });
 
         // Check if 2FA is enabled
-        if (userData.is2FAEnabled) {
+        if (userData) {
           // 2FA is enabled, show QR Code for authentication
-          const otpauthUrl = userData.otpauthUrl || ""; // Get OTP URL from Firestore
-          setQrCodeUrl(otpauthUrl);
-          alert("2FA is enabled!");
-        } else {
-          // If 2FA is not enabled, proceed to enable page
           alert("Login successful! Proceed to enable 2FA.");
-          router.push("/verify-email");
-          // router.push("/settings/enable-2fa");
+          router.push("/home");
+        } else {
+          alert("Failed to fetch user details. Please try again.");
         }
-      } else {
-        alert("Failed to fetch user details. Please try again.");
       }
     } catch (error: any) {
       console.error(error.message);
