@@ -97,7 +97,6 @@ const LoginPage = () => {
           team: userData.team,
         });
 
-        // Check if 2FA is enabled
         if (userData) {
           alert("Login successful!");
           router.push("/home");
