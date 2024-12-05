@@ -8,7 +8,6 @@ import { Input, Button } from "@nextui-org/react";
 import { useUser } from "../context/UserContext";
 import { db } from "@/FireBase/FireBaseConfig";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
-import "./page.css";
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
@@ -92,15 +91,13 @@ const LoginPage = () => {
         setUser({
           uid: user.uid,
           email: user.email!,
-          userName: userData.userName || "Anonymous", // Use userName from Firestore
+          userName: userData.userName || "Anonymous",
           role: userData.role,
           team: userData.team,
         });
 
-        if (userData) {
-          alert("Login successful!");
-          router.push("/home");
-        }
+        alert("Login successful!");
+        router.push("/home");
       } else {
         alert("Failed to fetch user details. Please try again.");
       }
@@ -117,66 +114,82 @@ const LoginPage = () => {
       setIsSubmitting(false);
     }
   };
-
   return (
-    <main>
-      <div className="logo-container">
-        <img
-          src="/images/Logo GeoProfs.png"
-          alt="GeoProfs Logo"
-          className="logo"
-        />
-      </div>
-      <div className="container">
-        <h2 className="title">Login</h2>
-        <form onSubmit={handleLogin}>
-          <div className="form-group">
-            <Input
-              type="email"
-              placeholder="E-mail..."
-              value={email}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setEmail(e.target.value)
-              }
-              required
-              fullWidth
+    <main className="relative h-screen w-screen bg-cover bg-center bg-no-repeat">
+      {/* Background image with overlay */}
+      <div className="absolute inset-0 bg-[url('/images/the_starry_night.jpg')] brightness-50"></div>
+  
+      {/* Layout container */}
+      <div className="flex items-center justify-start h-full relative">
+        {/* Image field centered on the right-hand side */}
+        <div className="absolute top-1/2 right-64 transform -translate-y-1/2">
+          <img
+            src="/images/Logo GeoProfs letter.png" /* Replace with your image path */
+            alt="Right-Side Image"
+            className="h-30 w-100 " /* Adjust size as needed */
+          />
+        </div>
+  
+        {/* Login block pushed to the left */}
+        <div className="bg-black bg-opacity-40 shadow-md w-2/4 h-full p-8 flex flex-col justify-center">
+          <div className="text-center mb-6">
+            <img
+              src="/images/Logo GeoProfs.png"
+              alt="GeoProfs Logo"
+              className="mx-auto h-32"
             />
           </div>
-
-          <div className="form-group">
-            <Input
-              type="password"
-              placeholder="****"
-              value={password}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setPassword(e.target.value)
-              }
-              required
-              fullWidth
-            />
-          </div>
-
-          <div className="form-group">
-            <HCaptcha
-              sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
-              onVerify={handleCaptchaChange}
-            />
-          </div>
-
-          <div className="button-group">
-            <Button
-              type="submit"
-              className="login-button"
-              color="primary"
-              disabled={isSubmitting}
-            >
-              Inloggen
-            </Button>
-          </div>
-        </form>
+          <h2 className="text-center text-2xl font-semibold mb-8 text-white">
+            Inloggen
+          </h2>
+  
+          {/* Login Form */}
+          <form onSubmit={handleLogin} className="space-y-6 flex flex-col items-center">
+            <div className="w-2/4">
+              <Input
+                type="email"
+                placeholder="E-mail..."
+                value={email}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setEmail(e.target.value)
+                }
+                required
+                className="w-full"
+              />
+            </div>
+            <div className="w-2/4">
+              <Input
+                type="password"
+                placeholder="****"
+                value={password}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setPassword(e.target.value)
+                }
+                required
+                className="w-full"
+              />
+            </div>
+            <div className="w-2/4">
+              <HCaptcha
+                sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
+                onVerify={handleCaptchaChange}
+              />
+            </div>
+            <div className="w-2/4">
+              <Button
+                type="submit"
+                className="w-full"
+                color="primary"
+                disabled={isSubmitting}
+              >
+                Inloggen
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </main>
   );
-};
-
-export default LoginPage;
+  
+}
+  export default LoginPage;
