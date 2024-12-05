@@ -154,9 +154,9 @@ const LoginPage = () => {
                   setEmail(e.target.value)
                 }
                 required
-                className="w-full"
-              />
-            </div>
+              fullWidth
+            />
+          </div>
             <div className="w-2/4">
               <Input
                 type="password"
