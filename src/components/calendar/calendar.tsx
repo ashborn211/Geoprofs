@@ -29,8 +29,8 @@ export default function CalendarComponent({
   const [visibleMonth, setVisibleMonth] = useState<number>(new Date().getMonth());
   const [visibleYear, setVisibleYear] = useState<number>(new Date().getFullYear());
   const containerRef = useRef<HTMLDivElement>(null);
-  const auth = getAuth(); // Haal de huidige ingelogde gebruiker op
-  const currentUser = auth.currentUser; // Controleer of er een ingelogde gebruiker is
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
 
   useEffect(() => {
     const fetchAllDates = async () => {
@@ -44,7 +44,7 @@ export default function CalendarComponent({
             const startDate = new Date(data.startDate.seconds * 1000);
             const endDate = new Date(data.endDate.seconds * 1000);
             const status = data.status;
-            const uid = data.uid; // Haal de uid van de eigenaar op
+            const uid = data.uid;
 
             console.log(
               `Document ${doc.id} heeft de startdatum: ${startDate.getDate()} en einddatum: ${endDate.getDate()} met status: ${status} en uid: ${uid}`
@@ -71,39 +71,44 @@ export default function CalendarComponent({
         const spans = containerRef.current.querySelectorAll("span");
 
         dateRanges.forEach(({ startDate, endDate, status, uid }) => {
-          // Alleen doorlopen als de uid overeenkomt met de huidige gebruiker
           if (uid === currentUser.uid) {
-            // Loop door alle dagen in het bereik tussen startDate en endDate
+            // Loop door het bereik van datums
             for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
               const day = d.getDate();
-              const matchingSpans = Array.from(spans).filter(
-                (span) => span.textContent === `${day}`
-              );
+              const month = d.getMonth();
+              const year = d.getFullYear();
 
-              matchingSpans.forEach((span) => {
-                switch (status) {
-                  case 1:
-                    span.style.backgroundColor = "orange";
-                    span.style.color = "white";
-                    break;
-                  case 2:
-                    span.style.backgroundColor = "green";
-                    span.style.color = "white";
-                    break;
-                  case 3:
-                    span.style.backgroundColor = "red";
-                    span.style.color = "white";
-                    break;
-                  default:
-                    span.style.backgroundColor = "transparent";
-                    span.style.color = "black";
-                    break;
-                }
-              });
+              // Alleen als de datum overeenkomt met de zichtbare maand en jaar
+              if (month === visibleMonth && year === visibleYear) {
+                const matchingSpans = Array.from(spans).filter(
+                  (span) => span.textContent === `${day}`
+                );
 
-              console.log(
-                `Aantal spans met waarde "${day}" en status "${status}": ${matchingSpans.length}`
-              );
+                matchingSpans.forEach((span) => {
+                  switch (status) {
+                    case 1:
+                      span.style.backgroundColor = "orange";
+                      span.style.color = "white";
+                      break;
+                    case 2:
+                      span.style.backgroundColor = "green";
+                      span.style.color = "white";
+                      break;
+                    case 3:
+                      span.style.backgroundColor = "red";
+                      span.style.color = "white";
+                      break;
+                    default:
+                      span.style.backgroundColor = "transparent";
+                      span.style.color = "black";
+                      break;
+                  }
+                });
+
+                console.log(
+                  `Aantal spans met waarde "${day}" en status "${status}": ${matchingSpans.length}`
+                );
+              }
             }
           }
         });
@@ -111,7 +116,7 @@ export default function CalendarComponent({
     };
 
     highlightMatchingSpans();
-  }, [dateRanges, currentUser]);
+  }, [dateRanges, currentUser, visibleMonth, visibleYear]);
 
   const handleDateChange = (newValue: DateValue) => {
     setValue(newValue);
@@ -119,21 +124,14 @@ export default function CalendarComponent({
     const jsDate = new Date(newValue.toString());
     onDateSelect(jsDate);
 
-    // Controleer of de zichtbare maand is veranderd
     const newMonth = jsDate.getMonth();
     const newYear = jsDate.getFullYear();
 
     if (newMonth !== visibleMonth || newYear !== visibleYear) {
-      console.log(
-        `De maand is veranderd naar: ${jsDate.toLocaleString("default", {
-          month: "long",
-        })} ${newYear}`
-      );
       setVisibleMonth(newMonth);
       setVisibleYear(newYear);
     }
 
-    // Controleer of de geselecteerde datum binnen een van de datumbereiken valt
     const selectedDate = dateRanges.find(
       ({ startDate, endDate, uid }) =>
         jsDate >= startDate && jsDate <= endDate && uid === currentUser?.uid
@@ -146,32 +144,28 @@ export default function CalendarComponent({
     }
   };
 
-  // Gebruik onVisibleRangeChange om de pagina te herladen bij navigeren naar een andere maand
-  const handleVisibleRangeChange = ({ start, end }: { start: Date; end: Date }) => {
-    // Als de maand verandert (door navigatie met de pijltjes), herlaad de pagina
+  const handleVisibleRangeChange = ({ start }: { start: Date }) => {
     const newMonth = start.getMonth();
     const newYear = start.getFullYear();
 
     if (newMonth !== visibleMonth || newYear !== visibleYear) {
-      console.log(`De maand is veranderd naar: ${newMonth + 1}/${newYear}. De pagina wordt herladen.`);
-      window.location.reload(); // Herlaad de pagina
+      console.log(`De maand is veranderd naar: ${newMonth + 1}/${newYear}`);
+      setVisibleMonth(newMonth);
+      setVisibleYear(newYear);
     }
-
-    setVisibleMonth(newMonth);
-    setVisibleYear(newYear);
   };
 
   return (
     <div className="flex justify-center items-center h-full">
       <Calendar
-        ref={containerRef} // Koppel de kalender aan de ref
+        ref={containerRef}
         calendarWidth={1000}
-        aria-label="Hij is er!" // Toegankelijkheid label
-        visibleMonths={1} // Toon 1 maand per keer
-        minValue={today(getLocalTimeZone())} // De minimale datum die kan worden geselecteerd is vandaag
-        value={value} // De geselecteerde waarde
-        onChange={handleDateChange} // De functie die wordt aangeroepen bij wijziging van de geselecteerde datum
-        onVisibleRangeChange={handleVisibleRangeChange} // De functie die wordt aangeroepen bij wijziging van de zichtbare maand
+        aria-label="Hij is er!"
+        visibleMonths={1}
+        minValue={today(getLocalTimeZone())}
+        value={value}
+        onChange={handleDateChange}
+        onVisibleRangeChange={handleVisibleRangeChange}
         style={{
           fontSize: "23px",
           boxShadow: "none",
