@@ -9,6 +9,8 @@ import {
   faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 
+import Logout from "../Logout";
+
 export default function NavBar() {
   return (
     <nav className="bg-[#2E56A2] w-full h-screen flex flex-col justify-between">
@@ -42,9 +44,7 @@ export default function NavBar() {
 
       {/* Onderkant: "E" */}
       <div className="flex justify-center mb-4">
-        <p className="text-white text-2xl">
-          <FontAwesomeIcon icon={faRightFromBracket} />
-        </p>
+      <Logout></Logout>
       </div>
     </nav>
   );

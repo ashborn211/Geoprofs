@@ -3,7 +3,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "@/FireBase/FireBaseConfig"; // Adjust path to your config file
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faRightFromBracket} from "@fortawesome/free-solid-svg-icons";
+import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
 const Logout = () => {
   const handleLogout = async () => {
@@ -21,7 +21,9 @@ const Logout = () => {
       className="text-white underline mb-[10px]"
       onClick={handleLogout}
     >
-      Log out
+      <p className="text-white text-2xl">
+        <FontAwesomeIcon icon={faRightFromBracket} />
+      </p>
     </Link>
   );
 };
