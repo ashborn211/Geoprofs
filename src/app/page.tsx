@@ -100,7 +100,7 @@ const LoginPage = () => {
         // Check if 2FA is enabled
         if (userData) {
           // 2FA is enabled, show QR Code for authentication
-          alert("Login successful! Proceed to enable 2FA.");
+          alert("Login successful!");
           router.push("/home");
         } else {
           alert("Failed to fetch user details. Please try again.");
