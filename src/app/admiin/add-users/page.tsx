@@ -14,6 +14,7 @@ import {
   sendPasswordResetEmail,
 } from "firebase/auth";
 import { generatePassword } from "@/utils/passwordGenerator";
+import { generateSecret } from "@/utils/totp"; // Importeer de TOTP-generator
 import Logout from "@/components/Logout";
 
 interface Team {
@@ -29,6 +30,7 @@ export default function AddUser() {
   const [role, setRole] = useState("");
   const [password, setPassword] = useState("");
   const [generatedPassword, setGeneratedPassword] = useState("");
+  const [totpSecret, setTotpSecret] = useState(""); // Secret voor 2FA
 
   // Fetch teams from Firestore
   useEffect(() => {
@@ -53,10 +55,15 @@ export default function AddUser() {
     setPassword(newPassword);
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(generatedPassword).then(() => {
-      alert("Password copied to clipboard!");
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Copied to clipboard!");
     });
+  };
+
+  const handleGenerateTOTPSecret = () => {
+    const secret = generateSecret(); // Genereer een unieke TOTP-sleutel
+    setTotpSecret(secret);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,13 +100,16 @@ export default function AddUser() {
         role: role,
         password: password,
         emailVerified: false,
+        totpSecret, // Opslaan van de TOTP-secret
       });
 
       console.log("User document created in Firestore:", {
         userName: naam,
         email,
         team,
+        password,
         role,
+        totpSecret,
       });
 
       // Send a password reset email after user creation using Firebase Auth
@@ -115,6 +125,7 @@ export default function AddUser() {
       setRole("");
       setPassword("");
       setGeneratedPassword("");
+      setTotpSecret(""); // Reset de secret
     } catch (error) {
       console.error("Error adding user: ", error);
       alert("Failed to add user. Please try again.");
@@ -210,17 +221,42 @@ export default function AddUser() {
                   >
                     Generate Password
                   </button>
-
                   {generatedPassword && (
                     <div className="flex items-center space-x-2">
                       <span className="font-mono">{generatedPassword}</span>
                       <button
                         type="button"
-                        onClick={copyToClipboard}
+                        onClick={() => copyToClipboard(generatedPassword)}
                         className="text-blue-500"
                       >
                         Copy
                       </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-col space-y-2">
+                  <button
+                    type="button"
+                    onClick={handleGenerateTOTPSecret}
+                    className="p-2 bg-blue-500 text-white rounded"
+                  >
+                    Generate TOTP Secret
+                  </button>
+                  {totpSecret && (
+                    <div className="flex flex-col space-y-1">
+                      <span className="font-mono">{totpSecret}</span>
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(totpSecret)}
+                        className="text-blue-500"
+                      >
+                        Copy
+                      </button>
+                      <p>
+                        Voeg deze sleutel handmatig toe in je Google
+                        Authenticator-app.
+                      </p>
                     </div>
                   )}
                 </div>

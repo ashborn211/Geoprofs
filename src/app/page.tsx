@@ -14,26 +14,11 @@ const LoginPage = () => {
   const [password, setPassword] = useState<string>("");
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const { setUser } = useUser();
   const router = useRouter();
 
   const isValidEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
-  };
-
-  const fetchUserData = async (uid: string) => {
-    try {
-      const userDoc = await getDoc(doc(db, "users", uid));
-      if (userDoc.exists()) {
-        return userDoc.data();
-      } else {
-        throw new Error("No such user document");
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      return null;
-    }
   };
 
   const handleCaptchaChange = (token: string | null) => {
@@ -79,28 +64,15 @@ const LoginPage = () => {
         email,
         password
       );
+
       const user = userCredential.user;
 
       if (!user.emailVerified) {
         alert("Your email is not verified. You may continue using the app.");
       }
 
-      const userData = await fetchUserData(user.uid);
-
-      if (userData) {
-        setUser({
-          uid: user.uid,
-          email: user.email!,
-          userName: userData.userName || "Anonymous",
-          role: userData.role,
-          team: userData.team,
-        });
-
-        alert("Login successful!");
-        router.push("/home");
-      } else {
-        alert("Failed to fetch user details. Please try again.");
-      }
+      // Pass user info to the 2FA page
+      router.push(`/2fa?uid=${user.uid}&email=${email}`);
     } catch (error: any) {
       console.error(error.message);
       if (error.code === "auth/user-not-found") {
@@ -114,23 +86,18 @@ const LoginPage = () => {
       setIsSubmitting(false);
     }
   };
+
   return (
     <main className="relative h-screen w-screen bg-cover bg-center bg-no-repeat">
-      {/* Background image with overlay */}
       <div className="absolute inset-0 bg-[url('/images/the_starry_night.jpg')] brightness-50"></div>
-  
-      {/* Layout container */}
       <div className="flex items-center justify-start h-full relative">
-        {/* Image field centered on the right-hand side */}
         <div className="absolute top-1/2 right-64 transform -translate-y-1/2">
           <img
-            src="/images/Logo GeoProfs letter.png" /* Replace with your image path */
+            src="/images/Logo GeoProfs letter.png"
             alt="Right-Side Image"
-            className="h-30 w-100 " /* Adjust size as needed */
+            className="h-30 w-100"
           />
         </div>
-  
-        {/* Login block pushed to the left */}
         <div className="bg-black bg-opacity-40 shadow-md w-2/4 h-full p-8 flex flex-col justify-center">
           <div className="text-center mb-6">
             <img
@@ -142,8 +109,6 @@ const LoginPage = () => {
           <h2 className="text-center text-2xl font-semibold mb-8 text-white">
             Inloggen
           </h2>
-  
-          {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-6 flex flex-col items-center">
             <div className="w-2/4">
               <Input
@@ -154,9 +119,9 @@ const LoginPage = () => {
                   setEmail(e.target.value)
                 }
                 required
-              fullWidth
-            />
-          </div>
+                fullWidth
+              />
+            </div>
             <div className="w-2/4">
               <Input
                 type="password"
@@ -166,7 +131,6 @@ const LoginPage = () => {
                   setPassword(e.target.value)
                 }
                 required
-                className="w-full"
               />
             </div>
             <div className="w-2/4">
@@ -190,6 +154,6 @@ const LoginPage = () => {
       </div>
     </main>
   );
-  
-}
-  export default LoginPage;
+};
+
+export default LoginPage;
