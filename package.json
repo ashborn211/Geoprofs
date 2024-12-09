@@ -23,7 +23,8 @@
     "test:loginPage": "jest __tests__/LoginPage.test.tsx --coverage --runTestsByPath",
     "test:Admin": "jest __tests__/admin.test.tsx --coverage --runTestsByPath",
     "test:Route": "jest __tests__/ProtectedRoute.test.tsx --verbose",
-    "test:password": "jest __tests__/passwordGenerator.test.ts --verbose"
+    "test:password": "jest __tests__/passwordGenerator.test.ts --verbose",
+    "test:ResultTable": "jest __tests__/ResultsTable.test.tsx --coverage --runTestsByPath"
   },
   "dependencies": {
     "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
