@@ -19,7 +19,7 @@ export default function NavBar() {
         {/* Achtergrondafbeelding */}
         <div
           className="w-16 h-16 bg-cover bg-center mb-4"
-          style={{ backgroundImage: "url('images/Logo GeoProfs.png')" }}
+          style={{ backgroundImage: "url('images/Logo.png')" }}
         />
         {/* Individuele tekstitems */}
         <p className="text-white text-2xl mb-8">

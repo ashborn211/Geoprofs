@@ -167,13 +167,13 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex h-screen overflow-hidden bg-custom-gray">
+      <div className="flex h-screen overflow-hidden bg-special-gray">
         <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
         <NavBar />
         </div>
         <div className="w-[94vw] h-full">
           <div className="h-full grid grid-cols-12 grid-rows-12">
-            <div className="col-span-12 row-span-4 col-start-1 bg-custom-gray-500 flex justify-around p-4">
+            <div className="col-span-12 row-span-4 col-start-1 bg-custom-gray flex justify-around p-4">
               <div
                 className="rounded-lg text-4xl flex items-center justify-center p-[15px]"
                 style={{
