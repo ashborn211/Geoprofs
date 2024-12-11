@@ -9,10 +9,7 @@ import {
   where,
 } from "firebase/firestore";
 import { auth, db } from "@/FireBase/FireBaseConfig";
-import {
-  createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { generatePassword } from "@/utils/passwordGenerator";
 import Logout from "@/components/Logout";
 
@@ -102,11 +99,25 @@ export default function AddUser() {
         role,
       });
 
-      // Send a password reset email after user creation using Firebase Auth
-      await sendPasswordResetEmail(auth, email);
+      // Call the custom API route to send a password reset email
+      const response = await fetch("/api/auth/password-reset", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        console.error("Error sending password reset email:", responseData);
+        alert("Failed to send password reset email. Please try again.");
+        return;
+      }
 
       console.log("Password reset email sent to:", email);
-      alert("Password reset email sent successfully!");
+      alert(responseData.message);
 
       // Reset form fields
       setNaam("");

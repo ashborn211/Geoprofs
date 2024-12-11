@@ -1,3 +1,4 @@
+// Mock ResizeObserver
 global.ResizeObserver = class {
   constructor(callback) {
     this.callback = callback;
@@ -7,34 +8,24 @@ global.ResizeObserver = class {
   disconnect() { }
 };
 
-import '@testing-library/jest-dom'; // Add this line
+// Firebase emulator setup
+import { initializeApp } from 'firebase/app';
+import { getAuth, connectAuthEmulator } from 'firebase/auth';
 
-jest.mock("firebase/auth", () => ({
-  getAuth: jest.fn(() => ({
-    currentUser: null,
-  })),
-  createUserWithEmailAndPassword: jest.fn(),
-  setPersistence: jest.fn(() => Promise.resolve()),
-  browserLocalPersistence: {},
-  connectAuthEmulator: jest.fn(),
-}));
+const firebaseConfig = {
+  apiKey: 'fake-api-key', // This key doesn't need to be real for the emulator
+  authDomain: 'localhost',
+  projectId: 'test-project',
+};
 
-jest.mock("firebase/firestore", () => ({
-  getFirestore: jest.fn(),
-  initializeFirestore: jest.fn(),
-  connectFirestoreEmulator: jest.fn(),
-  setDoc: jest.fn(() => Promise.resolve()),
-  getDocs: jest.fn(),
-  collection: jest.fn(),
-  query: jest.fn(),
-  where: jest.fn(),
-}));
+beforeAll(() => {
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  connectAuthEmulator(auth, 'http://localhost:9099');
+});
 
-jest.mock("firebase/database", () => ({
-  getDatabase: jest.fn(),
-  connectDatabaseEmulator: jest.fn(),
-}));
+// Polyfill fetch
+import 'whatwg-fetch';  // Add this line to polyfill fetch
 
-jest.mock("firebase/storage", () => ({
-  getStorage: jest.fn(),
-}));
+// Jest DOM for extended assertions
+import '@testing-library/jest-dom';  // Add this line

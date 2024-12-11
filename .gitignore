@@ -37,3 +37,6 @@ next-env.d.ts
 
 src/FireBase/serviceAccountKey.json
 GOOGLE_APPLICATION_CREDENTIALS.json
+ui-debug.log
+ui-debug.log
+*.log
