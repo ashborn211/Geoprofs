@@ -18,26 +18,26 @@ export default function NavBar() {
   <div className="flex flex-col items-center mt-8 space-y-12">
     {/* Achtergrondafbeelding */}
     <div
-      className="w-20 h-20 bg-cover bg-center"
+      className="w-16 h-16 bg-cover bg-center"
       style={{ backgroundImage: "url('images/Logo.png')" }}
     />
     {/* Individuele tekstitems */}
-    <p className="text-white text-3xl">
+    <p className="text-white text-2xl">
       <FontAwesomeIcon icon={faHouse} />
     </p>
-    <p className="text-white text-3xl">
+    <p className="text-white text-2xl">
       <FontAwesomeIcon icon={faClock} />
     </p>
-    <p className="text-white text-3xl">
+    <p className="text-white text-2xl">
       <FontAwesomeIcon icon={faPlaneDeparture} />
     </p>
-    <p className="text-white text-3xl">
+    <p className="text-white text-2xl">
       <FontAwesomeIcon icon={faUser} />
     </p>
-    <p className="text-white text-3xl">
+    <p className="text-white text-2xl">
       <FontAwesomeIcon icon={faFile} />
     </p>
-    <p className="text-white text-3xl">
+    <p className="text-white text-2xl">
       <FontAwesomeIcon icon={faUserPlus} />
     </p>
   </div>
