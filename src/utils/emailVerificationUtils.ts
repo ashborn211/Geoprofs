@@ -1,3 +1,4 @@
+//utils/emailVerificationUtils.ts
 import { getAuth } from "firebase/auth";
 
 export const handleSendVerification = async (

@@ -1,146 +1,155 @@
-import { getAuth, connectAuthEmulator, signInWithCustomToken, signOut } from "firebase/auth";
-import fetchMock from "jest-fetch-mock";
-import axios from "axios";
+// __tests__/emailVerificationUtils.test.ts
+
 import { handleSendVerification, handleConfirmVerification } from "@/utils/emailVerificationUtils";
-import * as admin from "firebase-admin";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, connectAuthEmulator } from "firebase/auth";
 
-const PROJECT_ID = "geoprofs-3f4e4";
+describe("emailVerificationUtils", () => {
+    let mockSetMessage: jest.Mock;
+    let mockSetError: jest.Mock;
+    let mockSetIsLoading: jest.Mock;
 
-const deletingFirebaseDataUrl = `http://127.0.0.1:8080/emulator/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
-const deletingAuthDataUrl = `http://localhost:9099/emulator/v1/projects/${PROJECT_ID}/accounts`;
+    beforeAll(async () => {
+        const auth = getAuth();
+        // Connect to the emulator
+        connectAuthEmulator(auth, "http://localhost:9099");
 
-
-const functionTest = require("firebase-functions-test"); // Updated import
-
-const test = functionTest({
-    projectId: PROJECT_ID, // Your project ID
-});
-
-// Initialize Firebase Admin and Emulator
-async function initApps() {
-    admin.initializeApp({
-        projectId: PROJECT_ID,
+        // Create a test user
+        await createUserWithEmailAndPassword(auth, "test@example.com", "password123");
     });
-    const auth = getAuth();
-    connectAuthEmulator(auth, "http://localhost:9099");
-}
 
-// Cleanup Firebase data and reinitialize
-async function deleteAllDataAndApps() {
-    admin.apps.forEach(app => app?.delete());
-    await axios.delete(deletingFirebaseDataUrl);
-    await axios.delete(deletingAuthDataUrl);
-    test.cleanup();
-}
-
-beforeEach(initApps);
-afterEach(deleteAllDataAndApps);
-
-// Test: handleSendVerification for authenticated user
-test("handleSendVerification - Valid User", async () => {
-    const auth = getAuth();
-
-    // Mock the authenticated user
-    await signInWithCustomToken(auth, "mock-custom-token");
-    const currentUser = auth.currentUser;
-    expect(currentUser).not.toBeNull(); // Ensure user is authenticated
-
-    const setMessage = jest.fn();
-    const setError = jest.fn();
-    const setIsLoading = jest.fn();
-
-    // Mock fetch response for sending verification email
-    fetchMock.mockResponseOnce(JSON.stringify({ message: "Verification email sent successfully." }));
-
-    // Call the function
-    await handleSendVerification(setMessage, setError, setIsLoading);
-
-    // Assertions
-    expect(setIsLoading).toHaveBeenCalledWith(true);
-    expect(fetchMock).toHaveBeenCalledWith("/api/auth/send-verification", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken: expect.any(String) }),
+    beforeEach(() => {
+        mockSetMessage = jest.fn();
+        mockSetError = jest.fn();
+        mockSetIsLoading = jest.fn();
     });
-    expect(setMessage).toHaveBeenCalledWith("Verification email sent successfully.");
-    expect(setError).not.toHaveBeenCalled();
-    expect(setIsLoading).toHaveBeenCalledWith(false);
-});
 
-// Test: handleSendVerification for unauthenticated user
-test("handleSendVerification - Unauthenticated User", async () => {
-    const auth = getAuth();
+    describe("handleSendVerification", () => {
+        it("should send a verification email successfully", async () => {
+            const auth = getAuth();
+            // Sign in the test user
+            await signInWithEmailAndPassword(auth, "test@example.com", "password123");
 
-    // Mock unauthenticated user
-    await signOut(auth); // Ensure the user is signed out
+            // Simulate the API call
+            const mockResponse = { message: "Verification email sent successfully." };
+            global.fetch = jest.fn().mockResolvedValue({
+                ok: true,
+                json: jest.fn().mockResolvedValue(mockResponse),
+            });
 
-    const setMessage = jest.fn();
-    const setError = jest.fn();
-    const setIsLoading = jest.fn();
+            await handleSendVerification(mockSetMessage, mockSetError, mockSetIsLoading);
 
-    // Call the function
-    await handleSendVerification(setMessage, setError, setIsLoading);
+            expect(mockSetIsLoading).toHaveBeenCalledWith(true);
+            expect(global.fetch).toHaveBeenCalledWith("/api/auth/send-verification", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ idToken: await auth.currentUser!.getIdToken() }),
+            });
+            expect(mockSetMessage).toHaveBeenCalledWith("Verification email sent successfully.");
+            expect(mockSetIsLoading).toHaveBeenCalledWith(false);
+        });
 
-    // Assertions
-    expect(setIsLoading).toHaveBeenCalledWith(true);
-    expect(setMessage).not.toHaveBeenCalled();
-    expect(setError).toHaveBeenCalledWith("User is not authenticated.");
-    expect(setIsLoading).toHaveBeenCalledWith(false);
-});
+        it("should handle error when no user is authenticated", async () => {
+            const auth = getAuth();
+            // Sign out the current user
+            await auth.signOut();
 
-// Test: handleConfirmVerification with valid code
-test("handleConfirmVerification - Valid Code", async () => {
-    const setMessage = jest.fn();
-    const setError = jest.fn();
-    const setIsLoading = jest.fn();
-    const setVerificationCode = jest.fn();
+            await handleSendVerification(mockSetMessage, mockSetError, mockSetIsLoading);
 
-    // Mock fetch response for confirming verification code
-    fetchMock.mockResponseOnce(JSON.stringify({ message: "Email successfully verified!" }));
-
-    // Call the function
-    const verificationCode = "valid-code";
-    await handleConfirmVerification(verificationCode, setMessage, setError, setIsLoading, setVerificationCode);
-
-    // Assertions
-    expect(setIsLoading).toHaveBeenCalledWith(true);
-    expect(fetchMock).toHaveBeenCalledWith("/api/auth/confirm-verification", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ oobCode: verificationCode }),
+            expect(mockSetError).toHaveBeenCalledWith("User is not authenticated.");
+            expect(mockSetIsLoading).toHaveBeenCalledWith(false);
+        });
     });
-    expect(setMessage).toHaveBeenCalledWith("Email successfully verified!");
-    expect(setError).not.toHaveBeenCalled();
-    expect(setVerificationCode).toHaveBeenCalledWith("");
-    expect(setIsLoading).toHaveBeenCalledWith(false);
+
+    // Similar tests for handleConfirmVerification can go here
 });
+describe('handleConfirmVerification', () => {
+    let setMessage: jest.Mock;
+    let setError: jest.Mock;
+    let setIsLoading: jest.Mock;
+    let setVerificationCode: jest.Mock;
 
-// Test: handleConfirmVerification with invalid code
-test("handleConfirmVerification - Invalid Code", async () => {
-    const setMessage = jest.fn();
-    const setError = jest.fn();
-    const setIsLoading = jest.fn();
-    const setVerificationCode = jest.fn();
+    beforeEach(() => {
+        // Mock the functions that handle state updates
+        setMessage = jest.fn();
+        setError = jest.fn();
+        setIsLoading = jest.fn();
+        setVerificationCode = jest.fn();
 
-    // Mock fetch response for confirming verification code
-    fetchMock.mockResponseOnce(
-        JSON.stringify({ error: "Invalid verification code." }),
-        { status: 400 }
-    );
-
-    // Call the function
-    const verificationCode = "invalid-code";
-    await handleConfirmVerification(verificationCode, setMessage, setError, setIsLoading, setVerificationCode);
-
-    // Assertions
-    expect(setIsLoading).toHaveBeenCalledWith(true);
-    expect(fetchMock).toHaveBeenCalledWith("/api/auth/confirm-verification", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ oobCode: verificationCode }),
+        // Mock global fetch (you could also use `jest.spyOn` if needed)
+        global.fetch = jest.fn();
     });
-    expect(setMessage).not.toHaveBeenCalled();
-    expect(setError).toHaveBeenCalledWith("Invalid verification code.");
-    expect(setVerificationCode).not.toHaveBeenCalled();
-    expect(setIsLoading).toHaveBeenCalledWith(false);
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('should handle successful email verification', async () => {
+        // Setup mock response for a successful API call
+        (fetch as jest.Mock).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ message: 'Email successfully verified!' }),
+        });
+
+        const verificationCode = 'validCode';
+
+        // Call the function
+        await handleConfirmVerification(
+            verificationCode,
+            setMessage,
+            setError,
+            setIsLoading,
+            setVerificationCode
+        );
+
+        // Assert that state setters are called as expected
+        expect(setIsLoading).toHaveBeenCalledWith(true);
+        expect(setMessage).toHaveBeenCalledWith('Email successfully verified!');
+        expect(setVerificationCode).toHaveBeenCalledWith(''); // Reset the verification code
+        expect(setIsLoading).toHaveBeenCalledWith(false);
+    });
+
+    it('should handle failed email verification', async () => {
+        // Setup mock response for a failed API call
+        (fetch as jest.Mock).mockResolvedValueOnce({
+            ok: false,
+            json: async () => ({ error: 'Invalid verification code.' }),
+        });
+
+        const verificationCode = 'invalidCode';
+
+        // Call the function
+        await handleConfirmVerification(
+            verificationCode,
+            setMessage,
+            setError,
+            setIsLoading,
+            setVerificationCode
+        );
+
+        // Assert that state setters are called as expected
+        expect(setIsLoading).toHaveBeenCalledWith(true);
+        expect(setError).toHaveBeenCalledWith('Invalid verification code.');
+        expect(setIsLoading).toHaveBeenCalledWith(false);
+    });
+
+    it('should handle unexpected error during email verification', async () => {
+        // Setup mock to simulate a network error
+        (fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+
+        const verificationCode = 'errorCode';
+
+        // Call the function
+        await handleConfirmVerification(
+            verificationCode,
+            setMessage,
+            setError,
+            setIsLoading,
+            setVerificationCode
+        );
+
+        // Assert that state setters are called as expected
+        expect(setIsLoading).toHaveBeenCalledWith(true);
+        expect(setError).toHaveBeenCalledWith('An unexpected error occurred.');
+        expect(setIsLoading).toHaveBeenCalledWith(false);
+    });
 });

@@ -24,8 +24,7 @@
     "test:Admin": "jest __tests__/admin.test.tsx --coverage --runTestsByPath",
     "test:Route": "jest __tests__/ProtectedRoute.test.tsx --verbose",
     "test:password": "jest __tests__/passwordGenerator.test.ts --verbose",
-    "test:verifyEmail": "firebase emulators:exec 'npm run jest-test'",
-    "jest-test": "jest __tests__/verifyEmailUtils.test.ts --verbose"
+    "test:verifyEmail": "jest __tests__/verifyEmailUtils.test.ts --verbose"
   },
   "dependencies": {
     "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
@@ -103,6 +102,7 @@
     "tailwindcss": "^3.4.10",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "whatwg-fetch": "^3.6.20"
   }
 }
