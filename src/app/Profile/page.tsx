@@ -22,7 +22,15 @@ export default function Profile() {
       return;
     }
 
-    if (isValidBSN(inputValue)) {
+    // Convert the input value to a number before passing it to the validation function
+    const bsnNumber = Number(inputValue);
+
+    if (isNaN(bsnNumber)) {
+      setMessage('Please enter a valid numeric BSN.');
+      return;
+    }
+
+    if (isValidBSN(bsnNumber)) {
       setMessage('Valid BSN number!');
     } else {
       setMessage('Invalid BSN number. Please enter a valid 9-digit BSN.');
