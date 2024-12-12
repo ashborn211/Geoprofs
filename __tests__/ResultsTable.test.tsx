@@ -1,58 +1,42 @@
-import { render } from '@testing-library/react';
+import React from "react";
+import { render } from "@testing-library/react";
+import ResultsTable from "@/components/ResultsTable"; // Assuming the component is in the same directory
 
-// Mock implementation of the convertTimestampToString function
-const convertTimestampToString = (timestamp: any) => {
-  if (!timestamp) {
-    console.error("Invalid timestamp:", timestamp);
-    return "Invalid Date";
-  }
+// Test the convertTimestampToString function logic
+describe("convertTimestampToString function", () => {
+  let component: any;
 
-  if (timestamp.seconds === undefined || timestamp.nanoseconds === undefined) {
-    console.error("Invalid Firestore Timestamp:", timestamp);
-    return "Invalid Date";
-  }
-
-  const date = new Date(timestamp.seconds * 1000);
-  if (isNaN(date.getTime())) {
-    console.error("Invalid Date object:", date);
-    return "Invalid Date";
-  }
-
-  return date.toLocaleDateString();
-};
-
-
-describe("convertTimestampToString", () => {
-  test("should return a readable date string for valid Firestore timestamps", () => {
-    const validTimestamp = { seconds: 1691164800, nanoseconds: 0 }; // Aug 4, 2023
-    expect(convertTimestampToString(validTimestamp)).toBe("8/4/2023"); // Adjust the date format if necessary
+  beforeEach(() => {
+    // Render the component to be able to test its behavior
+    component = render(<ResultsTable data={[]} />);
   });
 
-  test("should return 'Invalid Date' for null or undefined timestamps", () => {
-    expect(convertTimestampToString(null)).toBe("Invalid Date");
-    expect(convertTimestampToString(undefined)).toBe("Invalid Date");
+  it("should return a readable date string for a valid Firestore timestamp", () => {
+    const timestamp = { seconds: 1609459200, nanoseconds: 0 }; // 01/01/2021
+    const result = component.convertTimestampToString(timestamp);
+    expect(result).toBe("1/1/2021");
   });
 
-  test("should return 'Invalid Date' for timestamps missing seconds or nanoseconds", () => {
-    const invalidTimestamp1 = { nanoseconds: 0 }; // Missing seconds
-    const invalidTimestamp2 = { seconds: 1691164800 }; // Missing nanoseconds
-    expect(convertTimestampToString(invalidTimestamp1)).toBe("Invalid Date");
-    expect(convertTimestampToString(invalidTimestamp2)).toBe("Invalid Date");
+  it("should handle invalid Firestore timestamps", () => {
+    const invalidTimestamp = { seconds: undefined, nanoseconds: undefined };
+    const result = component.convertTimestampToString(invalidTimestamp);
+    expect(result).toBe("Invalid Date");
   });
 
-  test("should return 'Invalid Date' for non-Firestore timestamp objects", () => {
-    const invalidObject = { foo: "bar" };
-    expect(convertTimestampToString(invalidObject)).toBe("Invalid Date");
+  it("should return 'Invalid Date' for an invalid Date object", () => {
+    const invalidTimestamp = { seconds: "invalid", nanoseconds: "invalid" };
+    const result = component.convertTimestampToString(invalidTimestamp);
+    expect(result).toBe("Invalid Date");
   });
 
-  test("should log errors for invalid timestamps", () => {
-    console.error = jest.fn(); // Mock console.error
-    const invalidTimestamp = { foo: "bar" };
+  it("should return 'No results found' when data is empty", () => {
+    const { getByText } = render(<ResultsTable data={[]} />);
+    expect(getByText("No results found.")).toBeInTheDocument();
+  });
 
-    convertTimestampToString(invalidTimestamp);
-    expect(console.error).toHaveBeenCalledWith(
-      "Invalid Firestore Timestamp:",
-      invalidTimestamp
-    );
+  it("should render data correctly when provided", () => {
+    const data = [{ timestamp: { seconds: 1609459200, nanoseconds: 0 }, id: 1 }];
+    const { getByText } = render(<ResultsTable data={data} />);
+    expect(getByText("1/1/2021")).toBeInTheDocument(); // Assuming the data contains a timestamp
   });
 });
