@@ -7,6 +7,7 @@ describe('isValidBSN', () => {
         expect(isValidBSN('123456782')).toBe(true); // Valid 9-digit BSN
         expect(isValidBSN('232262536')).toBe(true); // Valid 9-digit BSN
         expect(isValidBSN('010464554')).toBe(true); // Valid 8-digit BSN (padded to 9 digits)
+
     });
 
     test('should return true for valid 8-digit BSN with leading zero', () => {
