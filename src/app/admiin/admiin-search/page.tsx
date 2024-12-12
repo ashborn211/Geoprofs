@@ -12,6 +12,7 @@ export default function AdminSearchPage() {
 
   // Fetch all data from Firestore when the page loads
   useEffect(() => {
+    
     const fetchData = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "verlof"));
