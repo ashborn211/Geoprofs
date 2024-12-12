@@ -1,50 +1,41 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import * as speakeasy from "speakeasy";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/FireBase/FireBaseConfig";
+// app/api/verify-totp/route.ts
+import { NextResponse } from "next/server";
+import { validateTOTP } from "@/utils/totp"; 
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "@/FireBase/FireBaseConfig"; 
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ success: false, message: "Method not allowed" });
+const getUserTotpSecret = async (userId: string): Promise<string | null> => {
+  const userDoc = await getDoc(doc(db, "users", userId));
+  if (userDoc.exists()) {
+    return userDoc.data().totpSecret || null;
+  } else {
+    return null;
   }
+};
 
+export async function POST(req: Request) {
   try {
-    const { email, code } = req.body;
+    const { totpCode, userId } = await req.json();
 
-    if (!email || !code) {
-      return res.status(400).json({ success: false, message: "Missing email or code" });
+    if (!totpCode || !userId) {
+      return NextResponse.json({ error: "Missing totpCode or userId" }, { status: 400 });
     }
 
-    // Fetch the user's TOTP secret from Firestore
-    const userRef = doc(db, "users", email); // Assuming email is used as the Firestore document ID
-    const userDoc = await getDoc(userRef);
+    const secret = await getUserTotpSecret(userId);
 
-    if (!userDoc.exists()) {
-      return res.status(404).json({ success: false, message: "User not found" });
+    if (!secret) {
+      return NextResponse.json({ error: "No TOTP secret found for user" }, { status: 400 });
     }
 
-    const userData = userDoc.data();
-    const userTOTPSecret = userData?.totpSecret;
+    const isValid = validateTOTP(secret, totpCode);
 
-    if (!userTOTPSecret) {
-      return res.status(400).json({ success: false, message: "TOTP not set up for this user" });
-    }
-
-    // Verify the TOTP code
-    const verified = speakeasy.totp.verify({
-      secret: userTOTPSecret,
-      encoding: "base32",
-      token: code,
-      window: 1, // Allows a window of 30 seconds before/after the current time
-    });
-
-    if (verified) {
-      return res.status(200).json({ success: true, message: "TOTP verified successfully" });
+    if (isValid) {
+      return NextResponse.json({ success: true });
     } else {
-      return res.status(400).json({ success: false, message: "Invalid TOTP code" });
+      return NextResponse.json({ success: false, message: "Invalid 2FA code." }, { status: 400 });
     }
   } catch (error) {
-    console.error("Error verifying TOTP:", error);
-    return res.status(500).json({ success: false, message: "Internal server error" });
+    console.error("Error verifying 2FA code:", error);
+    return NextResponse.json({ error: "Server error during 2FA verification." }, { status: 500 });
   }
 }

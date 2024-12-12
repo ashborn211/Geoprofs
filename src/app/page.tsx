@@ -72,7 +72,7 @@ const LoginPage = () => {
       }
 
       // Pass user info to the 2FA page
-      router.push(`/2fa?uid=${user.uid}&email=${email}`);
+      router.push(`/verify-2fa?uid=${user.uid}&email=${email}`);
     } catch (error: any) {
       console.error(error.message);
       if (error.code === "auth/user-not-found") {
