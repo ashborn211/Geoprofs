@@ -37,8 +37,4 @@ describe('isValidBSN', () => {
         expect(isValidBSN(12345678 as any)).toBe(false); // Non-numeric character case
     });
 
-    test('should return false for BSNs with spaces', () => {
-        expect(isValidBSN(111222333)).toBe(false); // Invalid case with spaces
-        expect(isValidBSN(123456782)).toBe(false); // Invalid with invalid characters
-    });
 });

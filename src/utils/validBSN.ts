@@ -1,8 +1,19 @@
 export const isValidBSN = (bsn: number): boolean => {
-    // Convert the number to a string to handle leading zeros
-    let bsnString = bsn.toString().padStart(9, '0'); // Ensure it is a 9-digit string
+    // Convert the number to a string and remove leading zeros
+    let bsnString = bsn.toString();
+
+    // Remove leading zeros by parsing it as an integer and converting back to string
+    bsnString = String(parseInt(bsnString, 10)); // This removes leading zeros automatically
     
-    // Ensure the BSN is exactly a 9-digit string
+    // Ensure the BSN is between 8 and 9 digits
+    if (bsnString.length < 8 || bsnString.length > 9) {
+        return false; // If the length is not exactly 9 digits, it's invalid
+    }
+    
+    // If less than 9 digits, pad with leading zeros to make it 9 digits
+    bsnString = bsnString.padStart(9, '0');
+    
+    // Ensure the BSN is exactly 9 digits (no more, no less)
     const regex = /^[0-9]{9}$/;
     if (!regex.test(bsnString)) {
       return false; // If it's not exactly 9 digits, it's invalid
