@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { NextUIProvider } from "@nextui-org/react";
-import { UserProvider } from "../context/UserContext"; // Import UserProvider
+import { UserProvider } from "@/context/UserContext"; 
 import "./globals.css";
 import ProtectedRoute from "@/components/ProtectedRoute";
 

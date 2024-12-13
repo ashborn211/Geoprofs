@@ -35,3 +35,57 @@
 //     }
 //   }
 // }
+
+// cypress/support/commands.ts
+
+
+// Initialize Firebase only if it hasn't been initialized already
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import {
+    getAuth,
+    setPersistence,
+    browserLocalPersistence,
+    signInWithEmailAndPassword,
+} from "firebase/auth";
+import { getStorage } from "firebase/storage";
+import { getDatabase } from "firebase/database";
+
+// Firebase config object
+const firebaseConfig = {
+    apiKey: "AIzaSyCGPXI9a5y1kYgNmW-bd7kcEXtzPBrDC7M",
+    authDomain: "geoprofs-3f4e4.firebaseapp.com",
+    databaseURL: "https://geoprofs-3f4e4-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "geoprofs-3f4e4",
+    storageBucket: "geoprofs-3f4e4.appspot.com",
+    messagingSenderId: "956083793044",
+    appId: "1:956083793044:web:f1674b50fae72ccf18d881",
+    measurementId: "G-ZFMSVSN97W"
+};
+
+// Initialize Firebase app
+const app = initializeApp(firebaseConfig);
+
+declare global {
+    namespace Cypress {
+        interface Chainable {
+            login(email: string, password: string): Chainable<any>;
+        }
+    }
+}
+
+// Add the login command
+Cypress.Commands.add("login", (email: string, password: string) => {
+    cy.window().then((win) => {
+        const auth = getAuth();
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                // Store the authenticated user info in localStorage
+                win.localStorage.setItem("firebaseAuth", JSON.stringify(user));
+            })
+            .catch((error) => {
+                console.error("Error signing in:", error);
+            });
+    });
+});
