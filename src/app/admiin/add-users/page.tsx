@@ -12,6 +12,7 @@ import { auth, db } from "@/FireBase/FireBaseConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { generatePassword } from "@/utils/passwordGenerator";
 import Logout from "@/components/Logout";
+import bcrypt from "bcryptjs";
 
 interface Team {
   id: string;
@@ -72,6 +73,8 @@ export default function AddUser() {
         return;
       }
 
+      const hashedPassword = await bcrypt.hash(password, 10);
+
       // Create the user with Firebase Authentication
       const authUser = await createUserWithEmailAndPassword(
         auth,
@@ -88,7 +91,7 @@ export default function AddUser() {
         email: email,
         team: doc(db, "Team", team),
         role: role,
-        password: password,
+        password: hashedPassword,
         emailVerified: false,
       });
 
@@ -97,6 +100,8 @@ export default function AddUser() {
         email,
         team,
         role,
+        hashedPassword,
+        password,
       });
 
       // Call the custom API route to send a password reset email
