@@ -9,23 +9,31 @@ global.ResizeObserver = class {
 };
 
 // Firebase emulator setup
-import { initializeApp } from 'firebase/app';
+
+import { initializeApp, FirebaseApp } from 'firebase/app';
 import { getAuth, connectAuthEmulator } from 'firebase/auth';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import 'whatwg-fetch';
+import '@testing-library/jest-dom';
 
 const firebaseConfig = {
-  apiKey: 'fake-api-key', // This key doesn't need to be real for the emulator
+  apiKey: 'fake-api-key',
   authDomain: 'localhost',
   projectId: 'test-project',
 };
 
+let app; // Remove type annotation
+
 beforeAll(() => {
-  const app = initializeApp(firebaseConfig);
+  app = initializeApp(firebaseConfig);
+
+  // Set up Firebase Authentication emulator
   const auth = getAuth(app);
-  connectAuthEmulator(auth, 'http://localhost:9099');
+  connectAuthEmulator(auth, "http://localhost:9099");
+
+  // Set up Firestore emulator
+  const db = getFirestore(app);
+  connectFirestoreEmulator(db, "localhost", 8080);
 });
 
-// Polyfill fetch
-import 'whatwg-fetch';  // Add this line to polyfill fetch
-
-// Jest DOM for extended assertions
-import '@testing-library/jest-dom';  // Add this line
+export { app };
