@@ -21,7 +21,7 @@ const firebaseConfig = {
 beforeAll(() => {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
-  connectAuthEmulator(auth, 'http://localhost:9099');
+  connectAuthEmulator(auth, 'http://127.0.0.1:9099');
 });
 
 // Polyfill fetch
