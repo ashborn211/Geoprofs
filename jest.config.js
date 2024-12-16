@@ -13,10 +13,11 @@ const config = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   transform: {
-    '^.+\\.(ts|tsx|js|jsx)$': 'babel-jest',
+    '^.+\\.(ts|tsx)$': 'ts-jest', // Use ts-jest for TypeScript files
+    '^.+\\.(js|jsx)$': 'babel-jest', // Retain babel-jest for JavaScript files if necessary
   },
   testMatch: [
-    '<rootDir>/__tests__/*.[jt]s?(x)',
+    '<rootDir>/__tests__/**/*.[jt]s?(x)', // Support tests in nested directories
   ],
 };
 
