@@ -37,7 +37,6 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
           const data = docSnap.data();
           // Assuming the fields in the document are the strings you want
           setLeaveTypes([
-            data.speciaalVerlof,
             data.vakantie,
             data.verlof,
             data.ziek,
