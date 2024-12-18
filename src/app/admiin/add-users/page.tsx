@@ -9,12 +9,8 @@ import {
   where,
 } from "firebase/firestore";
 import { auth, db } from "@/FireBase/FireBaseConfig";
-import {
-  createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { generatePassword } from "@/utils/passwordGenerator";
-import { generateSecret } from "@/utils/totp"; // Import TOTP generator
 import Logout from "@/components/Logout";
 import bcrypt from "bcryptjs";
 
@@ -31,7 +27,6 @@ export default function AddUser() {
   const [role, setRole] = useState("");
   const [password, setPassword] = useState("");
   const [generatedPassword, setGeneratedPassword] = useState("");
-  const [totpSecret, setTotpSecret] = useState(""); // Secret for 2FA
 
   // Fetch teams from Firestore
   useEffect(() => {
@@ -54,18 +49,12 @@ export default function AddUser() {
   const handleGeneratePassword = () => {
     const newPassword = generatePassword(10);
     setPassword(newPassword);
-    setGeneratedPassword(newPassword);
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      alert("gekopieerd!");
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(generatedPassword).then(() => {
+      alert("Password copied to clipboard!");
     });
-  };
-
-  const handleGenerateTOTPSecret = () => {
-    const secret = generateSecret();
-    setTotpSecret(secret);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -104,7 +93,6 @@ export default function AddUser() {
         role: role,
         password: hashedPassword,
         emailVerified: false,
-        totpSecret, // Store the TOTP secret
       });
 
       console.log("User document created in Firestore:", {
@@ -113,14 +101,28 @@ export default function AddUser() {
         team,
         role,
         hashedPassword,
-        totpSecret,
+        password,
       });
 
-      // Send a password reset email after user creation
-      await sendPasswordResetEmail(auth, email);
+      // Call the custom API route to send a password reset email
+      const response = await fetch("/api/auth/password-reset", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        console.error("Error sending password reset email:", responseData);
+        alert("Failed to send password reset email. Please try again.");
+        return;
+      }
 
       console.log("Password reset email sent to:", email);
-      alert("Password reset email sent successfully!");
+      alert(responseData.message);
 
       // Reset form fields
       setNaam("");
@@ -129,7 +131,6 @@ export default function AddUser() {
       setRole("");
       setPassword("");
       setGeneratedPassword("");
-      setTotpSecret("");
     } catch (error) {
       console.error("Error adding user: ", error);
       alert("Failed to add user. Please try again.");
@@ -225,44 +226,6 @@ export default function AddUser() {
                   >
                     Generate Password
                   </button>
-                  {generatedPassword && (
-                    <div className="flex items-center space-x-2">
-                      <span className="font-mono">{generatedPassword}</span>
-                      <button
-                        type="button"
-                        onClick={() => copyToClipboard(generatedPassword)}
-                        className="text-blue-500"
-                      >
-                        Copy
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex flex-col space-y-2">
-                  <button
-                    type="button"
-                    onClick={handleGenerateTOTPSecret}
-                    className="p-2 bg-blue-500 text-white rounded"
-                  >
-                    Generate TOTP Secret
-                  </button>
-                  {totpSecret && (
-                    <div className="flex flex-col space-y-1">
-                      <span className="font-mono">{totpSecret}</span>
-                      <button
-                        type="button"
-                        onClick={() => copyToClipboard(totpSecret)}
-                        className="text-blue-500"
-                      >
-                        Copy
-                      </button>
-                      <p>
-                        Voeg deze sleutel handmatig toe in je Google
-                        Authenticator-app.
-                      </p>
-                    </div>
-                  )}
                 </div>
 
                 <button
