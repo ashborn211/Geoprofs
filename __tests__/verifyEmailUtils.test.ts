@@ -11,7 +11,7 @@ describe("emailVerificationUtils", () => {
     beforeAll(async () => {
         const auth = getAuth();
         // Connect to the emulator
-        connectAuthEmulator(auth, "http://localhost:9099");
+        connectAuthEmulator(auth, "http://127.0.0.1:9099");
 
         // Create a test user
         await createUserWithEmailAndPassword(auth, "test@example.com", "password123");
