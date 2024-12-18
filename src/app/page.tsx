@@ -8,10 +8,12 @@ import { Input, Button } from "@nextui-org/react";
 import { useUser } from "../context/UserContext";
 import { db } from "@/FireBase/FireBaseConfig";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
+import { authenticator } from "otplib";
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [totpCode, setTotpCode] = useState<string>("");
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const { setUser } = useUser();
@@ -88,6 +90,27 @@ const LoginPage = () => {
       const userData = await fetchUserData(user.uid);
 
       if (userData) {
+        // 2FA Verification
+        const { totpSecret } = userData;
+
+        if (!totpSecret) {
+          alert("2FA is not set up for this account. Please contact support.");
+          setIsSubmitting(false);
+          return;
+        }
+
+        const isTotpValid = authenticator.verify({
+          token: totpCode,
+          secret: totpSecret,
+        });
+
+        if (!isTotpValid) {
+          alert("Invalid 2FA code. Please try again.");
+          setIsSubmitting(false);
+          return;
+        }
+
+        // Set user in context
         setUser({
           uid: user.uid,
           email: user.email!,
@@ -114,22 +137,23 @@ const LoginPage = () => {
       setIsSubmitting(false);
     }
   };
+
   return (
     <main className="relative h-screen w-screen bg-cover bg-center bg-no-repeat">
       {/* Background image with overlay */}
       <div className="absolute inset-0 bg-[url('/images/the_starry_night.jpg')] brightness-50"></div>
-  
+
       {/* Layout container */}
       <div className="flex items-center justify-start h-full relative">
         {/* Image field centered on the right-hand side */}
         <div className="absolute top-1/2 right-64 transform -translate-y-1/2">
           <img
-            src="/images/Logo GeoProfs letter.png" /* Replace with your image path */
+            src="/images/Logo GeoProfs letter.png"
             alt="Right-Side Image"
-            className="h-30 w-100 " /* Adjust size as needed */
+            className="h-30 w-100"
           />
         </div>
-  
+
         {/* Login block pushed to the left */}
         <div className="bg-black bg-opacity-40 shadow-md w-2/4 h-full p-8 flex flex-col justify-center">
           <div className="text-center mb-6">
@@ -142,7 +166,7 @@ const LoginPage = () => {
           <h2 className="text-center text-2xl font-semibold mb-8 text-white">
             Inloggen
           </h2>
-  
+
           {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-6 flex flex-col items-center">
             <div className="w-2/4">
@@ -154,9 +178,9 @@ const LoginPage = () => {
                   setEmail(e.target.value)
                 }
                 required
-              fullWidth
-            />
-          </div>
+                fullWidth
+              />
+            </div>
             <div className="w-2/4">
               <Input
                 type="password"
@@ -164,6 +188,18 @@ const LoginPage = () => {
                 value={password}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setPassword(e.target.value)
+                }
+                required
+                className="w-full"
+              />
+            </div>
+            <div className="w-2/4">
+              <Input
+                type="text"
+                placeholder="2FA Code"
+                value={totpCode}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setTotpCode(e.target.value)
                 }
                 required
                 className="w-full"
@@ -190,6 +226,6 @@ const LoginPage = () => {
       </div>
     </main>
   );
-  
-}
-  export default LoginPage;
+};
+
+export default LoginPage;
