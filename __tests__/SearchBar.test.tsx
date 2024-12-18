@@ -13,9 +13,9 @@ const sampleData = [
 describe("SearchBar Component", () => {
   it("displays all data when input is empty", () => {
     const mockOnSearch = jest.fn();
-    
+
     render(<SearchBar allData={sampleData} onSearch={mockOnSearch} />);
-    
+
     // Initially, it should call onSearch with all data
     expect(mockOnSearch).toHaveBeenCalledWith(sampleData);
   });
@@ -24,9 +24,11 @@ describe("SearchBar Component", () => {
     const mockOnSearch = jest.fn();
 
     render(<SearchBar allData={sampleData} onSearch={mockOnSearch} />);
-    
-    const input = screen.getByPlaceholderText("Search by name, type, or date...");
-    
+
+    const input = screen.getByPlaceholderText(
+      "Search by name, type, or date..."
+    );
+
     // Simulate typing in the search bar
     fireEvent.change(input, { target: { value: "alpha" } });
 
@@ -40,9 +42,11 @@ describe("SearchBar Component", () => {
     const mockOnSearch = jest.fn();
 
     render(<SearchBar allData={sampleData} onSearch={mockOnSearch} />);
-    
-    const input = screen.getByPlaceholderText("Search by name, type, or date...");
-    
+
+    const input = screen.getByPlaceholderText(
+      "Search by name, type, or date..."
+    );
+
     // First, simulate typing a query
     fireEvent.change(input, { target: { value: "beta" } });
     expect(mockOnSearch).toHaveBeenCalledWith([

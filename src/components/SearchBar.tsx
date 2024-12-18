@@ -1,52 +1,56 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface SearchBarProps {
-  allData: any[];
-  onSearch: (results: any[]) => void;
+  onSearch: (nameQuery: string, typeQuery: string, dateQuery: string) => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ allData, onSearch }) => {
-  const [queryText, setQueryText] = useState<string>("");
+const SearchBar = ({ onSearch }: SearchBarProps) => {
+  const [nameQuery, setNameQuery] = useState("");
+  const [typeQuery, setTypeQuery] = useState("");
+  const [dateQuery, setDateQuery] = useState("");
 
-  useEffect(() => {
-    onSearch(allData); // Show all data when component mounts
-  }, [allData, onSearch]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQueryText(e.target.value);
-    filterResults(e.target.value);
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setter: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    const value = e.target.value;
+    setter(value); // Update the corresponding query state
   };
 
-  const filterResults = (query: string) => {
-    if (query.trim() === "") {
-      onSearch(allData); // Show all data if no query
-      return;
-    }
-
-    const filteredResults = allData.filter((item) => {
-      const { name, type, startDate } = item;
-      const lowerQuery = query.toLowerCase();
-
-      return (
-        name.toLowerCase().includes(lowerQuery) ||
-        type.toLowerCase().includes(lowerQuery) ||
-        (startDate && new Date(startDate).toLocaleDateString().includes(query))
-      );
-    });
-
-    onSearch(filteredResults);
+  const handleSearch = () => {
+    onSearch(nameQuery, typeQuery, dateQuery); // Trigger search with current queries
   };
 
   return (
     <div className="search-bar flex space-x-2">
       <input
         type="text"
-        placeholder="Search by name, type, or date..."
-        value={queryText}
-        onChange={handleInputChange}
+        placeholder="Search by name"
+        value={nameQuery}
+        onChange={(e) => handleInputChange(e, setNameQuery)}
         className="search-input p-2 border rounded-lg"
       />
+      <input
+        type="text"
+        placeholder="Search by type"
+        value={typeQuery}
+        onChange={(e) => handleInputChange(e, setTypeQuery)}
+        className="search-input p-2 border rounded-lg"
+      />
+      <input
+        type="text"
+        placeholder="Search by date (mm/dd/yyy)"
+        value={dateQuery}
+        onChange={(e) => handleInputChange(e, setDateQuery)}
+        className="search-input p-2 border rounded-lg"
+      />
+      <button
+        onClick={handleSearch}
+        className="bg-blue-500 text-white p-2 rounded-lg"
+      >
+        Search
+      </button>
     </div>
   );
 };

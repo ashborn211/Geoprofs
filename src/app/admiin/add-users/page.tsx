@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import {
   collection,
@@ -10,10 +9,10 @@ import {
   where,
 } from "firebase/firestore";
 import { auth, db } from "@/FireBase/FireBaseConfig";
-import bcrypt from "bcryptjs";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { generatePassword } from "@/utils/passwordGenerator"; // Adjust the path as necessary
+import { generatePassword } from "@/utils/passwordGenerator";
 import Logout from "@/components/Logout";
+import bcrypt from "bcryptjs";
 
 interface Team {
   id: string;
@@ -36,9 +35,8 @@ export default function AddUser() {
         const querySnapshot = await getDocs(collection(db, "Team"));
         const teams = querySnapshot.docs.map((doc) => ({
           id: doc.id,
-          TeamName: doc.data().TeamName, // Ensure TeamName is retrieved
+          TeamName: doc.data().TeamName,
         }));
-
         setTeamList(teams);
       } catch (error) {
         console.error("Error fetching teams: ", error);
@@ -49,7 +47,7 @@ export default function AddUser() {
   }, []);
 
   const handleGeneratePassword = () => {
-    const newPassword = generatePassword(10); // You can change the length if needed
+    const newPassword = generatePassword(10);
     setPassword(newPassword);
   };
 
@@ -61,16 +59,9 @@ export default function AddUser() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted with values:", {
-      naam,
-      email,
-      team,
-      role,
-      password,
-    });
 
-    // Check if email is already taken
     try {
+      // Check if email is already taken
       const emailQuery = query(
         collection(db, "users"),
         where("email", "==", email)
@@ -82,6 +73,8 @@ export default function AddUser() {
         return;
       }
 
+      const hashedPassword = await bcrypt.hash(password, 10);
+
       // Create the user with Firebase Authentication
       const authUser = await createUserWithEmailAndPassword(
         auth,
@@ -89,32 +82,47 @@ export default function AddUser() {
         password
       );
 
+      console.log("Created user with email: ", email);
+      console.log("User details: ", authUser.user);
+
       // Create the user document in Firestore with team reference
       await setDoc(doc(db, "users", authUser.user.uid), {
         userName: naam,
         email: email,
-        team: doc(db, "Team", team), // Set the team as a reference to the team collection
+        team: doc(db, "Team", team),
         role: role,
-        password: password, // Password can be sent for server-side hashing if needed
+        password: hashedPassword,
         emailVerified: false,
       });
 
-      // Send a password reset email after user creation
-      const response = await fetch("/api/reset-password", {
+      console.log("User document created in Firestore:", {
+        userName: naam,
+        email,
+        team,
+        role,
+        hashedPassword,
+        password,
+      });
+
+      // Call the custom API route to send a password reset email
+      const response = await fetch("/api/auth/password-reset", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email: email }),
+        body: JSON.stringify({ email }),
       });
 
-      const data = await response.json();
+      const responseData = await response.json();
 
-      if (response.ok) {
-        alert("Password reset email sent successfully!");
-      } else {
-        alert(data.message || "Failed to send password reset email.");
+      if (!response.ok) {
+        console.error("Error sending password reset email:", responseData);
+        alert("Failed to send password reset email. Please try again.");
+        return;
       }
+
+      console.log("Password reset email sent to:", email);
+      alert(responseData.message);
 
       // Reset form fields
       setNaam("");
@@ -132,8 +140,8 @@ export default function AddUser() {
   return (
     <>
       <div className="flex h-screen overflow-hidden bg-custom-gray">
-        <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center h-full">
-        <Logout />
+        <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
+          <Logout />
         </div>
         <div className="w-[94vw] h-full">
           <div className="h-full grid grid-cols-12 grid-rows-12">
@@ -150,7 +158,6 @@ export default function AddUser() {
               </div>
             </div>
 
-            {/* Input Form */}
             <div className="col-span-12 row-span-8 col-start-1 p-8">
               <form
                 className="flex flex-col space-y-4 w-1/3 mx-auto"
@@ -211,7 +218,6 @@ export default function AddUser() {
                   </select>
                 </label>
 
-                {/* Password section */}
                 <div className="flex flex-col space-y-2">
                   <button
                     type="button"
@@ -220,22 +226,8 @@ export default function AddUser() {
                   >
                     Generate Password
                   </button>
-
-                  {generatedPassword && (
-                    <div className="flex items-center space-x-2">
-                      <span className="font-mono">{generatedPassword}</span>
-                      <button
-                        type="button"
-                        onClick={copyToClipboard}
-                        className="p-2 bg-gray-500 text-white rounded"
-                      >
-                        Copy Password
-                      </button>
-                    </div>
-                  )}
                 </div>
 
-                {/* Submit button */}
                 <button
                   type="submit"
                   className="p-2 bg-green-500 text-white rounded"

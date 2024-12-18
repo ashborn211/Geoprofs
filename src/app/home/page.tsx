@@ -5,11 +5,15 @@ import VerlofComponent from "../../components/verlof"; // Import your VerlofComp
 import { useUser } from "../../context/UserContext"; // Import your user context
 import { useRouter } from "next/navigation"; // Import useRouter from Next.js
 import Logout from "@/components/Logout";
+import NavBar from "@/components/navBar/navBar";
 import { db } from "../../FireBase/FireBaseConfig";
 import {
   collection,
   getDocs,
   deleteDoc,
+  addDoc, // Import addDoc to add documents
+  query,
+  where,
   doc,
 } from "firebase/firestore"; // Remove unused imports
 
@@ -39,6 +43,9 @@ export default function Home() {
     status: number;
     docId: string; // Document ID toegevoegd
   } | null>(null); // To store selected date info
+
+  // State to control sick leave submission popup
+  const [sickLeaveSubmitted, setSickLeaveSubmitted] = useState(false);
 
   // Fetch existing date ranges from Firestore
   const fetchExistingDates = async () => {
@@ -113,6 +120,7 @@ export default function Home() {
         await deleteDoc(doc(db, "verlof", selectedDateInfo.docId)); // Remove document by docId
         fetchExistingDates(); // Refresh date ranges after deletion
         setSelectedDateInfo(null); // Clear selected date info after deletion
+        window.location.reload();
       } catch (error) {
         console.error("Error deleting leave request:", error);
       }
@@ -131,15 +139,41 @@ export default function Home() {
     router.push("/admiin"); // Adjust the path to your actual admin page
   };
 
+  // Function to handle sick leave submission
+  const handleSickLeave = async () => {
+    if (user) {
+      const today = new Date();
+      const startDate = new Date(today); // Today's date
+      const endDate = new Date(today); // End date is also today
+
+      try {
+        await addDoc(collection(db, "verlof"), {
+          type: "ziek",
+          reason: "ik ben ziek vandaag",
+          startDate: startDate, // Firebase Timestamp will be handled automatically
+          endDate: endDate, // Firebase Timestamp will be handled automatically
+          uid: user.uid,
+          name: user.userName,
+          status: 2,
+        });
+        console.log("ziekte is gemeld!");
+        setSickLeaveSubmitted(true); // Set the state to show popup
+        fetchExistingDates(); // Refresh existing date ranges
+      } catch (error) {
+        console.error("Error voor ziekmelden:", error);
+      }
+    }
+  };
+
   return (
     <>
-      <div className="flex h-screen overflow-hidden bg-custom-gray">
+      <div className="flex h-screen overflow-hidden bg-special-gray">
         <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
-          <Logout />
+        <NavBar />
         </div>
         <div className="w-[94vw] h-full">
           <div className="h-full grid grid-cols-12 grid-rows-12">
-            <div className="col-span-12 row-span-4 col-start-1 bg-custom-gray-500 flex justify-around p-4">
+            <div className="col-span-12 row-span-4 col-start-1 bg-custom-gray flex justify-around p-4">
               <div
                 className="rounded-lg text-4xl flex items-center justify-center p-[15px]"
                 style={{
@@ -214,8 +248,11 @@ export default function Home() {
                   </button>
                 )}
 
-                <button className="bg-white border-2 border-black rounded-lg w-full h-[25%]">
-                  <h1>Report Sickness</h1>
+                <button
+                  className="bg-white border-2 border-black rounded-lg w-full h-[25%]"
+                  onClick={handleSickLeave} // Call sick leave function
+                >
+                  <h1>Ziek Melden</h1>
                 </button>
               </div>
             </div>
@@ -241,6 +278,24 @@ export default function Home() {
           selectedDate={selectedDate}
           onClose={() => setShowPopup(false)}
         />
+      )}
+
+      {/* Popup for sick leave submission */}
+      {sickLeaveSubmitted && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-4 rounded shadow-md">
+            <h2 className="text-lg font-bold">Ziekmelding succesvol ingediend!</h2>
+            <button
+              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+              onClick={() => {
+                setSickLeaveSubmitted(false); // Close the popup
+                window.location.reload(); // Reload the page
+              }}
+            >
+              Ok
+            </button>
+          </div>
+        </div>
       )}
     </>
   );

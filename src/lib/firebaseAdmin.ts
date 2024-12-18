@@ -1,17 +1,25 @@
-import { initializeApp, cert } from 'firebase-admin/app';
+import { initializeApp, cert, getApp, App } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
-import * as admin from 'firebase-admin'; // Import admin module to access Firestore, etc.
-import serviceAccount from '@/FireBase/serviceAccountKey.json'; // Adjust the path to your JSON file
-import { ServiceAccount } from 'firebase-admin'; // Import the ServiceAccount type
+import * as admin from 'firebase-admin';
+import serviceAccount from '@/FireBase/serviceAccountKey.json'; // Ensure the correct path
+import { ServiceAccount } from 'firebase-admin';
 
-// Initialize the Firebase Admin SDK
-const app = initializeApp({
+// Initialize Firebase Admin SDK only if not already initialized
+let app: App;
+
+try {
+  // Try to get the default app instance
+  app = getApp();
+} catch (error) {
+  // If the app isn't initialized, initialize it
+  app = initializeApp({
     credential: cert(serviceAccount as ServiceAccount),
-    databaseURL: "https://geoprofs-3f4e4-default-rtdb.europe-west1.firebasedatabase.app/",
-});
+    databaseURL: "https://geoprofs-3f4e4-default-rtdb.europe-west1.firebasedatabase.app/", // Your Realtime Database URL (if needed)
+  });
+}
 
-// Export the auth and other services
-const auth = getAuth(app);
-const db = admin.firestore(); // Initialize Firestore
+// Export Firebase Admin services
+const auth = getAuth(app);  // Firebase Authentication service
+const db = admin.firestore();  // Firestore service
 
 export { auth, db };

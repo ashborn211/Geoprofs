@@ -1,36 +1,40 @@
 "use client";
 // src/components/ResetPasswordForm.tsx
-import { useState } from 'react';
+import { useState } from "react";
 
 const ResetPasswordForm = () => {
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage('');
-    setError('');
-    console.log('Form submitted with email:', email); // Debug log
+    setMessage("");
+    setError("");
+    console.log("Form submitted with email:", email); // Debug log
 
     try {
-      const response = await fetch('api/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/auth/password-reset", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ email }),
       });
 
-      const data = await response.json();
-      console.log('Response from API:', data); // Debug log
+      const responseData = await response.json();
 
-      if (response.ok) {
-        setMessage(data.message);
-      } else {
-        setError(data.message);
+      if (!response.ok) {
+        console.error("Error sending password reset email:", responseData);
+        alert("Failed to send password reset email. Please try again.");
+        return;
       }
+
+      console.log("Password reset email sent to:", email);
+      alert(responseData.message);
     } catch (err) {
-      console.error('Error sending request:', err); // Debug log
-      setError('An unexpected error occurred.');
+      console.error("Error sending request:", err); // Debug log
+      setError("An unexpected error occurred.");
     }
   };
 
