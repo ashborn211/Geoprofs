@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { db } from "@/FireBase/FireBaseConfig";
 import { isValidBSN } from '@/utils/validBSN';  // Import the validation function
+import { Button, Input } from '@nextui-org/react';
 
 export default function Profile() {
   const [inputValue, setInputValue] = useState('');
@@ -41,13 +42,13 @@ export default function Profile() {
     <div>
       <h1>Check BSN Validity</h1>
       <form onSubmit={handleSubmit}>
-        <input
+        <Input
           type="text"
           value={inputValue}
           onChange={handleChange}
           placeholder="Enter BSN"
         />
-        <button type="submit">Check</button>
+        <Button type="submit">Check</Button>
       </form>
       {message && <p>{message}</p>}
     </div>
