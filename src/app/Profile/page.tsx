@@ -3,7 +3,7 @@
 'use client'; // This marks the component as a Client Component
 
 import { useState } from 'react';
-import { db } from "../../FireBase/FireBaseConfig";
+import { db } from "@/FireBase/FireBaseConfig";
 import { isValidBSN } from '@/utils/validBSN';  // Import the validation function
 
 export default function Profile() {
