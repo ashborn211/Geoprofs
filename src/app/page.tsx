@@ -1,12 +1,11 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { auth } from "../FireBase/FireBaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { Input, Button } from "@nextui-org/react";
 import { useUser } from "../context/UserContext";
-import { db } from "@/FireBase/FireBaseConfig";
+import { db, auth } from "@/FireBase/FireBaseConfig";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { authenticator } from "otplib";
 
@@ -90,24 +89,26 @@ const LoginPage = () => {
       const userData = await fetchUserData(user.uid);
 
       if (userData) {
-        // 2FA Verification
         const { totpSecret } = userData;
 
-        if (!totpSecret) {
-          alert("2FA is not set up for this account. Please contact support.");
-          setIsSubmitting(false);
-          return;
-        }
+        if (totpSecret) {
+          // 2FA is enabled, validate the TOTP code
+          if (!totpCode) {
+            alert("Please enter the 2FA code.");
+            setIsSubmitting(false);
+            return;
+          }
 
-        const isTotpValid = authenticator.verify({
-          token: totpCode,
-          secret: totpSecret,
-        });
+          const isTotpValid = authenticator.verify({
+            token: totpCode,
+            secret: totpSecret,
+          });
 
-        if (!isTotpValid) {
-          alert("Invalid 2FA code. Please try again.");
-          setIsSubmitting(false);
-          return;
+          if (!isTotpValid) {
+            alert("Invalid 2FA code. Please try again.");
+            setIsSubmitting(false);
+            return;
+          }
         }
 
         // Set user in context
@@ -168,7 +169,10 @@ const LoginPage = () => {
           </h2>
 
           {/* Login Form */}
-          <form onSubmit={handleLogin} className="space-y-6 flex flex-col items-center">
+          <form
+            onSubmit={handleLogin}
+            className="space-y-6 flex flex-col items-center"
+          >
             <div className="w-2/4">
               <Input
                 type="email"
@@ -201,7 +205,6 @@ const LoginPage = () => {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setTotpCode(e.target.value)
                 }
-                required
                 className="w-full"
               />
             </div>
