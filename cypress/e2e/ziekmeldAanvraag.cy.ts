@@ -15,5 +15,6 @@ describe("Home Page", () => {
 
   it("should display the user's name", () => {
     cy.contains("Good morning, Test User").should("be.visible");
+    cy.get('button').should('contains.text', 'Ziek Melden').click;
   });
 });
