@@ -179,7 +179,7 @@ export default function Home() {
                 style={{
                   width: "65%",
                   background:
-                    "linear-gradient(90deg, rgba(255,255,255,1) 16%, rgba(90,209,254,1) 100%)",
+                    "",
                 }}
               >
                 <div className="h-full w-1/2 text-[large] flex items-center justify-center flex-col">
