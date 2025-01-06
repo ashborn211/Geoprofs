@@ -65,6 +65,35 @@ const firebaseConfig = {
 
 // Initialize Firebase app
 const app = initializeApp(firebaseConfig);
+declare global {
+    namespace Cypress {
+        interface Chainable {
+            login(email: string, password: string): Chainable<any>;
+            mockLogin(user: {
+                uid: string;
+                email: string;
+                userName?: string;
+                role?: string;
+                team?: string;
+            }): Chainable<void>;
+        }
+    }
+}
+
+// Add the mockLogin command
+Cypress.Commands.add("mockLogin", (user) => {
+    cy.window().then((win) => {
+        const mockUser = {
+            uid: user.uid || "123456",
+            email: user.email || "test@example.com",
+            userName: user.userName || "Mock User",
+            role: user.role || "user",
+            team: user.team || "default-team",
+        };
+        // Store the mock user in localStorage
+        win.localStorage.setItem("mockUser", JSON.stringify(mockUser));
+    });
+});
 
 declare global {
     namespace Cypress {
@@ -88,4 +117,5 @@ Cypress.Commands.add("login", (email: string, password: string) => {
                 console.error("Error signing in:", error);
             });
     });
+    
 });
