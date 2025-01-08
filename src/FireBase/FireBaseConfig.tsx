@@ -1,3 +1,4 @@
+"use client"; // Markeer deze component als een Client Component
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import {

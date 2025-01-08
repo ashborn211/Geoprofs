@@ -1,3 +1,4 @@
+"use client"; // Markeer deze component als een Client Component
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHouse,
