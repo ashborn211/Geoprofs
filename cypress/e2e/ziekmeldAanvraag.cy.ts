@@ -5,7 +5,7 @@ describe("Home Page", () => {
       uid: "123456",
       email: "test@example.com",
       userName: "Test User",
-      role: "admin",
+      role: "user",
       team: "test-team",
     });
 
@@ -13,8 +13,14 @@ describe("Home Page", () => {
     cy.visit("http://localhost:3000/home");
   });
 
-  it("should display the user's name", () => {
+  it("should display the user's name and allow 'Ziek Melden' action", () => {
+    // Controleer of de gebruikersnaam zichtbaar is
     cy.contains("Good morning, Test User").should("be.visible");
-    cy.get('button').should('contains.text', 'Ziek Melden').click;
+
+    // Controleer en klik op de 'Ziek Melden'-knop
+    cy.get('button')
+      .contains("Ziek Melden") // Controleer of de knop de juiste tekst bevat
+      .should("be.visible") // Zorg dat de knop zichtbaar is
+      .click(); // Klik op de knop
   });
 });
