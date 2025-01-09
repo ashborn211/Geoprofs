@@ -12,7 +12,6 @@
     "test:watch": "jest --watch",
     "test:all": "jest __tests__",
     "test:calendar": "jest __tests__/Calendar.test.tsx --runTestsByPath --coverage",
-    "test:verlof": "cross-env NODE_ENV=development jest __tests__/Verlof.test.tsx --runTestsByPath",
     "test:AddUser": "dotenv -e .env.test -- jest __tests__/AddUser.test.tsx",
     "test:Home": "jest __tests__/Home.test.tsx",
     "test:Search": "jest __tests__/SearchBar.test.tsx",
@@ -26,6 +25,7 @@
     "test:Route": "jest __tests__/ProtectedRoute.test.tsx --verbose",
     "test:password": "jest __tests__/passwordGenerator.test.ts --verbose",
     "test:verifyEmail": "jest __tests__/verifyEmailUtils.test.ts --verbose",
+    "test:verlofaanvraag": "jest __tests__/verlofaanvraag.test.ts --verbose",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

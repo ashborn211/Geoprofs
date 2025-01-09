@@ -1,68 +1,110 @@
+// __tests__/verlofComponent.test.tsx
+
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import VerlofComponent from "@/components/verlof"; // Update the path accordingly
-import { UserProvider } from "@/context/UserContext"; // Import the provider
+import VerlofComponent from "@/components/verlof"; // Update to actual path
+import { useUser } from "@/context/UserContext"; // Mock UserContext
 import { db } from "@/FireBase/FireBaseConfig";
-import { collection, addDoc, getDocs, query, where, Timestamp } from "firebase/firestore";
-import "@testing-library/jest-dom";
+import { addDoc, collection, doc, getDoc } from "firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 
-// Mock user data
-const mockUser = {
-  user: { uid: "testUser123", userName: "Test User" },
-};
+jest.mock("@/context/UserContext", () => ({
+  useUser: jest.fn(),
+}));
 
-// Helper to render with UserProvider
-const renderWithProviders = (ui: React.ReactNode) => {
-  return render(
-    <UserProvider value={mockUser}>
-      {ui}
-    </UserProvider>
-  );
-};
+jest.mock("@/FireBase/FireBaseConfig", () => ({
+  db: { collection: jest.fn(), doc: jest.fn(), addDoc: jest.fn(), getDoc: jest.fn() },
+}));
 
-describe("VerlofComponent Integration Tests", () => {
-  it("fetches and displays leave types from Firestore", async () => {
-    renderWithProviders(<VerlofComponent selectedDate={new Date()} onClose={() => {}} />);
+describe("VerlofComponent Integration Test", () => {
+  const mockOnClose = jest.fn();
 
-    // Wacht tot de opties worden geladen
-    await waitFor(() => {
-      expect(screen.getByText("Vakantie")).toBeInTheDocument();
-      expect(screen.getByText("Verlof")).toBeInTheDocument();
-      expect(screen.getByText("Ziek")).toBeInTheDocument();
+  beforeEach(() => {
+    (useUser as jest.Mock).mockReturnValue({
+      user: {
+        uid: "test-user-uid",
+        userName: "Test User",
+      },
     });
+
+    (getDoc as jest.Mock).mockResolvedValue({
+      exists: jest.fn().mockReturnValue(true),
+      data: jest.fn().mockReturnValue({
+        vakantie: "Vakantie",
+        verlof: "Verlof",
+        ziek: "Ziek",
+      }),
+    });
+
+    (addDoc as jest.Mock).mockResolvedValue({ id: "mock-doc-id" });
   });
 
-  it("writes data to Firestore", async () => {
-    renderWithProviders(<VerlofComponent selectedDate={new Date()} onClose={() => {}} />);
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-    // Vul het formulier in
-    fireEvent.change(screen.getByRole("combobox"), {
-      target: { value: "Vakantie" },
-    });
-    fireEvent.change(screen.getByPlaceholderText("reden..."), {
-      target: { value: "Vakantie nodig" },
-    });
-
-    fireEvent.click(screen.getByText("Verstuur"));
-
-    // Controleer of het document is toegevoegd in Firestore
-    const q = query(
-      collection(db, "verlof"),
-      where("type", "==", "Vakantie"),
-      where("reason", "==", "Vakantie nodig")
+  it("should submit a leave request successfully", async () => {
+    render(
+      <VerlofComponent selectedDate={new Date()} onClose={mockOnClose} />
     );
 
-    const snapshot = await getDocs(q);
+    // Wait for leave types to load
+    await waitFor(() => screen.getByLabelText(/select leave type/i));
 
-    expect(snapshot.size).toBe(1);
-    const doc = snapshot.docs[0].data();
-    expect(doc).toEqual({
-      type: "Vakantie",
-      reason: "Vakantie nodig",
-      startDate: expect.any(Timestamp),
-      endDate: expect.any(Timestamp),
-      uid: "testUser123",
-      name: "Test User",
-      status: 1,
+    // Select leave type
+    const leaveTypeSelect = screen.getByLabelText(/select leave type/i);
+    fireEvent.change(leaveTypeSelect, { target: { value: "Vakantie" } });
+
+    // Fill reason textarea
+    const reasonTextarea = screen.getByPlaceholderText(/reden.../i);
+    fireEvent.change(reasonTextarea, { target: { value: "Vakantie nodig." } });
+
+    // Set start date and end date
+    const startDateInput = screen.getByLabelText(/start date and time/i);
+    const endDateInput = screen.getByLabelText(/end date and time/i);
+
+    fireEvent.change(startDateInput, { target: { value: "2025-01-10T09:00" } });
+    fireEvent.change(endDateInput, { target: { value: "2025-01-12T17:00" } });
+
+    // Click submit button
+    const submitButton = screen.getByRole("button", { name: /verstuur/i });
+    fireEvent.click(submitButton);
+
+    // Assert that addDoc was called with the correct data
+    await waitFor(() => {
+      expect(addDoc).toHaveBeenCalledWith(collection(db, "verlof"), {
+        type: "Vakantie",
+        reason: "Vakantie nodig.",
+        startDate: Timestamp.fromDate(new Date("2025-01-10T09:00")),
+        endDate: Timestamp.fromDate(new Date("2025-01-12T17:00")),
+        uid: "test-user-uid",
+        name: "Test User",
+        status: 1,
+      });
     });
+
+    // Assert onClose is called
+    expect(mockOnClose).toHaveBeenCalled();
+  });
+
+  it("should show an error when required fields are missing", async () => {
+    render(
+      <VerlofComponent selectedDate={new Date()} onClose={mockOnClose} />
+    );
+
+    // Wait for leave types to load
+    await waitFor(() => screen.getByLabelText(/select leave type/i));
+
+    // Click submit button without filling fields
+    const submitButton = screen.getByRole("button", { name: /verstuur/i });
+    fireEvent.click(submitButton);
+
+    // Assert alerts are shown
+    await waitFor(() => {
+      expect(window.alert).toHaveBeenCalledWith("Selecteer een verloftype.");
+      expect(window.alert).toHaveBeenCalledWith("Geef een reden op.");
+    });
+
+    // Assert addDoc is not called
+    expect(addDoc).not.toHaveBeenCalled();
   });
 });
