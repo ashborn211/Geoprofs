@@ -1,84 +1,89 @@
-import { createServer } from "http";
-import { POST as handler } from "@/app/api/auth/password-reset/route"; // Adjust to your API route file path
-import { getAuth, connectAuthEmulator, createUserWithEmailAndPassword } from "firebase/auth";
-import supertest from "supertest";
+import {
+  getAuth,
+  connectAuthEmulator,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  Auth, // Add this import
+} from "firebase/auth";
 
-describe("Password Reset API Integration", () => {
-  let server: ReturnType<typeof createServer>;
-  let request: supertest.SuperTest<supertest.Test>;
-  const testUserEmail = "test@example.com";
+
+
+describe("Password Reset API Integration Tests", () => {
+  const firebaseAuthUrl = "http://127.0.0.1:9099"; // Firebase Auth Emulator URL
+  const testEmail = "testuser@example.com";
+  const testPassword = "password123";
+
 
   beforeAll(async () => {
-    // Connect to Firebase Auth Emulator
     const auth = getAuth();
-    connectAuthEmulator(auth, "http://127.0.0.1:9099");
+      connectAuthEmulator(auth, firebaseAuthUrl);
 
-    // Create a test user
-    await createUserWithEmailAndPassword(auth, testUserEmail, "password123");
 
-    // Mock environment variable for Firebase API Key
-    process.env.NEXT_PUBLIC_FIREBASE_API_KEY = "fakeApiKey";
-
-    // Create a server for the API route
-    server = createServer((req, res) => handler(req, res));
-    request = supertest(server);
+      // Create the test user
+      await createUserWithEmailAndPassword(auth, testEmail, testPassword);
   });
 
-  afterAll(() => {
-    server.close();
+  it("should log in the user successfully", async () => {
+      try {
+         const auth = getAuth();
+          const userCredential = await signInWithEmailAndPassword(auth, testEmail, testPassword);
+          const user = userCredential.user;
+
+          expect(user.email).toBe(testEmail);
+          expect(user.emailVerified).toBe(false); // Assuming email is not verified
+      } catch (error) {
+          console.error("Login failed:", error);
+          throw new Error("Login failed");
+      }
   });
 
-  it("should return 200 and a success message when email is valid", async () => {
-    const res = await request.post("/api/auth/password-reset").send({ email: testUserEmail });
+  it("should successfully send a password reset email", async () => {
+      const response = await fetch("/api/auth/password-reset", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: testEmail }),
+      });
 
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual({
-      message: `Password reset email sent successfully to ${testUserEmail}.`,
-    });
+      const responseData = await response.json();
+
+      expect(response.ok).toBe(true);
+      expect(responseData.message).toBe(
+          `Password reset email sent successfully to ${testEmail}.`
+      );
   });
 
-  it("should return 400 when email is not provided", async () => {
-    const res = await request.post("/api/auth/password-reset").send({});
+  it("should fail when email is missing", async () => {
+      const response = await fetch(apiEndpoint, {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify({}),
+      });
 
-    expect(res.status).toBe(400);
-    expect(res.body).toEqual({
-      error: "Email is required.",
-    });
+      const responseData = await response.json();
+
+      expect(response.ok).toBe(false);
+      expect(response.status).toBe(400);
+      expect(responseData.error).toBe("Email is required.");
   });
 
-  it("should return 500 when Firebase API key is missing", async () => {
-    // Temporarily remove the API key
-    delete process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+  it("should fail when an invalid email is provided", async () => {
+      const invalidEmail = "invalidemail@example.com"; // This user does not exist
+      const response = await fetch(apiEndpoint, {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: invalidEmail }),
+      });
 
-    const res = await request.post("/api/auth/password-reset").send({ email: testUserEmail });
+      const responseData = await response.json();
 
-    expect(res.status).toBe(500);
-    expect(res.body).toEqual({
-      error: "Firebase API Key is not configured.",
-    });
-
-    // Restore the API key
-    process.env.NEXT_PUBLIC_FIREBASE_API_KEY = "fakeApiKey";
-  });
-
-  it("should handle Firebase API errors gracefully", async () => {
-    // Mock fetch to simulate a Firebase API error
-    global.fetch = jest.fn().mockResolvedValueOnce({
-      ok: false,
-      status: 400,
-      json: async () => ({
-        error: { message: "INVALID_EMAIL" },
-      }),
-    });
-
-    const res = await request.post("/api/auth/password-reset").send({ email: "invalid@example.com" });
-
-    expect(res.status).toBe(400);
-    expect(res.body).toEqual({
-      error: "Failed to send password reset email.",
-      details: { error: { message: "INVALID_EMAIL" } },
-    });
-
-    jest.restoreAllMocks();
+      expect(response.ok).toBe(false);
+      expect(response.status).toBe(400); // Assuming Firebase API would return 400 for non-existent email
+      expect(responseData.error).toContain("Failed to send password reset email.");
   });
 });

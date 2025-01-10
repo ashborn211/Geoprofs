@@ -1,111 +1,155 @@
-import { getAuth, sendPasswordResetEmail, connectAuthEmulator } from "firebase/auth";
-import { POST } from "@/app/api/auth/password-reset/route"; // Import the API route handler
-import { NextResponse } from "next/server";
+// __tests__/emailVerificationUtils.test.ts
 
-describe("Password Reset API", () => {
-  const validEmail = "test@example.com";
-  const invalidEmail = "invalid@example.com";
+import { handleSendVerification, handleConfirmVerification } from "@/utils/emailVerificationUtils";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, connectAuthEmulator } from "firebase/auth";
 
-  beforeAll(async () => {
-    const auth = getAuth();
-    // Connect to the Firebase emulator
-    connectAuthEmulator(auth, "http://127.0.0.1:9099");
+describe("emailVerificationUtils", () => {
+    let mockSetMessage: jest.Mock;
+    let mockSetError: jest.Mock;
+    let mockSetIsLoading: jest.Mock;
 
-    // You can create a test user here if needed
-    await sendPasswordResetEmail(auth, validEmail); // This is for testing the reset flow
-  });
+    beforeAll(async () => {
+        const auth = getAuth();
+        // Connect to the emulator
+        connectAuthEmulator(auth, "http://127.0.0.1:9099");
 
-  afterAll(() => {
-    // Cleanup, if any, after tests complete
-    jest.restoreAllMocks();
-  });
-
-  it("should return 200 and a success message for a valid email", async () => {
-    // Mock the global fetch to simulate Firebase API response
-    global.fetch = jest.fn().mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({}),
+        // Create a test user
+        await createUserWithEmailAndPassword(auth, "test@example.com", "password123");
     });
 
-    // Simulate the request object for the API
-    const request = new Request("http://localhost/api/auth/password-reset", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: validEmail }),
+    beforeEach(() => {
+        mockSetMessage = jest.fn();
+        mockSetError = jest.fn();
+        mockSetIsLoading = jest.fn();
     });
 
-    const response = await POST(request); // Call the handler directly
-    const json = await response.json();
+    describe("handleSendVerification", () => {
+        it("should send a verification email successfully", async () => {
+            const auth = getAuth();
+            // Sign in the test user
+            await signInWithEmailAndPassword(auth, "test@example.com", "password123");
 
-    expect(response.status).toBe(200);
-    expect(json).toEqual({
-      message: `Password reset email sent successfully to ${validEmail}.`,
+            // Simulate the API call
+            const mockResponse = { message: "Verification email sent successfully." };
+            global.fetch = jest.fn().mockResolvedValue({
+                ok: true,
+                json: jest.fn().mockResolvedValue(mockResponse),
+            });
+
+            await handleSendVerification(mockSetMessage, mockSetError, mockSetIsLoading);
+
+            expect(mockSetIsLoading).toHaveBeenCalledWith(true);
+            expect(global.fetch).toHaveBeenCalledWith("/api/auth/send-verification", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ idToken: await auth.currentUser!.getIdToken() }),
+            });
+            expect(mockSetMessage).toHaveBeenCalledWith("Verification email sent successfully.");
+            expect(mockSetIsLoading).toHaveBeenCalledWith(false);
+        });
+
+        it("should handle error when no user is authenticated", async () => {
+            const auth = getAuth();
+            // Sign out the current user
+            await auth.signOut();
+
+            await handleSendVerification(mockSetMessage, mockSetError, mockSetIsLoading);
+
+            expect(mockSetError).toHaveBeenCalledWith("User is not authenticated.");
+            expect(mockSetIsLoading).toHaveBeenCalledWith(false);
+        });
     });
 
-    jest.restoreAllMocks(); // Cleanup mocks
-  });
+    // Similar tests for handleConfirmVerification can go here
+});
+describe('handleConfirmVerification', () => {
+    let setMessage: jest.Mock;
+    let setError: jest.Mock;
+    let setIsLoading: jest.Mock;
+    let setVerificationCode: jest.Mock;
 
-  it("should return 400 if email is not provided", async () => {
-    const request = new Request("http://localhost/api/auth/password-reset", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}), // No email
+    beforeEach(() => {
+        // Mock the functions that handle state updates
+        setMessage = jest.fn();
+        setError = jest.fn();
+        setIsLoading = jest.fn();
+        setVerificationCode = jest.fn();
+
+        // Mock global fetch (you could also use `jest.spyOn` if needed)
+        global.fetch = jest.fn();
     });
 
-    const response = await POST(request);
-    const json = await response.json();
-
-    expect(response.status).toBe(400);
-    expect(json).toEqual({
-      error: "Email is required.",
-    });
-  });
-
-  it("should return 500 if Firebase API key is not configured", async () => {
-    delete process.env.NEXT_PUBLIC_FIREBASE_API_KEY; // Remove the API key
-
-    const request = new Request("http://localhost/api/auth/password-reset", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: validEmail }),
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
-    const response = await POST(request);
-    const json = await response.json();
+    it('should handle successful email verification', async () => {
+        // Setup mock response for a successful API call
+        (fetch as jest.Mock).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ message: 'Email successfully verified!' }),
+        });
 
-    expect(response.status).toBe(500);
-    expect(json).toEqual({
-      error: "Firebase API Key is not configured.",
+        const verificationCode = 'validCode';
+
+        // Call the function
+        await handleConfirmVerification(
+            verificationCode,
+            setMessage,
+            setError,
+            setIsLoading,
+            setVerificationCode
+        );
+
+        // Assert that state setters are called as expected
+        expect(setIsLoading).toHaveBeenCalledWith(true);
+        expect(setMessage).toHaveBeenCalledWith('Email successfully verified!');
+        expect(setVerificationCode).toHaveBeenCalledWith(''); // Reset the verification code
+        expect(setIsLoading).toHaveBeenCalledWith(false);
     });
 
-    // Restore the API key
-    process.env.NEXT_PUBLIC_FIREBASE_API_KEY = "fakeApiKey";
-  });
+    it('should handle failed email verification', async () => {
+        // Setup mock response for a failed API call
+        (fetch as jest.Mock).mockResolvedValueOnce({
+            ok: false,
+            json: async () => ({ error: 'Invalid verification code.' }),
+        });
 
-  it("should handle Firebase API errors gracefully", async () => {
-    global.fetch = jest.fn().mockResolvedValueOnce({
-      ok: false,
-      status: 400,
-      json: async () => ({
-        error: { message: "EMAIL_NOT_FOUND" },
-      }),
+        const verificationCode = 'invalidCode';
+
+        // Call the function
+        await handleConfirmVerification(
+            verificationCode,
+            setMessage,
+            setError,
+            setIsLoading,
+            setVerificationCode
+        );
+
+        // Assert that state setters are called as expected
+        expect(setIsLoading).toHaveBeenCalledWith(true);
+        expect(setError).toHaveBeenCalledWith('Invalid verification code.');
+        expect(setIsLoading).toHaveBeenCalledWith(false);
     });
 
-    const request = new Request("http://localhost/api/auth/password-reset", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: invalidEmail }),
+    it('should handle unexpected error during email verification', async () => {
+        // Setup mock to simulate a network error
+        (fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+
+        const verificationCode = 'errorCode';
+
+        // Call the function
+        await handleConfirmVerification(
+            verificationCode,
+            setMessage,
+            setError,
+            setIsLoading,
+            setVerificationCode
+        );
+
+        // Assert that state setters are called as expected
+        expect(setIsLoading).toHaveBeenCalledWith(true);
+        expect(setError).toHaveBeenCalledWith('An unexpected error occurred.');
+        expect(setIsLoading).toHaveBeenCalledWith(false);
     });
-
-    const response = await POST(request);
-    const json = await response.json();
-
-    expect(response.status).toBe(400);
-    expect(json).toEqual({
-      error: "Failed to send password reset email.",
-      details: { error: { message: "EMAIL_NOT_FOUND" } },
-    });
-
-    jest.restoreAllMocks(); // Cleanup mocks
-  });
 });
