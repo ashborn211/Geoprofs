@@ -54,14 +54,20 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
 
   // Helper to format date for "datetime-local" input
   const formatDateForInput = (timestamp: Timestamp) => {
-    const date = timestamp.toDate();
-    const timeZone = "Europe/Amsterdam"; // Fixed timezone
+    try {
+      const date = timestamp.toDate();
+      const timeZone = "Europe/Amsterdam"; // Fixed timezone
 
-    // Convert the date to the Netherlands timezone
-    const zonedDate = toZonedTime(date, timeZone);
+      // Convert the date to the Netherlands timezone
+      const zonedDate = toZonedTime(date, timeZone);
 
-    // Format it as YYYY-MM-DDTHH:MM (required by datetime-local input)
-    return format(zonedDate, "yyyy-MM-dd'T'HH:mm");
+      // Format it as YYYY-MM-DDTHH:MM (required by datetime-local input)
+      return format(zonedDate, "yyyy-MM-dd'T'HH:mm");
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      // Fallback to empty string if invalid
+      return "";
+    }
   };
 
   // Handle form submission
@@ -106,6 +112,10 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
     setter: (value: Timestamp) => void
   ) => {
     const newDate = new Date(event.target.value);
+    if (isNaN(newDate.getTime())) {
+      console.warn("Invalid date selected");
+      return; // Stop further execution
+    }
     console.log("Selected date:", newDate); // Debug log
     setter(Timestamp.fromDate(newDate));
   };
