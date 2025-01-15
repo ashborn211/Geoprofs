@@ -53,12 +53,6 @@ export default function AddUser() {
     setPassword(newPassword);
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(generatedPassword).then(() => {
-      alert("Password copied to clipboard!");
-    });
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValidBSN(parseInt(bsnNumber))) {
