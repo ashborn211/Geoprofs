@@ -17,6 +17,7 @@ interface User {
   userName: string | null;
   role: string | null;
   team: string | null;
+  bsnNumber: number;
 }
 
 // Extend UserContextType to include `isLoading` state
@@ -59,6 +60,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
             userName: userSnap.data().userName,
             role: userSnap.data().role,
             team: userSnap.data().team,
+            bsnNumber: userSnap.data().bsnNumber,
+
           });
         }
       } else {

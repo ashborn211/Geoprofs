@@ -1,0 +1,124 @@
+/* General Reset */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+  }
+  
+  .profile-container {
+    display: flex;
+    height: 100vh;
+  }
+  
+  /* Sidebar Navigation */
+  .side-nav {
+    width: 80px;
+    background-color: #337ab7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+  }
+  
+  .nav-item {
+    width: 60px;
+    height: 60px;
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  
+  .nav-item.active,
+  .nav-item:hover {
+    background-color: #286090;
+    border-radius: 8px;
+  }
+  
+  .icon {
+    width: 30px;
+    height: 30px;
+    background-color: #fff;
+    border-radius: 50%;
+  }
+  
+  /* Replace icons with actual SVGs or images later */
+  .home-icon::before {
+    content: "🏠"; /* Placeholder for home icon */
+  }
+  .stats-icon::before {
+    content: "📊";
+  }
+  .plane-icon::before {
+    content: "✈️";
+  }
+  .user-icon::before {
+    content: "👤";
+  }
+  .file-icon::before {
+    content: "📁";
+  }
+  .add-user-icon::before {
+    content: "➕";
+  }
+  .question-icon::before {
+    content: "❓";
+  }
+  .logout-icon::before {
+    content: "🚪";
+  }
+  
+  /* Profile Content */
+  .profile-content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .profile-card {
+    background-color: #ffffff;
+    width: 400px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .avatar {
+    width: 100px;
+    height: 100px;
+    background-color: #ddd;
+    border-radius: 50%;
+    margin-bottom: 10px;
+  }
+  
+  .profile-details {
+    text-align: left;
+  }
+  
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  .label {
+    font-weight: bold;
+    color: #555;
+  }
+  
+  .value {
+    color: #333;
+  }
+  
