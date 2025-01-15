@@ -16,19 +16,10 @@ import {
       const auth = getAuth();
       connectAuthEmulator(auth, firebaseAuthUrl);
   
-      // Clean up the test user if it already exists
-      try {
-        const userCredential = await signInWithEmailAndPassword(auth, testEmail, testPassword);
-        await deleteUser(userCredential.user);
-      } catch (error) {
-        // Ignore errors for non-existing users
-        if (error.code !== "auth/user-not-found") {
-          throw error;
-        }
-      }
   
-      // Create the test user
       await createUserWithEmailAndPassword(auth, testEmail, testPassword);
+      await signInWithEmailAndPassword(auth, testEmail, testPassword);
+
     });
   
     it("should log in the user successfully", async () => {
@@ -45,7 +36,7 @@ import {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-        },
+        },  
         body: JSON.stringify({ email: testEmail }),
       });
   
