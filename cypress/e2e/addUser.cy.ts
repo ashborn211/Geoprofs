@@ -52,13 +52,13 @@ describe("Add User Component", () => {
 
     it("should generate a password and copy it to clipboard", () => {
         cy.get("button").contains("Generate Password").click();
-      
     });
 
     it("should successfully add a user", () => {
         // Fill out the form with valid data
         cy.get('input[placeholder="Enter naam"]').type("John Doe");
         cy.get('input[placeholder="Enter email"]').type("john.doe@example.com");
+        cy.get('input[placeholder="Enter BSN"]').type("123456789"); // Valid BSN
         cy.get("select").eq(0).select("managment");
         cy.get("select").eq(1).select("Admin");
 
@@ -86,6 +86,7 @@ describe("Add User Component", () => {
         // Fill out the form with an existing email
         cy.get('input[placeholder="Enter naam"]').type("Jane Doe");
         cy.get('input[placeholder="Enter email"]').type("jane.doe@example.com");
+        cy.get('input[placeholder="Enter BSN"]').type("123456789"); // Valid BSN
         cy.get("select").eq(0).select("ICT");
         cy.get("select").eq(1).select("User");
 
@@ -100,6 +101,25 @@ describe("Add User Component", () => {
         // Assert error alert
         cy.on("window:alert", (str) => {
             expect(str).to.equal("Email already taken. Please use a different email.");
+        });
+    });
+
+    it("should show an error for invalid BSN numbers", () => {
+        // Fill out the form with an invalid BSN
+        cy.get('input[placeholder="Enter naam"]').type("Emily Brown");
+        cy.get('input[placeholder="Enter email"]').type("emily.brown@example.com");
+        cy.get('input[placeholder="Enter BSN"]').type("111111111"); // Invalid BSN
+        cy.get("select").eq(0).select("ICT");
+        cy.get("select").eq(1).select("User");
+
+        cy.get("button").contains("Generate Password").click();
+
+        // Submit the form
+        cy.get('button[type="submit"]').click();
+
+        // Assert BSN error message
+        cy.on("window:alert", (str) => {
+            expect(str).to.equal("Invalid BSN number. Please enter a valid BSN.");
         });
     });
 });
