@@ -5,7 +5,7 @@ describe('VerifyEmailForm', () => {
         // Log in using Cypress custom command
         cy.login("test10@gmail.com", "8^!@C4hybR");
 
-        cy.visit('/verify-email');
+        cy.visit('http://localhost:3000/verify-email');
     });
 
     it('should display the current user email', () => {
