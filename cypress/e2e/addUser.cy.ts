@@ -17,14 +17,7 @@ describe("Add User Component", () => {
         cy.visit("http://localhost:3000/admiin/add-users");
 
         // Intercept Firestore and Firebase API calls
-        cy.intercept("GET", "**/users?where=email", {
-            statusCode: 200,
-            body: { exists: false }, // Simulate no email conflict
-        }).as("checkEmailNoConflict");
 
-        cy.intercept("POST", "**/users", {
-            statusCode: 200,
-        }).as("createUser");
     });
 
     it("should load the Add User form and display team options", () => {
