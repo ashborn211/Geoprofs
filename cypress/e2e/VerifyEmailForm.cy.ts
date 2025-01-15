@@ -3,8 +3,17 @@
 describe('VerifyEmailForm', () => {
     beforeEach(() => {
         // Log in using Cypress custom command
-        cy.login("test10@gmail.com", "8^!@C4hybR");
+        const mockUser = {
+            uid: "test123",
+            email: "test10@gmail.com",
+            userName: "Test User",
+            role: "Admin",
+            team: "Management",
+        };
 
+        cy.window().then((win) => {
+            win.localStorage.setItem("mockUser", JSON.stringify(mockUser));
+        });
         cy.visit('http://localhost:3000/verify-email');
     });
 
