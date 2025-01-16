@@ -26,35 +26,35 @@ export default function VerlofTable() {
     const [selectedStatus, setSelectedStatus] = useState(1); // Default status is 1 (In behandeling)
 
     // Fetch "verlof" collection from Firestore
+    const fetchVerlof = async () => {
+        try {
+            const querySnapshot = await getDocs(collection(db, "verlof"));
+            const verlofList: Verlof[] = querySnapshot.docs
+                .map((verlofDoc) => {
+                    const verlofData = verlofDoc.data();
+
+                    return {
+                        id: verlofDoc.id,
+                        name: verlofData.name,
+                        reason: verlofData.reason,
+                        startDate: new Date(verlofData.startDate.seconds * 1000).toLocaleString(), // Convert timestamp to string
+                        endDate: new Date(verlofData.endDate.seconds * 1000).toLocaleString(), // Convert timestamp to string
+                        status: verlofData.status,
+                        type: verlofData.type,
+                    };
+                })
+                .filter((verlof) => verlof.status === selectedStatus); // Filter based on selected status
+
+            setVerlof(verlofList);
+        } catch (error) {
+            console.error("Error fetching verlof data: ", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchVerlof = async () => {
-            try {
-                const querySnapshot = await getDocs(collection(db, "verlof"));
-                const verlofList: Verlof[] = querySnapshot.docs
-                    .map((verlofDoc) => {
-                        const verlofData = verlofDoc.data();
-
-                        return {
-                            id: verlofDoc.id,
-                            name: verlofData.name,
-                            reason: verlofData.reason,
-                            startDate: new Date(verlofData.startDate.seconds * 1000).toLocaleString(), // Convert timestamp to string
-                            endDate: new Date(verlofData.endDate.seconds * 1000).toLocaleString(), // Convert timestamp to string
-                            status: verlofData.status,
-                            type: verlofData.type,
-                        };
-                    })
-                    .filter((verlof) => verlof.status === selectedStatus); // Filter based on selected status
-
-                setVerlof(verlofList);
-            } catch (error) {
-                console.error("Error fetching verlof data: ", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchVerlof();
+        fetchVerlof(); // Initial fetch on page load
     }, [selectedStatus]); // Refetch the list when the status changes
 
     // Convert status number to readable text
@@ -80,7 +80,7 @@ export default function VerlofTable() {
             });
 
             // Refetch the list to reflect the updated status
-            setSelectedStatus(newStatus);
+            fetchVerlof(); // Refresh the list after updating the status
             console.log(`Verlof entry with ID ${verlofId} updated to status ${newStatus}`);
         } catch (error) {
             console.error("Error updating status: ", error);
