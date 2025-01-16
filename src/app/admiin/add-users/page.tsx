@@ -53,18 +53,22 @@ export default function AddUser() {
     setPassword(newPassword);
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(generatedPassword).then(() => {
-      alert("Password copied to clipboard!");
-    });
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValidBSN(parseInt(bsnNumber))) {
       alert("Invalid BSN number. Please enter a valid BSN.");
       return;
     }     
+    const bsnNumberQuery = query(
+      collection(db, "users"),
+      where("bsnNumber", "==", bsnNumber)
+    );
+    const bsnNumberQuerySnapshot = await getDocs(bsnNumberQuery);
+
+    if (!bsnNumberQuerySnapshot.empty) {
+      alert("BSN already taken. Please use a different BSN.");
+      return;
+    }
     try {
       // Check if email is already taken
       const emailQuery = query(
