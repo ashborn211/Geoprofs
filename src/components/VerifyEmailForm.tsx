@@ -21,7 +21,7 @@ const VerifyEmailForm = () => {
   }, []);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen">
       <form className="bg-white p-6 rounded-lg shadow-md w-96">
         <h2 className="text-lg font-semibold mb-4">Verify Email</h2>
 

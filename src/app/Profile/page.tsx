@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/FireBase/FireBaseConfig";
 import NavBar from "@/components/navBar/navBar";
+import ResetPasswordForm from "@/components/ResetPasswordForm";
+import VerifyEmailForm from "@/components/VerifyEmailForm";
 
 export default function UserProfile() {
   const [userData, setUserData] = useState({
@@ -14,8 +16,10 @@ export default function UserProfile() {
     team: "",
     vakantiedagen: "60/60", // Example value
   });
-
   const [loading, setLoading] = useState(true);
+  
+  const [isResetPopupOpen, setIsResetPopupOpen] = useState(false); // State for pop-up visibility
+  const [isverifyPopupOpen, setIsverifyPopupOpen] = useState(false); // State for pop-up visibility
 
   // Fetch user data from Firestore
   useEffect(() => {
@@ -36,7 +40,7 @@ export default function UserProfile() {
 
               if (teamDoc.exists()) {
                 const teamData = teamDoc.data();
-                teamName = teamData.TeamName || ""; // Safely access the team name
+                teamName = teamData.TeamName || "";
               } else {
                 console.error("No team document found");
               }
@@ -51,7 +55,7 @@ export default function UserProfile() {
               password: userData.password || "",
               geboorte: userData.geboorte || "",
               team: teamName,
-              vakantiedagen: "60/60", // Replace with dynamic value if needed
+              vakantiedagen: "60/60",
             });
           } else {
             console.error("No user document found");
@@ -73,6 +77,14 @@ export default function UserProfile() {
       return bsnStr;
     }
     return "*".repeat(bsnStr.length - 3) + bsnStr.slice(-3);
+  };
+
+  // Function to close the password reset popup
+  const closeResetPopup = () => {
+    setIsResetPopupOpen(false);
+  };
+  const closeverifyPopup = () => {
+    setIsverifyPopupOpen(false);
   };
 
   return (
@@ -113,7 +125,9 @@ export default function UserProfile() {
                     <td className="font-bold py-2 px-4">Email:</td>
                     <td className="py-2 px-4">{userData.email}</td>
                     <td className="py-2 px-4 text-right">
-                      <button className="text-blue-500 hover:underline">✏️</button>
+                      <button className="text-blue-500 hover:underline"
+                       onClick={() => setIsverifyPopupOpen(true)} >
+                        ✏️</button>
                     </td>
                   </tr>
                   <tr className="border-b">
@@ -122,7 +136,12 @@ export default function UserProfile() {
                       {"*".repeat(userData.password.length)}
                     </td>
                     <td className="py-2 px-4 text-right">
-                      <button className="text-blue-500 hover:underline">✏️</button>
+                      <button
+                        className="text-blue-500 hover:underline"
+                        onClick={() => setIsResetPopupOpen(true)} // Open the reset password pop-up
+                      >
+                        ✏️
+                      </button>
                     </td>
                   </tr>
                   <tr className="border-b">
@@ -146,6 +165,46 @@ export default function UserProfile() {
           )}
         </div>
       </div>
+
+      {/* Pop-up Modal */}
+      {isResetPopupOpen && (
+        <div className="fixed inset-0 flex items-center justify-center">
+
+            <ResetPasswordForm /> 
+            <button
+                className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                //onClick={confirmPasswordReset} // Confirm the reset
+              >
+                Confirm
+              </button>
+              <button
+                className="bg-gray-300 px-4 py-2 rounded-md"
+                onClick={closeResetPopup} // Close the modal without action
+              >
+                Close
+              </button>
+          </div>
+          
+      )}
+      {isverifyPopupOpen && (
+        <div className="fixed inset-0 flex items-center justify-center">
+
+            <VerifyEmailForm /> 
+            <button
+                className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                //onClick={confirmPasswordReset} // Confirm the reset
+              >
+                Confirm
+              </button>
+              <button
+                className="bg-gray-300 px-4 py-2 rounded-md"
+                onClick={closeverifyPopup} // Close the modal without action
+              >
+                Close
+              </button>
+          </div>
+          
+      )}
     </div>
   );
 }
