@@ -89,9 +89,9 @@ const LoginPage = () => {
       const userData = await fetchUserData(user.uid);
 
       if (userData) {
-        const { totpSecret } = userData;
+        const { totpSecret, twoFAEnabled } = userData;
 
-        if (totpSecret) {
+        if (twoFAEnabled) {
           // 2FA is enabled, validate the TOTP code
           if (!totpCode) {
             alert("Please enter the 2FA code.");
@@ -118,6 +118,7 @@ const LoginPage = () => {
           userName: userData.userName || "Anonymous",
           role: userData.role,
           team: userData.team,
+          bsnNumber: 0,
         });
 
         alert("Login successful!");
