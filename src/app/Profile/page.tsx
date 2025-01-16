@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/FireBase/FireBaseConfig";
-import Logout from "@/components/Logout";
 import NavBar from "@/components/navBar/navBar";
 
 export default function UserProfile() {
@@ -10,7 +9,10 @@ export default function UserProfile() {
     bsnNumber: "",
     naam: "",
     email: "",
+    password: "",
+    geboorte: "",
     team: "",
+    vakantiedagen: "60/60", // Example value
   });
 
   const [loading, setLoading] = useState(true);
@@ -23,15 +25,15 @@ export default function UserProfile() {
         if (currentUser) {
           const userDocRef = doc(db, "users", currentUser.uid);
           const userDoc = await getDoc(userDocRef);
-    
+
           if (userDoc.exists()) {
             const userData = userDoc.data();
-    
+
             let teamName = "";
-            if (userData.team.id) {
+            if (userData.team?.id) {
               const teamDocRef = doc(db, "Team", userData.team.id);
               const teamDoc = await getDoc(teamDocRef);
-    
+
               if (teamDoc.exists()) {
                 const teamData = teamDoc.data();
                 teamName = teamData.TeamName || ""; // Safely access the team name
@@ -41,12 +43,15 @@ export default function UserProfile() {
             } else {
               console.error("User does not have a valid team reference");
             }
-    
+
             setUserData({
               bsnNumber: userData.bsnNumber || "",
               naam: userData.userName || "",
               email: userData.email || "",
-              team: teamName, // Use resolved team name
+              password: userData.password || "",
+              geboorte: userData.geboorte || "",
+              team: teamName,
+              vakantiedagen: "60/60", // Replace with dynamic value if needed
             });
           } else {
             console.error("No user document found");
@@ -58,62 +63,89 @@ export default function UserProfile() {
         setLoading(false);
       }
     };
-    
 
     fetchUserData();
   }, []);
 
-  return (
-    <>
-      <div className="flex h-screen overflow-hidden bg-custom-gray">
-        <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
-           <NavBar />
-        </div>
-        <div className="w-[94vw] h-full">
-          <div className="h-full grid grid-cols-12 grid-rows-12">
-            <div className="col-span-12 row-span-4 col-start-1 bg-custom-gray-500 flex justify-around p-4">
-              <div
-                className="rounded-lg text-4xl flex items-center justify-center p-[15px]"
-                style={{
-                  width: "65%",
-                  background:
-                    "linear-gradient(90deg, rgba(255,255,255,1) 16%, rgba(90,209,254,1) 100%)",
-                }}
-              >
-                <h1>Welcome, {userData.naam || "User"}</h1>
-              </div>
-            </div>
+  const maskBsnNumber = (bsnNumber: string | number): string => {
+    const bsnStr = bsnNumber.toString();
+    if (bsnStr.length <= 3) {
+      return bsnStr;
+    }
+    return "*".repeat(bsnStr.length - 3) + bsnStr.slice(-3);
+  };
 
-            <div className="col-span-12 row-span-8 col-start-1 p-8">
-              {loading ? (
-                <div className="text-center text-xl">Loading...</div>
-              ) : (
-                <div className="p-6 bg-white shadow-md rounded-lg w-1/3 mx-auto">
-                  <h2 className="text-2xl mb-4 text-center">Your Profile</h2>
-                  <div className="space-y-4">
-                    <div>
-                      <strong>BSN:</strong>
-                      <span className="ml-2">{userData.bsnNumber}</span>
-                    </div>
-                    <div>
-                      <strong>Name:</strong>
-                      <span className="ml-2">{userData.naam}</span>
-                    </div>
-                    <div>
-                      <strong>Email:</strong>
-                      <span className="ml-2">{userData.email}</span>
-                    </div>
-                    <div>
-                      <strong>Team:</strong>
-                      <span className="ml-2">{userData.team}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
+  return (
+    <div className="flex h-screen overflow-hidden bg-gray-100">
+      <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
+        <NavBar />
+      </div>
+      <div className="w-[94vw] flex justify-center items-center">
+        <div className="bg-white shadow-lg rounded-lg p-6 w-2/3">
+          {/* Profile Avatar and Title */}
+          <div className="flex flex-col items-center mb-6">
+            <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
+              <img
+                src="/default-avatar.png"
+                alt="Profile Avatar"
+                className="w-full h-full object-cover rounded-full"
+              />
             </div>
+            <h2 className="text-2xl font-bold mt-4">Your Profile</h2>
           </div>
+
+          {/* Profile Details */}
+          {loading ? (
+            <div className="text-center text-xl">Loading...</div>
+          ) : (
+            <div className="bg-gray-50 rounded-md shadow-sm p-4">
+              <table className="w-full">
+                <tbody>
+                  <tr className="border-b">
+                    <td className="font-bold py-2 px-4">BSN:</td>
+                    <td className="py-2 px-4">{maskBsnNumber(userData.bsnNumber)}</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="font-bold py-2 px-4">Naam:</td>
+                    <td className="py-2 px-4">{userData.naam}</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="font-bold py-2 px-4">Email:</td>
+                    <td className="py-2 px-4">{userData.email}</td>
+                    <td className="py-2 px-4 text-right">
+                      <button className="text-blue-500 hover:underline">✏️</button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="font-bold py-2 px-4">Password:</td>
+                    <td className="py-2 px-4">
+                      {"*".repeat(userData.password.length)}
+                    </td>
+                    <td className="py-2 px-4 text-right">
+                      <button className="text-blue-500 hover:underline">✏️</button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="font-bold py-2 px-4">Geboorte:</td>
+                    <td className="py-2 px-4">{userData.geboorte || "Not set"}</td>
+                    <td className="py-2 px-4 text-right">
+                      <button className="text-blue-500 hover:underline">✏️</button>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="font-bold py-2 px-4">Teams:</td>
+                    <td className="py-2 px-4">{userData.team}</td>
+                  </tr>
+                  <tr>
+                    <td className="font-bold py-2 px-4">Vakantiedagen 2024:</td>
+                    <td className="py-2 px-4">{userData.vakantiedagen}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 }
