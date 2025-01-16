@@ -4,6 +4,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/FireBase/FireBaseConfig";
 import Logout from "@/components/Logout";
 import NavBar from "@/components/navBar/navBar";
+import { generateSecret } from "@/utils/totp"; // Import TOTP generator
 
 export default function UserProfile() {
   const [userData, setUserData] = useState({
@@ -15,6 +16,27 @@ export default function UserProfile() {
 
   const [loading, setLoading] = useState(true);
 
+  const [generatedPassword, setGeneratedPassword] = useState("");
+  const [totpSecret, setTotpSecret] = useState("");
+
+  const handleGeneratePassword = () => {
+    const password = Math.random().toString(36).slice(-8); // Simple password generation
+    setGeneratedPassword(password);
+  };
+
+  const handleGenerateTOTPSecret = () => {
+    const secret = generateSecret();
+    setTotpSecret(secret);
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Copied to clipboard!");
+    });
+  };
+
+  
+
   // Fetch user data from Firestore
   useEffect(() => {
     const fetchUserData = async () => {
@@ -23,15 +45,15 @@ export default function UserProfile() {
         if (currentUser) {
           const userDocRef = doc(db, "users", currentUser.uid);
           const userDoc = await getDoc(userDocRef);
-    
+
           if (userDoc.exists()) {
             const userData = userDoc.data();
-    
+
             let teamName = "";
             if (userData.team.id) {
               const teamDocRef = doc(db, "Team", userData.team.id);
               const teamDoc = await getDoc(teamDocRef);
-    
+
               if (teamDoc.exists()) {
                 const teamData = teamDoc.data();
                 teamName = teamData.TeamName || ""; // Safely access the team name
@@ -41,7 +63,7 @@ export default function UserProfile() {
             } else {
               console.error("User does not have a valid team reference");
             }
-    
+
             setUserData({
               bsnNumber: userData.bsnNumber || "",
               naam: userData.userName || "",
@@ -58,7 +80,6 @@ export default function UserProfile() {
         setLoading(false);
       }
     };
-    
 
     fetchUserData();
   }, []);
@@ -67,7 +88,7 @@ export default function UserProfile() {
     <>
       <div className="flex h-screen overflow-hidden bg-custom-gray">
         <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
-           <NavBar />
+          <NavBar />
         </div>
         <div className="w-[94vw] h-full">
           <div className="h-full grid grid-cols-12 grid-rows-12">
@@ -107,6 +128,30 @@ export default function UserProfile() {
                       <strong>Team:</strong>
                       <span className="ml-2">{userData.team}</span>
                     </div>
+                  </div>
+                  <div className="flex flex-col space-y-2 mt-6">
+                    <button
+                      type="button"
+                      onClick={handleGenerateTOTPSecret}
+                      className="p-2 bg-blue-500 text-white rounded"
+                    >
+                      Generate TOTP Secret
+                    </button>
+                    {totpSecret && (
+                      <div className="flex flex-col space-y-1">
+                        <span className="font-mono">{totpSecret}</span>
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(totpSecret)}
+                          className="text-blue-500"
+                        >
+                          Copy
+                        </button>
+                        <p>
+                          Voeg deze sleutel handmatig toe in je Google Authenticator-app.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
