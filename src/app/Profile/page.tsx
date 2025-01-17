@@ -5,6 +5,7 @@ import { auth, db } from "@/FireBase/FireBaseConfig";
 import NavBar from "@/components/navBar/navBar";
 import ResetPasswordForm from "@/components/ResetPasswordForm";
 import VerifyEmailForm from "@/components/VerifyEmailForm";
+import { generateSecret } from "@/utils/totp";
 
 export default function UserProfile() {
   const [userData, setUserData] = useState({
@@ -16,10 +17,28 @@ export default function UserProfile() {
     team: "",
     vakantiedagen: "60/60", // Example value
   });
+
   const [loading, setLoading] = useState(true);
-  
-  const [isResetPopupOpen, setIsResetPopupOpen] = useState(false); // State for pop-up visibility
-  const [isverifyPopupOpen, setIsverifyPopupOpen] = useState(false); // State for pop-up visibility
+  const [isResetPopupOpen, setIsResetPopupOpen] = useState(false);
+  const [isVerifyPopupOpen, setIsVerifyPopupOpen] = useState(false);
+  const [generatedPassword, setGeneratedPassword] = useState("");
+  const [totpSecret, setTotpSecret] = useState("");
+
+  const handleGeneratePassword = () => {
+    const password = Math.random().toString(36).slice(-8); // Simple password generation
+    setGeneratedPassword(password);
+  };
+
+  const handleGenerateTOTPSecret = () => {
+    const secret = generateSecret();
+    setTotpSecret(secret);
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Copied to clipboard!");
+    });
+  };
 
   // Fetch user data from Firestore
   useEffect(() => {
@@ -71,7 +90,7 @@ export default function UserProfile() {
     fetchUserData();
   }, []);
 
-  const maskBsnNumber = (bsnNumber: string | number): string => {
+  const maskBsnNumber = (bsnNumber) => {
     const bsnStr = bsnNumber.toString();
     if (bsnStr.length <= 3) {
       return bsnStr;
@@ -79,12 +98,12 @@ export default function UserProfile() {
     return "*".repeat(bsnStr.length - 3) + bsnStr.slice(-3);
   };
 
-  // Function to close the password reset popup
   const closeResetPopup = () => {
     setIsResetPopupOpen(false);
   };
-  const closeverifyPopup = () => {
-    setIsverifyPopupOpen(false);
+
+  const closeVerifyPopup = () => {
+    setIsVerifyPopupOpen(false);
   };
 
   return (
@@ -94,7 +113,6 @@ export default function UserProfile() {
       </div>
       <div className="w-[94vw] flex justify-center items-center">
         <div className="bg-white shadow-lg rounded-lg p-6 w-2/3">
-          {/* Profile Avatar and Title */}
           <div className="flex flex-col items-center mb-6">
             <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
               <img
@@ -106,7 +124,6 @@ export default function UserProfile() {
             <h2 className="text-2xl font-bold mt-4">Your Profile</h2>
           </div>
 
-          {/* Profile Details */}
           {loading ? (
             <div className="text-center text-xl">Loading...</div>
           ) : (
@@ -125,20 +142,21 @@ export default function UserProfile() {
                     <td className="font-bold py-2 px-4">Email:</td>
                     <td className="py-2 px-4">{userData.email}</td>
                     <td className="py-2 px-4 text-right">
-                      <button className="text-blue-500 hover:underline"
-                       onClick={() => setIsverifyPopupOpen(true)} >
-                        ✏️</button>
+                      <button
+                        className="text-blue-500 hover:underline"
+                        onClick={() => setIsVerifyPopupOpen(true)}
+                      >
+                        ✏️
+                      </button>
                     </td>
                   </tr>
                   <tr className="border-b">
                     <td className="font-bold py-2 px-4">Password:</td>
-                    <td className="py-2 px-4">
-                      {"*".repeat(userData.password.length)}
-                    </td>
+                    <td className="py-2 px-4">{"*".repeat(userData.password.length)}</td>
                     <td className="py-2 px-4 text-right">
                       <button
                         className="text-blue-500 hover:underline"
-                        onClick={() => setIsResetPopupOpen(true)} // Open the reset password pop-up
+                        onClick={() => setIsResetPopupOpen(true)}
                       >
                         ✏️
                       </button>
@@ -147,9 +165,6 @@ export default function UserProfile() {
                   <tr className="border-b">
                     <td className="font-bold py-2 px-4">Geboorte:</td>
                     <td className="py-2 px-4">{userData.geboorte || "Not set"}</td>
-                    <td className="py-2 px-4 text-right">
-                      <button className="text-blue-500 hover:underline">✏️</button>
-                    </td>
                   </tr>
                   <tr className="border-b">
                     <td className="font-bold py-2 px-4">Teams:</td>
@@ -161,49 +176,49 @@ export default function UserProfile() {
                   </tr>
                 </tbody>
               </table>
+
+              <div className="flex flex-col mt-6">
+                <button
+                  type="button"
+                  onClick={handleGenerateTOTPSecret}
+                  className="p-2 bg-blue-500 text-white rounded"
+                >
+                  Generate TOTP Secret
+                </button>
+                {totpSecret && (
+                  <div className="mt-4">
+                    <p className="font-mono">{totpSecret}</p>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(totpSecret)}
+                      className="text-blue-500"
+                    >
+                      Copy to Clipboard
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Pop-up Modal */}
       {isResetPopupOpen && (
         <div className="fixed inset-0 flex items-center justify-center">
-
-            <ResetPasswordForm /> 
-            <button
-                className="bg-blue-500 text-white px-4 py-2 rounded-md"
-                //onClick={confirmPasswordReset} // Confirm the reset
-              >
-                Confirm
-              </button>
-              <button
-                className="bg-gray-300 px-4 py-2 rounded-md"
-                onClick={closeResetPopup} // Close the modal without action
-              >
-                Close
-              </button>
-          </div>
-          
+          <ResetPasswordForm />
+          <button className="bg-gray-300 px-4 py-2 rounded-md" onClick={closeResetPopup}>
+            Close
+          </button>
+        </div>
       )}
-      {isverifyPopupOpen && (
-        <div className="fixed inset-0 flex items-center justify-center">
 
-            <VerifyEmailForm /> 
-            <button
-                className="bg-blue-500 text-white px-4 py-2 rounded-md"
-                //onClick={confirmPasswordReset} // Confirm the reset
-              >
-                Confirm
-              </button>
-              <button
-                className="bg-gray-300 px-4 py-2 rounded-md"
-                onClick={closeverifyPopup} // Close the modal without action
-              >
-                Close
-              </button>
-          </div>
-          
+      {isVerifyPopupOpen && (
+        <div className="fixed inset-0 flex items-center justify-center">
+          <VerifyEmailForm />
+          <button className="bg-gray-300 px-4 py-2 rounded-md" onClick={closeVerifyPopup}>
+            Close
+          </button>
+        </div>
       )}
     </div>
   );
