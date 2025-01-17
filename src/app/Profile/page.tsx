@@ -202,24 +202,16 @@ export default function UserProfile() {
           )}
         </div>
       </div>
-
       {isResetPopupOpen && (
-        <div className="fixed inset-0 flex items-center justify-center">
-          <ResetPasswordForm />
-          <button className="bg-gray-300 px-4 py-2 rounded-md" onClick={closeResetPopup}>
-            Close
-          </button>
-        </div>
-      )}
+  <ResetPasswordForm onClose={closeResetPopup} />
+)}
 
-      {isVerifyPopupOpen && (
-        <div className="fixed inset-0 flex items-center justify-center">
-          <VerifyEmailForm />
-          <button className="bg-gray-300 px-4 py-2 rounded-md" onClick={closeVerifyPopup}>
-            Close
-          </button>
-        </div>
-      )}
+
+
+{isVerifyPopupOpen && (
+  <VerifyEmailForm onClose={closeVerifyPopup} />
+)}
+
     </div>
   );
 }

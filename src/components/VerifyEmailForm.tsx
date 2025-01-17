@@ -6,7 +6,11 @@ import {
   handleConfirmVerification,
 } from "@/utils/emailVerificationUtils";
 
-const VerifyEmailForm = () => {
+type VerifyEmailFormProps = {
+  onClose: () => void; // Callback to handle closing the form
+};
+
+const VerifyEmailForm: React.FC<VerifyEmailFormProps> = ({ onClose }) => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -21,8 +25,8 @@ const VerifyEmailForm = () => {
   }, []);
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <form className="bg-white p-6 rounded-lg shadow-md w-96">
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+      <div className="bg-white p-6 rounded-lg shadow-md w-96 relative">
         <h2 className="text-lg font-semibold mb-4">Verify Email</h2>
 
         {userEmail && (
@@ -84,7 +88,15 @@ const VerifyEmailForm = () => {
 
         {message && <p className="text-green-500 mt-4">{message}</p>}
         {error && <p className="text-red-500 mt-4">{error}</p>}
-      </form>
+
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+        >
+          ✖
+        </button>
+      </div>
     </div>
   );
 };
