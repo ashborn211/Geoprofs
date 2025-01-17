@@ -241,7 +241,7 @@ export default function Home() {
                 {/* Conditionally render the admin button */}
                 {user?.role === "admin" && (
                   <button
-                    className="bg-blue-500 text-white border-2 border-black rounded-lg w-full h-[20%] mb-2"
+                    className="bg-blue-500 text-white border-2 border-black rounded-lg w-full h-[16%] mb-2"
                     onClick={handleAdminClick}
                   >
                     <h1>Admin Action</h1>
@@ -249,7 +249,7 @@ export default function Home() {
                 )}
 
                 <button
-                  className="bg-white border-2 border-black rounded-lg w-full h-[25%]"
+                  className="bg-white border-2 border-black rounded-lg w-full h-[20%]"
                   onClick={handleSickLeave} // Call sick leave function
                 >
                   <h1>Ziek Melden</h1>
