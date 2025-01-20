@@ -1,4 +1,5 @@
 import { Link } from "@nextui-org/react";
+import NavBar from "@/components/navBar/navBar";
 
 export default function AdminPage() {
   return (
@@ -6,9 +7,7 @@ export default function AdminPage() {
       <div className="flex h-screen overflow-hidden bg-custom-gray">
         {/* Sidebar */}
         <div  aria-label="sidebar1" className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
-          <Link href="./" className="text-white underline mb-4">
-            Log out
-          </Link>
+          <p>dit is de navbar</p>
         </div>
 
         {/* Main Content */}
@@ -76,6 +75,17 @@ export default function AdminPage() {
                 >
                   Go to Users
                 </Link>
+                
+              </div>
+              <div className="bg-white border-2 border-black rounded-lg p-8 flex justify-between items-center">
+                <h2 className="text-2xl">Verlof</h2>
+                <Link
+                  href="./admiin/show-verlof"
+                  className="bg-blue-500 text-white rounded-lg py-2 px-4"
+                >
+                  Go to Verlof
+                </Link>
+                
               </div>
             </div>
           </div>

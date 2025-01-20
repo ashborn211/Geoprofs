@@ -3,11 +3,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Calendar } from "@nextui-org/react";
 import type { DateValue } from "@react-types/calendar";
-import { today, getLocalTimeZone } from "@internationalized/date";
 import { db } from "@/FireBase/FireBaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import "./calendar.css";
+import { getLocalTimeZone, today, endOfMonth } from "@internationalized/date";
 
 interface CalendarComponentProps {
   onDateSelect: (date: Date) => void;
@@ -24,6 +24,9 @@ interface DateRange {
 export default function CalendarComponent({
   onDateSelect,
 }: CalendarComponentProps) {
+  const currentDate = today(getLocalTimeZone());
+  const endOfCurrentMonth = endOfMonth(currentDate); // Bereken de laatste dag van de huidige maand
+
   const [value, setValue] = useState<DateValue | null>(null);
   const [dateRanges, setDateRanges] = useState<DateRange[]>([]);
   const [visibleMonth, setVisibleMonth] = useState<number>(new Date().getMonth());
@@ -66,7 +69,11 @@ export default function CalendarComponent({
 
         dateRanges.forEach(({ startDate, endDate, status, uid }) => {
           if (uid === currentUser.uid) {
-            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            for (
+              let d = new Date(startDate);
+              d <= endDate;
+              d.setDate(d.getDate() + 1)
+            ) {
               const day = d.getDate();
               const month = d.getMonth();
               const year = d.getFullYear();
@@ -117,7 +124,9 @@ export default function CalendarComponent({
 
     if (newMonth !== visibleMonth || newYear !== visibleYear) {
       console.log(
-        `Maand of jaar veranderd. Huidige maand/jaar: ${visibleMonth + 1}/${visibleYear}. Nieuwe maand/jaar: ${newMonth + 1}/${newYear}.`
+        `Maand of jaar veranderd. Huidige maand/jaar: ${
+          visibleMonth + 1
+        }/${visibleYear}. Nieuwe maand/jaar: ${newMonth + 1}/${newYear}.`
       );
 
       setVisibleMonth(newMonth);
@@ -137,6 +146,7 @@ export default function CalendarComponent({
         aria-label="Hij is er!"
         visibleMonths={1}
         minValue={today(getLocalTimeZone())}
+        maxValue={endOfCurrentMonth} // Beperk tot de laatste dag van de huidige maand
         value={value}
         onChange={handleDateChange}
         style={{

@@ -25,55 +25,25 @@ export default function NavBar() {
         />
 
         {/* Icons with Links */}
-        <a
-          href="home"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-white text-2xl"
-        >
+        <a href="home" className="text-white text-2xl">
           <FontAwesomeIcon icon={faHouse} />
         </a>
-        <a
-          href="schedule"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-white text-2xl"
-        >
+        <a href="schedule" className="text-white text-2xl">
           <FontAwesomeIcon icon={faClock} />
         </a>
-        <a
-          href="flights"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-white text-2xl"
-        >
+        <a href="flights" className="text-white text-2xl">
           <FontAwesomeIcon icon={faPlaneDeparture} />
         </a>
-        <a
-          href="profile"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-white text-2xl"
-        >
+        <a href="profile" className="text-white text-2xl">
           <FontAwesomeIcon icon={faUser} />
         </a>
-        <a
-          href="documents"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-white text-2xl"
-        >
+        <a href="documents" className="text-white text-2xl">
           <FontAwesomeIcon icon={faFile} />
         </a>
 
         {/* Admin-Only Icon */}
         {user?.role === "admin" && (
-          <a
-            href="admin"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white text-2xl"
-          >
+          <a href="admin" className="text-white text-2xl">
             <FontAwesomeIcon icon={faUserPlus} />
           </a>
         )}
