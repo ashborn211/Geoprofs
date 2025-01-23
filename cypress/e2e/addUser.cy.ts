@@ -16,7 +16,6 @@ describe("Add User Component", () => {
         // Visit the Add User page
         cy.visit("http://localhost:3000/admiin/add-users");
 
-        // Intercept Firestore and Firebase API calls
 
     });
 

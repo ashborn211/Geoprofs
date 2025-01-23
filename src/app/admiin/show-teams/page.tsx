@@ -77,7 +77,7 @@ export default function TeamUserTable() {
     <>
       <div className="flex h-screen overflow-hidden bg-custom-gray">
         <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
-        <Logout />
+          <Logout />
         </div>
         <div className="w-[94vw] h-full">
           <div className="h-full grid grid-cols-12 grid-rows-12">
@@ -99,10 +99,12 @@ export default function TeamUserTable() {
               {loading ? (
                 <p className="text-blue-600">Loading teams and users...</p>
               ) : (
-                <div>
+                <div className="h-full overflow-y-auto">
                   {teams.map((team) => (
                     <div key={team.id} className="mb-8">
-                      <h2 className="text-2xl font-bold text-blue-800">{team.teamName}</h2>
+                      <h2 className="text-2xl font-bold text-blue-800">
+                        {team.teamName}
+                      </h2>
                       {team.users.length > 0 ? (
                         <table className="min-w-full bg-white border-collapse shadow-lg">
                           <thead className="bg-blue-200">
@@ -125,7 +127,9 @@ export default function TeamUserTable() {
                           </tbody>
                         </table>
                       ) : (
-                        <p className="text-blue-600">No users assigned to this team.</p>
+                        <p className="text-blue-600">
+                          No users assigned to this team.
+                        </p>
                       )}
                     </div>
                   ))}
