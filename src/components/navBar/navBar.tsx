@@ -34,7 +34,7 @@ export default function NavBar() {
         <a href="flights" className="text-white text-2xl">
           <FontAwesomeIcon icon={faPlaneDeparture} />
         </a>
-        <a href="profile" className="text-white text-2xl">
+        <a href="Profile" className="text-white text-2xl">
           <FontAwesomeIcon icon={faUser} />
         </a>
         <a href="documents" className="text-white text-2xl">
