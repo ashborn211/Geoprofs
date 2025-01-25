@@ -13,36 +13,18 @@ describe("Show Users Page", () => {
       win.localStorage.setItem("mockUser", JSON.stringify(mockUser));
     });
 
-    // Intercept the API call for fetching users
-    cy.intercept("GET", "**/users", (req) => {
-      req.reply((res) => {
-        res.send({
-          statusCode: 200,
-          body: [
-            {
-              id: "1",
-              userName: "John Doe",
-              email: "john.doe@example.com",
-              team: "Development",
-              role: "Developer",
-            }
-          ],
-        });
-      });
-    }).as("fetchUsers");
-
-    // Intercept the DELETE request for deleting a user
-    cy.intercept("DELETE", "**/users/*", {
-      statusCode: 200,
-    }).as("deleteUser");
-
-    // Visit the page
+    // Visit the Show User page
     cy.visit("http://localhost:3000/admiin/show-user"); // Adjust the path if necessary
   });
 
   it("should find and delete john.doe@example.com", () => {
-    // Wait for users to load
-    cy.wait("@fetchUsers");
+    // Ensure the table is visible
+    cy.get("table").should("be.visible");
+
+    // Ensure the user list is loaded
+    cy.contains("tbody tr", "john.doe@example.com", { timeout: 10000 }).should(
+      "exist"
+    );
 
     // Find the row containing john.doe@example.com
     cy.contains("tbody tr", "john.doe@example.com").within(() => {
@@ -51,12 +33,15 @@ describe("Show Users Page", () => {
     });
 
     // Confirm the deletion alert
-    cy.on("window:confirm", () => true);
+    cy.on("window:confirm", (alertText) => {
+      expect(alertText).to.equal(
+        "Are you sure you want to delete this user?"
+      );
+      return true; // Simulate clicking "OK" on the confirmation dialog
+    });
 
-    // Wait for the DELETE request to complete
-    cy.wait("@deleteUser");
-
-    // Verify that john.doe@example.com is no longer in the table
+    // Verify that the user has been removed from the table
     cy.get("tbody").should("not.contain", "john.doe@example.com");
+    
   });
 });
