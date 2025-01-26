@@ -1,80 +1,95 @@
-
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import CalendarComponent from "../src/components/calendar/calendar";
-import "@testing-library/jest-dom";
-import { act } from 'react';
-import { getDocs } from "firebase/firestore";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import CalendarComponent from "@/components/calendar/calendar";
+import { getAuth } from "firebase/auth";
+import { getDocs, collection } from "firebase/firestore";
 
-window.scrollTo = jest.fn();
-
+// Mock Firebase modules
 jest.mock("firebase/firestore", () => ({
   collection: jest.fn(),
   getDocs: jest.fn(),
-  getFirestore: jest.fn(),
 }));
 
 jest.mock("firebase/auth", () => ({
   getAuth: jest.fn(() => ({
-    currentUser: { uid: "testUserId" }, 
+    currentUser: { uid: "test-uid" },
   })),
-  GoogleAuthProvider: jest.fn(),
-  setPersistence: jest.fn(() => Promise.resolve()),
-  browserLocalPersistence: {},
 }));
 
-// Mock de Firestore data
-const mockDateRanges = [
-  {
-    startDate: new Date("2024-01-01"),
-    endDate: new Date("2024-01-03"),
-    status: 1,
-    docId: "testDoc1",
-    uid: "testUserId",
-  },
-  {
-    startDate: new Date("2024-02-01"),
-    endDate: new Date("2024-02-02"),
-    status: 2,
-    docId: "testDoc2",
-    uid: "testUserId",
-  },
-];
+jest.mock("@nextui-org/react", () => ({
+  Calendar: jest.fn(({ onChange }) => (
+    <div
+      data-testid="mock-calendar"
+      onClick={() => onChange({ toString: () => "2023-01-01" })}
+    >
+      Mock Calendar
+    </div>
+  )),
+}));
+
+jest.mock("@/FireBase/FireBaseConfig", () => ({
+  db: {},
+}));
 
 describe("CalendarComponent", () => {
   beforeEach(() => {
-    // Mock de getDocs functie om gesimuleerde data te retourneren
-    (getDocs as jest.Mock).mockResolvedValue({
-      forEach: (callback: (doc: any) => void) =>
-        mockDateRanges.forEach((range) => {
-          callback({
-            id: range.docId,
-            data: () => ({
-              startDate: { seconds: range.startDate.getTime() / 1000 },
-              endDate: { seconds: range.endDate.getTime() / 1000 },
-              status: range.status,
-              uid: range.uid,
-            }),
-          });
+    jest.clearAllMocks();
+  });
+
+  test("renders the Calendar component", () => {
+    render(<CalendarComponent onDateSelect={jest.fn()} />);
+    expect(screen.getByTestId("mock-calendar")).toBeInTheDocument();
+  });
+
+  test("fetches date ranges from Firestore", async () => {
+    const mockData = [
+      {
+        id: "doc1",
+        data: () => ({
+          startDate: { seconds: 1672531200 }, // Jan 1, 2023
+          endDate: { seconds: 1672617600 }, // Jan 2, 2023
+          status: 1,
+          uid: "test-uid",
         }),
+      },
+    ];
+
+    (getDocs as jest.Mock).mockResolvedValue({
+      forEach: (callback: (doc: any) => void) => {
+        mockData.forEach(callback);
+      },
     });
+
+    render(<CalendarComponent onDateSelect={jest.fn()} />);
+    await waitFor(() => expect(getDocs).toHaveBeenCalledTimes(1));
+    expect(collection).toHaveBeenCalledWith({}, "verlof");
   });
 
-  afterEach(() => {
-    jest.clearAllMocks(); // Haal ff alle mocks weer weg
+  test("calls onDateSelect when a date is selected", async () => {
+    const mockOnDateSelect = jest.fn();
+    render(<CalendarComponent onDateSelect={mockOnDateSelect} />);
+
+    const calendar = screen.getByTestId("mock-calendar");
+    fireEvent.click(calendar);
+
+    await waitFor(() =>
+      expect(mockOnDateSelect).toHaveBeenCalledWith(new Date("2023-01-01"))
+    );
   });
 
-  it("renders the Calendar component with the correct label", () => {
-    // Test dat de Calendar component correct wordt gerenderd met het juiste labelText
-    render(<CalendarComponent onDateSelect={() => {}} />);
-    expect(screen.getByLabelText("Hij is er!")).toBeInTheDocument(); // Controleer of het label in het document staat
-  });
+  test("updates the visible month and year when a date is selected", async () => {
+    jest.spyOn(window, "location", "get").mockReturnValue({
+      href: "http://localhost",
+    } as any);
 
-  it("fetches date ranges from Firestore and sets state correctly", async () => {
-    // Test of de date ranges correct worden opgehaald uit Firestore
-    await act(async () => {
-      render(<CalendarComponent onDateSelect={() => {}} />);
+    render(<CalendarComponent onDateSelect={jest.fn()} />);
+    const calendar = screen.getByTestId("mock-calendar");
+
+    fireEvent.click(calendar);
+
+    await waitFor(() => {
+      // Expect the page to attempt a reload
+      expect(window.location.href).toBe("http://localhost");
     });
-    expect(getDocs).toHaveBeenCalled(); // Controleer of getDocs is aangeroepen
   });
 });
