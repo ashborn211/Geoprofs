@@ -8,7 +8,7 @@ import {
 } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "@/FireBase/FireBaseConfig"; // Adjust the path as needed
+import { auth, db } from "@/FireBase/FireBaseConfig";
 
 // Define User interface
 interface User {
@@ -17,6 +17,7 @@ interface User {
   userName: string | null;
   role: string | null;
   team: string | null;
+  bsnNumber: number;
 }
 
 // Extend UserContextType to include `isLoading` state
@@ -30,9 +31,24 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Add isLoading state
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Check if the app is running in a test environment
+    const isTestEnvironment =
+      process.env.NODE_ENV === "test" || (typeof window !== "undefined" && window.Cypress);
+
+    if (isTestEnvironment) {
+      // Load mock user from localStorage in test mode
+      const mockUser = localStorage.getItem("mockUser");
+      if (mockUser) {
+        setUser(JSON.parse(mockUser));
+      }
+      setIsLoading(false);
+      return;
+    }
+
+    // Regular Firebase authentication flow
     const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
       if (authUser) {
         const userDoc = doc(db, "users", authUser.uid);
@@ -44,12 +60,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
             userName: userSnap.data().userName,
             role: userSnap.data().role,
             team: userSnap.data().team,
+            bsnNumber: userSnap.data().bsnNumber,
+
           });
         }
       } else {
         setUser(null);
       }
-      setIsLoading(false); // Update loading state
+      setIsLoading(false);
     });
 
     return () => unsubscribe();

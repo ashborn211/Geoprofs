@@ -42,3 +42,4 @@ ui-debug.log
 *.log
 
 *storybook.log
+serviceAccountKey.json

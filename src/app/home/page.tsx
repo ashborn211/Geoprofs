@@ -167,19 +167,19 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex h-screen overflow-hidden bg-special-gray">
-        <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
+      <div className="flex h-screen overflow-hidden bg-linear1">
+        <div className="w-[6vw]  h-full flex flex-col justify-end items-center">
         <NavBar />
         </div>
         <div className="w-[94vw] h-full">
           <div className="h-full grid grid-cols-12 grid-rows-12">
-            <div className="col-span-12 row-span-4 col-start-1 bg-custom-gray flex justify-around p-4">
+            <div className="col-span-12 row-span-4 col-start-1 bg-linear1 flex justify-around p-4">
               <div
-                className="rounded-lg text-4xl flex items-center justify-center p-[15px]"
+                className="rounded-lg text-4xl flex items-center justify-center p-[15px] shadow-lg mt-2"
                 style={{
                   width: "65%",
                   background:
-                    "linear-gradient(90deg, rgba(255,255,255,1) 16%, rgba(90,209,254,1) 100%)",
+                    "linear-gradient(180deg, rgba(183, 201, 211) 0%, rgba(218, 237, 255) 100%)",
                 }}
               >
                 <div className="h-full w-1/2 text-[large] flex items-center justify-center flex-col">
@@ -241,7 +241,7 @@ export default function Home() {
                 {/* Conditionally render the admin button */}
                 {user?.role === "admin" && (
                   <button
-                    className="bg-blue-500 text-white border-2 border-black rounded-lg w-full h-[20%] mb-2"
+                    className="bg-blue-500 text-white border-2 border-black rounded-lg w-full h-[16%] mb-2"
                     onClick={handleAdminClick}
                   >
                     <h1>Admin Action</h1>
@@ -249,7 +249,7 @@ export default function Home() {
                 )}
 
                 <button
-                  className="bg-white border-2 border-black rounded-lg w-full h-[25%]"
+                  className="bg-white border-2 border-black rounded-lg w-full h-[20%]"
                   onClick={handleSickLeave} // Call sick leave function
                 >
                   <h1>Ziek Melden</h1>

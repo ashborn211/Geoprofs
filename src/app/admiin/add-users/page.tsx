@@ -13,6 +13,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { generatePassword } from "@/utils/passwordGenerator";
 import Logout from "@/components/Logout";
 import bcrypt from "bcryptjs";
+import { isValidBSN } from "@/utils/validBSN";
 
 interface Team {
   id: string;
@@ -27,6 +28,7 @@ export default function AddUser() {
   const [role, setRole] = useState("");
   const [password, setPassword] = useState("");
   const [generatedPassword, setGeneratedPassword] = useState("");
+  const [bsnNumber, setBsnNumber] = useState("");  // Added BSN number state
 
   // Fetch teams from Firestore
   useEffect(() => {
@@ -51,15 +53,22 @@ export default function AddUser() {
     setPassword(newPassword);
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(generatedPassword).then(() => {
-      alert("Password copied to clipboard!");
-    });
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isValidBSN(parseInt(bsnNumber))) {
+      alert("Invalid BSN number. Please enter a valid BSN.");
+      return;
+    }     
+    const bsnNumberQuery = query(
+      collection(db, "users"),
+      where("bsnNumber", "==", bsnNumber)
+    );
+    const bsnNumberQuerySnapshot = await getDocs(bsnNumberQuery);
 
+    if (!bsnNumberQuerySnapshot.empty) {
+      alert("BSN already taken. Please use a different BSN.");
+      return;
+    }
     try {
       // Check if email is already taken
       const emailQuery = query(
@@ -75,6 +84,8 @@ export default function AddUser() {
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
+      //put connection here
+
       // Create the user with Firebase Authentication
       const authUser = await createUserWithEmailAndPassword(
         auth,
@@ -85,13 +96,16 @@ export default function AddUser() {
       console.log("Created user with email: ", email);
       console.log("User details: ", authUser.user);
 
-      // Create the user document in Firestore with team reference
+      
+
+      // Create the user document in Firestore with team reference and BSN number
       await setDoc(doc(db, "users", authUser.user.uid), {
         userName: naam,
         email: email,
         team: doc(db, "Team", team),
         role: role,
         password: hashedPassword,
+        bsnNumber: bsnNumber,  // Saving the BSN number
         emailVerified: false,
       });
 
@@ -102,6 +116,7 @@ export default function AddUser() {
         role,
         hashedPassword,
         password,
+        bsnNumber,  // Logging BSN number
       });
 
       // Call the custom API route to send a password reset email
@@ -131,6 +146,7 @@ export default function AddUser() {
       setRole("");
       setPassword("");
       setGeneratedPassword("");
+      setBsnNumber("");  // Resetting BSN number field
     } catch (error) {
       console.error("Error adding user: ", error);
       alert("Failed to add user. Please try again.");
@@ -183,6 +199,18 @@ export default function AddUser() {
                     placeholder="Enter email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </label>
+
+                <label className="flex flex-col">
+                  BSN Number:
+                  <input
+                    type="text"
+                    className="p-2 border border-gray-300 rounded"
+                    placeholder="Enter BSN number"
+                    value={bsnNumber}
+                    onChange={(e) => setBsnNumber(e.target.value)}  // Handle BSN input
                     required
                   />
                 </label>

@@ -13,7 +13,7 @@ describe("Home Page", () => {
       cy.visit("http://localhost:3000/home");
     });
   
-    it("should display the user's name and allow 'verlofaanvraag' action", () => {
+    it("should display an error if there is no given reason", () => {
       cy.contains("Good morning, Test User").should("be.visible");
   
       // Klik op een dag (bijvoorbeeld de 25e van de maand)
@@ -38,11 +38,13 @@ describe("Home Page", () => {
       cy.get('#enddate-input')
         .type("2025-01-23T17:00"); // Voorbeeldwaarde voor einddatum en tijd
   
-      // Vul een reden in
-      cy.get('.reason-textarea').type("Ik wil op vakantie met Edwar"); // Pas de waarde aan afhankelijk van je gegevens
-  
-      // Klik op de verstuurknop
+      // Laat het redenveld leeg en probeer te versturen
       cy.get('.submit-button').click();
+  
+      // Controleer of de foutmelding wordt weergegeven
+      cy.on("window:alert", (text) => {
+        expect(text).to.contains("Geef een reden op.");
+      });
     });
   });
   
