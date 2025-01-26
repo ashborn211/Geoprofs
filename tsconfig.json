@@ -35,7 +35,8 @@
     "jest.setup.js",
     "tailwind.config.ts",
     "src/FireBase/FireBaseConfig.tsx",
-    "src/types/**/*.d.ts"
+    "src/types/**/*.d.ts",
+    "global.d.ts"
   ],
   "exclude": ["node_modules"]
 }

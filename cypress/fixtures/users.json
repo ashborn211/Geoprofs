@@ -1,0 +1,211 @@
+{
+    "meta": {
+        "format": "JSON",
+        "version": "1.1.0",
+        "projectId": "geoprofs-3f4e4",
+        "resourcePath": [
+            "users"
+        ],
+        "recursive": false,
+        "creationTime": 1737645235,
+        "app": "firefoo"
+    },
+    "data": {
+        "6wfLdlKYgObKqlenHWAC2BQWGo63": {
+            "bsnNumber": "10464554",
+            "email": "test2222@gmail.com",
+            "emailVerified": false,
+            "password": "$2a$10$UlO5sZkh0TP1619CF/epYO/nTurI4px.I4tam4XJPesr.POEVSsNu",
+            "role": "user",
+            "team": {
+                "__ref__": "Team/gYs3NIReB5KSh0ZozSb6"
+            },
+            "userName": "test2222",
+            "__collections__": {}
+        },
+        "7ZmYdwy3jnUQGz9maoXd9PyQR8O2": {
+            "email": "florian123@gmail.com",
+            "emailVerified": false,
+            "password": "]Fos5O-%!X",
+            "role": "user",
+            "team": {
+                "__ref__": "Team/r7Ba5DCzWT63BwbcmgX4"
+            },
+            "userName": "4534",
+            "__collections__": {}
+        },
+        "Aay3C4lNLZQ3uogNDcApVJEYaGd2": {
+            "email": "test1@gmail.com",
+            "emailVerified": false,
+            "password": "Pq?2{y}'CA",
+            "role": "admin",
+            "team": {
+                "__ref__": "Team/r7Ba5DCzWT63BwbcmgX4"
+            },
+            "userName": "test",
+            "__collections__": {}
+        },
+        "DjsLZP4XVjgxNMUuMYUx71jf6233": {
+            "email": "Asdadad@gmail.com",
+            "emailVerified": false,
+            "password": "5bky}8rCuA",
+            "role": "user",
+            "team": {
+                "__ref__": "Team/r7Ba5DCzWT63BwbcmgX4"
+            },
+            "userName": "AYDAtafsf",
+            "__collections__": {}
+        },
+        "FIuPbvk7LMNLnS8BRqyzgwOH6js2": {
+            "email": "dflkjhgrjk@gmail.com",
+            "emailVerified": false,
+            "password": "MyX7.)&7%'",
+            "role": "admin",
+            "team": {
+                "__ref__": "Team/r7Ba5DCzWT63BwbcmgX4"
+            },
+            "userName": "kuysgfkusgfsku",
+            "__collections__": {}
+        },
+        "Fd6PrKgsfeXkzR0beXxHuuhuKr63": {
+            "bsnNumber": 123456782,
+            "email": "test10@gmail.com",
+            "emailVerified": false,
+            "is2FAEnabled": false,
+            "otpauthUrl": "otpauth://totp/GeoProfsApp:Fd6PrKgsfeXkzR0beXxHuuhuKr63?secret=NFYXU5SVMYABGSZR&period=30&digits=6&algorithm=SHA1&issuer=GeoProfsApp",
+            "password": "8^!@C4hybR",
+            "role": "admin",
+            "secret": "NFYXU5SVMYABGSZR",
+            "team": {
+                "__ref__": "Team/r7Ba5DCzWT63BwbcmgX4"
+            },
+            "twoFAEnabled": false,
+            "twoFASecret": "LIZSYIK2JJMCKO3BNBZUSNCIJ5GXS3SUNMTE4M2DNZLE46SXFESQ",
+            "userName": "test10",
+            "__collections__": {}
+        },
+        "GXb9aBANeWOFQ3DUncae6VK9TUh2": {
+            "email": "Michal.Test@gmail.com",
+            "password": "$2a$10$jpX/7aWIj8mK7oIUfghv5OyP.1olBesztCiE9e.jmrEjmUwpK583e",
+            "role": "user",
+            "team": "teamA",
+            "userName": "Michal",
+            "__collections__": {}
+        },
+        "H9oS1jNNuXcd3rvqC502stASSkH3": {
+            "email": "test6969@gmail.com",
+            "emailVerified": false,
+            "password": "$2a$10$33PPPmGwD7rFnwWR5R9Y8ugPuu9qWrOE9V56Zf7feknpL1o0bJbTa",
+            "role": "user",
+            "team": {
+                "__ref__": "Team/r7Ba5DCzWT63BwbcmgX4"
+            },
+            "userName": "test6969",
+            "__collections__": {}
+        },
+        "Hy5vM7jvznYY98cnQVicWjl3Kpv1": {
+            "email": "Edwar4682793@gmail.com",
+            "emailVerified": false,
+            "password": "Hk2My)J)'L",
+            "role": "user",
+            "team": {
+                "__ref__": "Team/r7Ba5DCzWT63BwbcmgX4"
+            },
+            "userName": "edwar13534",
+            "__collections__": {}
+        },
+        "IkmsxIH8JDQFB2KmgAOcD2ejVZS2": {
+            "email": "sdfsdfs@gmail.com",
+            "emailVerified": false,
+            "password": "dl8'z+C8qF",
+            "role": "user",
+            "team": {
+                "__ref__": "Team/r7Ba5DCzWT63BwbcmgX4"
+            },
+            "userName": "sdfsdfsd",
+            "__collections__": {}
+        },
+        "Jy6AMZYOc5MvnzXGJvZObyJbprh2": {
+            "email": "skdfjhskjdfh@gmail.com",
+            "emailVerified": false,
+            "password": ":F^5njL777",
+            "role": "user",
+            "team": {
+                "__ref__": "Team/r7Ba5DCzWT63BwbcmgX4"
+            },
+            "userName": "djhgdkjghd",
+            "__collections__": {}
+        },
+        "KuBkRf3F18d42Wqkt13Bo4PVDJ53": {
+            "bsnNumber": "123456782",
+            "email": "testbsn2137@gmail.com",
+            "emailVerified": false,
+            "password": "$2a$10$1O6IQUUEhWVkOWIunCRXKO7uyHXM6Kg.zLJQRXC/7bUHbAsKCk3mu",
+            "role": "user",
+            "team": {
+                "__ref__": "Team/gYs3NIReB5KSh0ZozSb6"
+            },
+            "userName": "testbsn2137",
+            "__collections__": {}
+        },
+        "S9fYU1AM4ZVnyhsU1ZGW42XoyTB3": {
+            "email": "test12@gmail.com",
+            "emailVerified": false,
+            "is2FAEnabled": false,
+            "password": "&Wn5%38&HB",
+            "role": "admin",
+            "secretKey": "",
+            "team": {
+                "__ref__": "Team/r7Ba5DCzWT63BwbcmgX4"
+            },
+            "userName": "test12",
+            "__collections__": {}
+        },
+        "UC7ReXp9dRdqxaTdFPmXeLLVFUt2": {
+            "bsnNumber": "123456782",
+            "email": "BSNduplicate@gmail.com",
+            "emailVerified": false,
+            "password": "$2a$10$ZJVEJCIhSYsxp.KhkET8cOiIM37Ga0inbeRk6RPLmCmUn3d/WrNaS",
+            "role": "user",
+            "team": {
+                "__ref__": "Team/gYs3NIReB5KSh0ZozSb6"
+            },
+            "userName": "Test duplicate BSN",
+            "__collections__": {}
+        },
+        "c4WIyvJHVfYJQ7wAzSRjM4mjNFf2": {
+            "email": "flori@gmail.com",
+            "password": "$2a$10$IjDveF/WhKMgDNb.98l4tupsmVzwdosyZhMlwOKKc/BNwXRLPO0xe",
+            "role": "user",
+            "team": {
+                "__ref__": "Team/r7Ba5DCzWT63BwbcmgX4"
+            },
+            "userName": "flori",
+            "__collections__": {}
+        },
+        "fDaJXf3LnuQqT4Drrd2KzYJeEh53": {
+            "bsnNumber": "123456782",
+            "email": "BSNtest@gmail.com",
+            "emailVerified": false,
+            "password": "$2a$10$1Dg4KTJZZ/yP1q/h5TYWuuZ1mciucEHqdROKrFeffcpeyuZxtsyJW",
+            "role": "user",
+            "team": {
+                "__ref__": "Team/gYs3NIReB5KSh0ZozSb6"
+            },
+            "userName": "BSN Test",
+            "__collections__": {}
+        },
+        "xHtH2itHR5h0PqZdww349IflCtZ2": {
+            "bsnNumber": "44016773",
+            "email": "test111111@gmail.com",
+            "emailVerified": false,
+            "password": "$2a$10$Hdaj1m06UPt/BOiicildoua76iCxo.wQ8b8Ps1ZK/0kRK.XK1MWbS",
+            "role": "user",
+            "team": {
+                "__ref__": "Team/gYs3NIReB5KSh0ZozSb6"
+            },
+            "userName": "test111111",
+            "__collections__": {}
+        }
+    }
+}
