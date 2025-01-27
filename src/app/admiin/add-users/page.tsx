@@ -11,9 +11,9 @@ import {
 import { auth, db } from "@/FireBase/FireBaseConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { generatePassword } from "@/utils/passwordGenerator";
-import Logout from "@/components/Logout";
 import bcrypt from "bcryptjs";
 import { isValidBSN } from "@/utils/validBSN";
+import NavBar from "@/components/navBar/navBar";
 
 interface Team {
   id: string;
@@ -157,7 +157,7 @@ export default function AddUser() {
     <>
       <div className="flex h-screen overflow-hidden bg-custom-gray">
         <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
-          <Logout />
+                <NavBar />
         </div>
         <div className="w-[94vw] h-full">
           <div className="h-full grid grid-cols-12 grid-rows-12">

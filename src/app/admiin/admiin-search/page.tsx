@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/FireBase/FireBaseConfig";
-import Logout from "@/components/Logout";
+import NavBar from "@/components/navBar/navBar";
 import SearchBar from "@/components/SearchBar";
 import ResultsTable from "@/components/ResultsTable";
 
@@ -66,7 +66,7 @@ export default function AdminSearchPage() {
   return (
     <div className="flex h-screen overflow-hidden bg-custom-gray">
       <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
-        <Logout />
+                <NavBar />
       </div>
 
       {/* Main Content */}
