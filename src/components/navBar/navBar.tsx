@@ -25,25 +25,17 @@ export default function NavBar() {
         />
 
         {/* Icons with Links */}
-        <a href="home" className="text-white text-2xl">
+        <a href="home" className="text-white text-6xl">
           <FontAwesomeIcon icon={faHouse} />
         </a>
-        <a href="schedule" className="text-white text-2xl">
-          <FontAwesomeIcon icon={faClock} />
-        </a>
-        <a href="flights" className="text-white text-2xl">
-          <FontAwesomeIcon icon={faPlaneDeparture} />
-        </a>
-        <a href="profile" className="text-white text-2xl">
+
+        <a href="Profile" className="text-white text-6xl">
           <FontAwesomeIcon icon={faUser} />
-        </a>
-        <a href="documents" className="text-white text-2xl">
-          <FontAwesomeIcon icon={faFile} />
         </a>
 
         {/* Admin-Only Icon */}
-        {user?.role === "admin" && (
-          <a href="admin" className="text-white text-2xl">
+        {user?.role === "admiin" && (
+          <a href="admin" className="text-white text-6xl">
             <FontAwesomeIcon icon={faUserPlus} />
           </a>
         )}
