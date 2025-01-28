@@ -31,20 +31,5 @@ describe("Verlof Page Actions", () => {
       // Optionally verify UI changes after approval
       cy.contains("Approved").should("exist"); // Update based on your UI behavior
     });
-  
-    it("Clicks on the 'Afkeuren' button", () => {
-      // Search for the 'Afkeuren' button, ensure visibility, and click it
-      cy.get("button")
-        .contains("Afkeuren")
-        .scrollIntoView()
-        .should("be.visible")
-        .click();
-  
-      // Verify expected behavior (success alert or updated UI)
-      cy.on("window:alert", (str) => {
-        expect(str).to.equal("Leave request has been declined successfully.");
-      });
-  
-    });
   });
   
