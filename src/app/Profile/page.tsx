@@ -15,7 +15,7 @@ export default function UserProfile() {
     password: "",
     geboorte: "",
     team: "",
-    vakantiedagen: "60/60", // Example value
+    vakantiedagen: "", // Example value
   });
 
   const [loading, setLoading] = useState(true);
@@ -34,7 +34,7 @@ export default function UserProfile() {
     setTotpSecret(secret);
   };
 
-  const copyToClipboard = (text) => {
+  const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
       alert("Copied to clipboard!");
     });
@@ -74,7 +74,7 @@ export default function UserProfile() {
               password: userData.password || "",
               geboorte: userData.geboorte || "",
               team: teamName,
-              vakantiedagen: "60/60",
+              vakantiedagen: userData.vakantiedagen || "",
             });
           } else {
             console.error("No user document found");
@@ -90,7 +90,7 @@ export default function UserProfile() {
     fetchUserData();
   }, []);
 
-  const maskBsnNumber = (bsnNumber) => {
+  const maskBsnNumber = (bsnNumber: string) => {
     const bsnStr = bsnNumber.toString();
     if (bsnStr.length <= 3) {
       return bsnStr;
