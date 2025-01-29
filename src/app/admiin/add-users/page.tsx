@@ -107,6 +107,7 @@ export default function AddUser() {
         password: hashedPassword,
         bsnNumber: bsnNumber,  // Saving the BSN number
         emailVerified: false,
+        vakantiedagen: 60,
       });
 
       console.log("User document created in Firestore:", {

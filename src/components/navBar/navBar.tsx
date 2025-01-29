@@ -10,6 +10,7 @@ import {
 
 import Logout from "../Logout";
 import { useUser } from "@/context/UserContext"; // Import your user context
+import { Link } from "@nextui-org/react";
 
 export default function NavBar() {
   const { user } = useUser(); // Destructure `user` from `useUser`
@@ -25,19 +26,19 @@ export default function NavBar() {
         />
 
         {/* Icons with Links */}
-        <a href="home" className="text-white text-6xl">
+        <Link className="text-white text-6xl" href="home">
           <FontAwesomeIcon icon={faHouse} />
-        </a>
+        </Link>
 
-        <a href="Profile" className="text-white text-6xl">
+        <Link className="text-white text-6xl" href="profile">
           <FontAwesomeIcon icon={faUser} />
-        </a>
+        </Link>
 
         {/* Admin-Only Icon */}
         {user?.role === "admiin" && (
-          <a href="admin" className="text-white text-6xl">
+          <Link href="admin" className="text-white text-6xl">
             <FontAwesomeIcon icon={faUserPlus} />
-          </a>
+          </Link>
         )}
       </div>
 
