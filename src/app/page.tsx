@@ -143,7 +143,7 @@ const LoginPage = () => {
   return (
     <main className="relative h-screen w-screen bg-cover bg-center bg-no-repeat">
       {/* Background image with overlay */}
-      <div className="absolute inset-0 bg-[url('/images/the_starry_night.jpg')] brightness-50"></div>
+      <div className="absolute inset-0 bg-[url('/images/the_starry_night.jpg')] brightness-50 md:w-screen sm:w-screen"></div>
 
       {/* Layout container */}
       <div className="flex items-center justify-start h-full relative">
@@ -152,17 +152,17 @@ const LoginPage = () => {
           <img
             src="/images/Logo GeoProfs letter.png"
             alt="Right-Side Image"
-            className="h-30 w-100"
+            className="h-30 w-100 max-lg:w-0 "
           />
         </div>
 
         {/* Login block pushed to the left */}
-        <div className="bg-black bg-opacity-40 shadow-md w-2/4 h-full p-8 flex flex-col justify-center">
+        <div className="bg-black bg-opacity-40 shadow-md w-2/4 h-full p-8 flex flex-col justify-center max-lg:w-screen">
           <div className="text-center mb-6">
             <img
               src="/images/Logo GeoProfs.png"
               alt="GeoProfs Logo"
-              className="mx-auto h-32"
+              className="mx-auto h-32 "
             />
           </div>
           <h2 className="text-center text-2xl font-semibold mb-8 text-white">
@@ -174,7 +174,7 @@ const LoginPage = () => {
             onSubmit={handleLogin}
             className="space-y-6 flex flex-col items-center"
           >
-            <div className="w-2/4">
+            <div className="w-2/4 max-lg:w-3/4 ">
               <Input
                 type="email"
                 placeholder="E-mail..."
@@ -186,7 +186,7 @@ const LoginPage = () => {
                 fullWidth
               />
             </div>
-            <div className="w-2/4">
+            <div className="w-2/4 max-lg:w-3/4">
               <Input
                 type="password"
                 placeholder="****"
@@ -198,7 +198,7 @@ const LoginPage = () => {
                 className="w-full"
               />
             </div>
-            <div className="w-2/4">
+            <div className="w-2/4 max-lg:w-3/4">
               <Input
                 type="text"
                 placeholder="2FA Code"
@@ -209,7 +209,7 @@ const LoginPage = () => {
                 className="w-full"
               />
             </div>
-            <div className="w-2/4">
+            <div className="w-2/4 max-md:mr-28">
               <HCaptcha
                 sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
                 onVerify={handleCaptchaChange}
