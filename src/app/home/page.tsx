@@ -210,24 +210,23 @@ export default function Home() {
   return (
     <>
       <div className="flex h-screen overflow-hidden bg-linear1">
-        <div className="w-[6vw]  h-full flex flex-col justify-end items-center">
+        {/* Sidebar - Hidden on smaller screens, appears on md+ */}
+        <div className="hidden md:flex w-[6vw] min-w-[50px] h-full flex-col justify-end items-center">
           <NavBar />
         </div>
-        <div className="w-[94vw] h-full">
-          <div className="h-full grid grid-cols-12 grid-rows-12">
-            <div className="col-span-12 row-span-4 col-start-1 bg-linear1 flex justify-around p-4">
-              <div
-                className="rounded-lg text-4xl flex items-center justify-center p-[15px] shadow-lg mt-2"
-                style={{
-                  width: "65%",
-                  background:
-                    "linear-gradient(180deg, rgba(183, 201, 211) 0%, rgba(218, 237, 255) 100%)",
-                }}
-              >
-                <div className="h-full w-1/2 text-[large] flex items-center justify-center flex-col">
+  
+        {/* Main Content */}
+        <div className="w-full md:w-[94vw] h-full">
+          <div className="h-full grid grid-cols-1 md:grid-cols-12 grid-rows-12">
+            
+            {/* Top Section */}
+            <div className="col-span-1 md:col-span-12 row-span-4 bg-linear1 flex flex-col md:flex-row justify-around p-4">
+              {/* Status Box */}
+              <div className="rounded-lg text-lg md:text-4xl flex items-center justify-center p-4 shadow-lg mt-2 w-full md:w-[65%] bg-gradient-to-b from-[#B7C9D3] to-[#DAEDFF]">
+                <div className="h-full w-1/2 text-center flex flex-col items-center justify-center">
                   {selectedDateInfo ? (
                     <>
-                      <h2>
+                      <h2 className="text-lg md:text-2xl">
                         {selectedDateInfo.status === 1
                           ? "Pending"
                           : selectedDateInfo.status === 2
@@ -237,7 +236,7 @@ export default function Home() {
                           : ""}
                       </h2>
                       <div
-                        className="h-[120px] w-[210px] flex flex-col items-center justify-center rounded-[8%]"
+                        className="h-[100px] w-[180px] flex flex-col items-center justify-center rounded-lg"
                         style={{
                           backgroundColor:
                             selectedDateInfo.status === 1
@@ -249,89 +248,65 @@ export default function Home() {
                               : "gray",
                         }}
                       >
-                        <h1>{formatDateWithTime(selectedDateInfo.startDate)}</h1>
+                        <h1 className="text-sm md:text-lg">{formatDateWithTime(selectedDateInfo.startDate)}</h1>
                         <h1>to</h1>
-                        <h1>{formatDateWithTime(selectedDateInfo.endDate)}</h1>
+                        <h1 className="text-sm md:text-lg">{formatDateWithTime(selectedDateInfo.endDate)}</h1>
                       </div>
                     </>
                   ) : (
-                    <h1>Good morning, {user?.userName}</h1>
+                    <h1 className="text-lg md:text-2xl">Good morning, {user?.userName}</h1>
                   )}
                 </div>
-
-                {selectedDateInfo ? (
+  
+                {selectedDateInfo && (
                   <div className="flex flex-col items-center">
-                    <h1 className="text-[large]">Reason: {selectedDateInfo.reason}</h1>
-                    <button
-                      className="mt-4 h-[50px] w-[150px] bg-[white] border-[black] border-[solid] border-[2px] text-[x-large]"
-                      onClick={handleDelete}
-                    >
+                    <h1 className="text-sm md:text-lg">Reason: {selectedDateInfo.reason}</h1>
+                    <button className="mt-4 h-[40px] md:h-[50px] w-full md:w-[150px] bg-white border-black border-2 text-lg md:text-xl" onClick={handleDelete}>
                       Remove
                     </button>
                   </div>
-                ) : null}
+                )}
               </div>
-
-              <div style={{ width: "20%" }}>
-                <div
-                  className="w-full h-[75%] bg-cover bg-center"
-                  style={{
-                    backgroundImage: "url('images/Logo GeoProfs.png')",
-                  }}
-                ></div>
-
+  
+              {/* Right Side Section */}
+              <div className="w-full md:w-[20%] flex flex-col items-center">
+                <div className="w-full h-[75%] bg-cover bg-center" style={{ backgroundImage: "url('images/Logo GeoProfs.png')" }}></div>
+  
                 {user?.role === "admin" && (
-                  <button
-                    className="bg-blue-500 text-white border-2 border-black rounded-lg w-full h-[16%] mb-2"
-                    onClick={handleAdminClick}
-                  >
-                    <h1>Admin Action</h1>
+                  <button className="bg-blue-500 text-white border-2 border-black rounded-lg w-full h-[16%] mb-2 text-lg md:text-xl" onClick={handleAdminClick}>
+                    Admin Action
                   </button>
                 )}
-
-                <button
-                  className="bg-white border-2 border-black rounded-lg w-full h-[20%]"
-                  onClick={handleSickLeave}
-                >
-                  <h1>Ziek Melden</h1>
+  
+                <button className="bg-white border-2 border-black rounded-lg w-full md:h-[20%] text-lg md:text-xl" onClick={handleSickLeave}>
+                  Ziek Melden
                 </button>
               </div>
             </div>
-            <div className="col-span-12 row-span-8 col-start-1 row-start-5 bg-custom-gray-500 flex justify-center items-center">
-              <div
-                className="rounded-lg"
-                style={{
-                  width: "90%",
-                  height: "90%",
-                  background:
-                    "linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(52,198,254,1) 100%)",
-                }}
-              >
+  
+            {/* Bottom Section */}
+            <div className="col-span-1 md:col-span-12 row-span-8 bg-custom-gray-500 flex justify-center items-center">
+              <div className="rounded-lg w-[90%] h-[90%] bg-gradient-to-b from-white to-[#34C6FE]">
                 <CalendarComponent onDateSelect={handleDateSelect} />
               </div>
             </div>
           </div>
         </div>
       </div>
-
+  
+      {/* Popups */}
       {showPopup && selectedDate && (
-        <VerlofComponent
-          selectedDate={selectedDate}
-          onClose={() => setShowPopup(false)}
-        />
+        <VerlofComponent selectedDate={selectedDate} onClose={() => setShowPopup(false)} />
       )}
-
+  
       {sickLeaveSubmitted && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-4 rounded shadow-md">
+          <div className="bg-white p-4 rounded shadow-md text-center">
             <h2 className="text-lg font-bold">Ziekmelding succesvol ingediend!</h2>
-            <button
-              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-              onClick={() => {
-                setSickLeaveSubmitted(false);
-                window.location.reload();
-              }}
-            >
+            <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded" onClick={() => {
+              setSickLeaveSubmitted(false);
+              window.location.reload();
+            }}>
               Ok
             </button>
           </div>
@@ -339,4 +314,4 @@ export default function Home() {
       )}
     </>
   );
-}
+}  

@@ -21,22 +21,22 @@ export default function NavBar() {
       <div className="flex flex-col items-center mt-8 space-y-12">
         {/* Logo */}
         <div
-          className="w-16 h-16 bg-cover bg-center"
+          className="w-16 h-16 bg-cover bg-center max-lg:w-12 max-lg:h-12"
           style={{ backgroundImage: "url('images/Logo.png')" }}
         />
 
         {/* Icons with Links */}
-        <Link className="text-white text-6xl" href="home">
+        <Link className="text-white text-5xl max-lg:text-2xl " href="home">
           <FontAwesomeIcon icon={faHouse} />
         </Link>
 
-        <Link className="text-white text-6xl" href="profile">
+        <Link className="text-white text-4xl max-lg:text-2xl" href="profile">
           <FontAwesomeIcon icon={faUser} />
         </Link>
 
         {/* Admin-Only Icon */}
         {user?.role === "admiin" && (
-          <Link href="admin" className="text-white text-6xl">
+          <Link href="admin" className="text-white text-4xl max-lg:text-2xl">
             <FontAwesomeIcon icon={faUserPlus} />
           </Link>
         )}
