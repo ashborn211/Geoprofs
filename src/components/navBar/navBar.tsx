@@ -16,7 +16,7 @@ export default function NavBar() {
   const { user } = useUser(); // Destructure `user` from `useUser`
 
   return (
-    <nav className="bg-[#2E56A2] w-full h-screen flex flex-col justify-between">
+    <nav className="bg-[#2E56A2] w-full h-screen flex flex-col justify-between max-md:w-14 max-md:align-middle  ">
       {/* Top Section: Background Image and Icons */}
       <div className="flex flex-col items-center mt-8 space-y-12">
         {/* Logo */}
@@ -30,7 +30,7 @@ export default function NavBar() {
           <FontAwesomeIcon icon={faHouse} />
         </Link>
 
-        <Link className="text-white text-4xl max-lg:text-2xl" href="profile">
+        <Link className="text-white text-4xl max-lg:text-2xl" href="Profile">
           <FontAwesomeIcon icon={faUser} />
         </Link>
 
