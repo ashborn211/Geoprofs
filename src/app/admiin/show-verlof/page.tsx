@@ -1,14 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-    collection,
-    getDocs,
-    updateDoc,
-    doc,
-} from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
 import { db } from "@/FireBase/FireBaseConfig";
-import Logout from "@/components/Logout";
+import NavBar from "@/components/navBar/navBar";
 
 interface Verlof {
     id: string;
@@ -71,27 +66,43 @@ export default function VerlofTable() {
         }
     };
 
-    // Handle status update (Approve or Reject)
+    // Handle status update (Approve or Reject) with confirmation and feedback
     const handleStatusChange = async (verlofId: string, newStatus: number) => {
-        try {
-            const verlofRef = doc(db, "verlof", verlofId);
-            await updateDoc(verlofRef, {
-                status: newStatus,
-            });
+        const action = newStatus === 2 ? "approve" : "decline";
+        const confirmMessage = `Are you sure you want to ${action} this leave request?`;
 
-            // Refetch the list to reflect the updated status
-            fetchVerlof(); // Refresh the list after updating the status
-            console.log(`Verlof entry with ID ${verlofId} updated to status ${newStatus}`);
-        } catch (error) {
-            console.error("Error updating status: ", error);
+        if (window.confirm(confirmMessage)) {
+            try {
+                const verlofRef = doc(db, "verlof", verlofId);
+                await updateDoc(verlofRef, {
+                    status: newStatus,
+                });
+
+                // Refetch the list to reflect the updated status
+                fetchVerlof(); // Refresh the list after updating the status
+
+                const successMessage =
+                    newStatus === 2
+                        ? "Leave request has been approved successfully."
+                        : "Leave request has been declined successfully.";
+
+                alert(successMessage); // Show confirmation to the admin
+                console.log(`Verlof entry with ID ${verlofId} updated to status ${newStatus}`);
+            } catch (error) {
+                console.error("Error updating status: ", error);
+            }
+        } else {
+            console.log(`Action canceled for verlof ID ${verlofId}`);
         }
     };
 
     return (
         <>
+        
             <div className="flex h-screen overflow-hidden bg-custom-gray">
                 <div className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
-                    <Logout />
+                <NavBar />
+
                 </div>
                 <div className="w-[94vw] h-full">
                     <div className="h-full grid grid-cols-12 grid-rows-12">

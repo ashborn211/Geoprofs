@@ -145,7 +145,7 @@ export default function CalendarComponent({
         calendarWidth={1000}
         aria-label="Hij is er!"
         visibleMonths={1}
-        minValue={today(getLocalTimeZone())}
+        //minValue={today(getLocalTimeZone())}
         maxValue={endOfCurrentMonth} // Beperk tot de laatste dag van de huidige maand
         value={value}
         onChange={handleDateChange}

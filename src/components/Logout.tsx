@@ -21,7 +21,7 @@ const Logout = () => {
       className="text-white underline mb-[10px]"
       onClick={handleLogout}
     >
-      <p className="text-white text-2xl">
+      <p className="text-white text-4xl max-lg:text-2xl">
         <FontAwesomeIcon icon={faRightFromBracket} />
       </p>
     </Link>

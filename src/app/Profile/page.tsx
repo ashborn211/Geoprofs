@@ -15,7 +15,7 @@ export default function UserProfile() {
     password: "",
     geboorte: "",
     team: "",
-    vakantiedagen: "60/60", // Example value
+    vakantiedagen: "", // Example value
   });
 
   const [loading, setLoading] = useState(true);
@@ -34,7 +34,7 @@ export default function UserProfile() {
     setTotpSecret(secret);
   };
 
-  const copyToClipboard = (text) => {
+  const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
       alert("Copied to clipboard!");
     });
@@ -74,7 +74,7 @@ export default function UserProfile() {
               password: userData.password || "",
               geboorte: userData.geboorte || "",
               team: teamName,
-              vakantiedagen: "60/60",
+              vakantiedagen: userData.vakantiedagen || "",
             });
           } else {
             console.error("No user document found");
@@ -90,7 +90,7 @@ export default function UserProfile() {
     fetchUserData();
   }, []);
 
-  const maskBsnNumber = (bsnNumber) => {
+  const maskBsnNumber = (bsnNumber: string) => {
     const bsnStr = bsnNumber.toString();
     if (bsnStr.length <= 3) {
       return bsnStr;
@@ -123,60 +123,31 @@ export default function UserProfile() {
             </div>
             <h2 className="text-2xl font-bold mt-4">Your Profile</h2>
           </div>
-
+  
           {loading ? (
             <div className="text-center text-xl">Loading...</div>
           ) : (
-            <div className="bg-gray-50 rounded-md shadow-sm p-4">
-              <table className="w-full">
-                <tbody>
-                  <tr className="border-b">
-                    <td className="font-bold py-2 px-4">BSN:</td>
-                    <td className="py-2 px-4">{maskBsnNumber(userData.bsnNumber)}</td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="font-bold py-2 px-4">Naam:</td>
-                    <td className="py-2 px-4">{userData.naam}</td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="font-bold py-2 px-4">Email:</td>
-                    <td className="py-2 px-4">{userData.email}</td>
-                    <td className="py-2 px-4 text-right">
-                      <button
-                        className="text-blue-500 hover:underline"
-                        onClick={() => setIsVerifyPopupOpen(true)}
-                      >
-                        ✏️
-                      </button>
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="font-bold py-2 px-4">Password:</td>
-                    <td className="py-2 px-4">{"*".repeat(userData.password.length)}</td>
-                    <td className="py-2 px-4 text-right">
-                      <button
-                        className="text-blue-500 hover:underline"
-                        onClick={() => setIsResetPopupOpen(true)}
-                      >
-                        ✏️
-                      </button>
-                    </td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="font-bold py-2 px-4">Geboorte:</td>
-                    <td className="py-2 px-4">{userData.geboorte || "Not set"}</td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="font-bold py-2 px-4">Teams:</td>
-                    <td className="py-2 px-4">{userData.team}</td>
-                  </tr>
-                  <tr>
-                    <td className="font-bold py-2 px-4">Vakantiedagen 2024:</td>
-                    <td className="py-2 px-4">{userData.vakantiedagen}</td>
-                  </tr>
-                </tbody>
-              </table>
-
+            <div className="bg-gray-50 rounded-md shadow-sm p-4 flex flex-col gap-4">
+              {[
+                { label: "BSN:", value: maskBsnNumber(userData.bsnNumber) },
+                { label: "Naam:", value: userData.naam },
+                { label: "Email:", value: userData.email, editable: true, onClick: () => setIsVerifyPopupOpen(true) },
+                { label: "Password:", value: "*****", editable: true, onClick: () => setIsResetPopupOpen(true) },
+                { label: "Geboorte:", value: userData.geboorte || "Not set" },
+                { label: "Teams:", value: userData.team },
+                { label: "Vakantiedagen 2024:", value: userData.vakantiedagen },
+              ].map(({ label, value, editable, onClick }, index) => (
+                <div key={index} className="flex justify-between items-center border-b pb-2">
+                  <span className="font-bold">{label}</span>
+                  <span>{value}</span>
+                  {editable && (
+                    <button className="text-blue-500 hover:underline" onClick={onClick}>
+                      ✏️
+                    </button>
+                  )}
+                </div>
+              ))}
+  
               <div className="flex flex-col mt-6">
                 <button
                   type="button"
@@ -186,7 +157,7 @@ export default function UserProfile() {
                   Generate TOTP Secret
                 </button>
                 {totpSecret && (
-                  <div className="mt-4">
+                  <div className="mt-4 flex flex-col items-center">
                     <p className="font-mono">{totpSecret}</p>
                     <button
                       type="button"
@@ -202,16 +173,9 @@ export default function UserProfile() {
           )}
         </div>
       </div>
-      {isResetPopupOpen && (
-  <ResetPasswordForm onClose={closeResetPopup} />
-)}
-
-
-
-{isVerifyPopupOpen && (
-  <VerifyEmailForm onClose={closeVerifyPopup} />
-)}
-
+  
+      {isResetPopupOpen && <ResetPasswordForm onClose={closeResetPopup} />}
+      {isVerifyPopupOpen && <VerifyEmailForm onClose={closeVerifyPopup} />}
     </div>
   );
 }

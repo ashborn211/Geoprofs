@@ -1,3 +1,4 @@
+"use client"
 import { Link } from "@nextui-org/react";
 import NavBar from "@/components/navBar/navBar";
 
@@ -7,7 +8,7 @@ export default function AdminPage() {
       <div className="flex h-screen overflow-hidden bg-custom-gray">
         {/* Sidebar */}
         <div  aria-label="sidebar1" className="w-[6vw] bg-blue-500 h-full flex flex-col justify-end items-center">
-          <p>dit is de navbar</p>
+        <NavBar />
         </div>
 
         {/* Main Content */}

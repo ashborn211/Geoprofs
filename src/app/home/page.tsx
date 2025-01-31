@@ -15,6 +15,8 @@ import {
   query,
   where,
   doc,
+  getDoc, // Import getDoc to get documents
+  updateDoc, // Import updateDoc to update documents
 } from "firebase/firestore"; // Remove unused imports
 
 export default function Home() {
@@ -23,17 +25,15 @@ export default function Home() {
 
   const [showPopup, setShowPopup] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [existingDateRanges, setExistingDateRanges] = useState<
-    {
-      startDate: Date;
-      endDate: Date;
-      reason: string;
-      name: string;
-      uid: string;
-      status: number;
-      docId: string; // Document ID toegevoegd
-    }[]
-  >([]); // Store existing date ranges
+  const [existingDateRanges, setExistingDateRanges] = useState<{
+    startDate: Date;
+    endDate: Date;
+    reason: string;
+    name: string;
+    uid: string;
+    status: number;
+    docId: string; // Document ID toegevoegd
+  }[]>([]); // Store existing date ranges
 
   const [selectedDateInfo, setSelectedDateInfo] = useState<{
     startDate: Date;
@@ -42,15 +42,31 @@ export default function Home() {
     name: string;
     status: number;
     docId: string; // Document ID toegevoegd
+    type: string; // Added type field
   } | null>(null); // To store selected date info
 
   // State to control sick leave submission popup
   const [sickLeaveSubmitted, setSickLeaveSubmitted] = useState(false);
 
+  // Function to calculate number of days off
+  const calculateDaysOff = (startDate: Date, endDate: Date): number => {
+    const start = new Date(startDate).getTime();
+    const end = new Date(endDate).getTime();
+
+    if (isNaN(start) || isNaN(end)) {
+      console.error("Ongeldige datums:", startDate, endDate);
+      return 0;
+    }
+
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    return diffDays;
+  };
+
   // Fetch existing date ranges from Firestore
   const fetchExistingDates = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "verlof")); // Use the "verlof" collection
+      const querySnapshot = await getDocs(collection(db, "verlof"));
       const dateRanges: {
         startDate: Date;
         endDate: Date;
@@ -59,6 +75,7 @@ export default function Home() {
         uid: string;
         status: number;
         docId: string;
+        type: string;
       }[] = [];
 
       querySnapshot.forEach((doc) => {
@@ -68,6 +85,7 @@ export default function Home() {
         const name = doc.data().name;
         const uid = doc.data().uid;
         const status = doc.data().status;
+        const type = doc.data().type; // Get the type field
 
         if (startDate && endDate) {
           dateRanges.push({
@@ -78,6 +96,7 @@ export default function Home() {
             uid: uid || "",
             status: status || 1,
             docId: doc.id, // Store document ID for deletion
+            type: type || "", // Ensure type is set
           });
         } else {
           console.warn(
@@ -115,14 +134,39 @@ export default function Home() {
   };
 
   const handleDelete = async () => {
-    if (selectedDateInfo && selectedDateInfo.docId) {
+    if (selectedDateInfo && selectedDateInfo.docId && user) {
+      const daysOff = calculateDaysOff(selectedDateInfo.startDate, selectedDateInfo.endDate);
+
       try {
-        await deleteDoc(doc(db, "verlof", selectedDateInfo.docId)); // Remove document by docId
-        fetchExistingDates(); // Refresh date ranges after deletion
-        setSelectedDateInfo(null); // Clear selected date info after deletion
-        window.location.reload();
+        await deleteDoc(doc(db, "verlof", selectedDateInfo.docId));
+
+        if (selectedDateInfo.type === "vakantie") {
+          const userRef = doc(db, "users", user.uid);
+          const userDoc = await getDoc(userRef);
+
+          if (userDoc.exists()) {
+            const currentVacationDays = userDoc.data().vakantiedagen || 0;
+            console.log("Current vacation days:", currentVacationDays);
+
+            const updatedVacationDays = currentVacationDays + daysOff;
+            console.log("Updated vacation days:", updatedVacationDays);
+
+            await updateDoc(userRef, {
+              vakantiedagen: updatedVacationDays,
+            });
+
+            fetchExistingDates();
+            setSelectedDateInfo(null);
+            window.location.reload();
+          } else {
+            console.error("User document does not exist");
+          }
+        } else {
+          fetchExistingDates();
+          setSelectedDateInfo(null);
+        }
       } catch (error) {
-        console.error("Error deleting leave request:", error);
+        console.error("Error deleting leave request or updating vacation days:", error);
       }
     }
   };
@@ -134,31 +178,29 @@ export default function Home() {
     })}`;
   };
 
-  // Navigate to the admin page
   const handleAdminClick = () => {
-    router.push("/admiin"); // Adjust the path to your actual admin page
+    router.push("/admiin"); 
   };
 
-  // Function to handle sick leave submission
   const handleSickLeave = async () => {
     if (user) {
       const today = new Date();
-      const startDate = new Date(today); // Today's date
-      const endDate = new Date(today); // End date is also today
+      const startDate = new Date(today);
+      const endDate = new Date(today);
 
       try {
         await addDoc(collection(db, "verlof"), {
           type: "ziek",
           reason: "ik ben ziek vandaag",
-          startDate: startDate, // Firebase Timestamp will be handled automatically
-          endDate: endDate, // Firebase Timestamp will be handled automatically
+          startDate: startDate, 
+          endDate: endDate, 
           uid: user.uid,
           name: user.userName,
           status: 2,
         });
         console.log("ziekte is gemeld!");
-        setSickLeaveSubmitted(true); // Set the state to show popup
-        fetchExistingDates(); // Refresh existing date ranges
+        setSickLeaveSubmitted(true);
+        fetchExistingDates();
       } catch (error) {
         console.error("Error voor ziekmelden:", error);
       }
@@ -168,24 +210,23 @@ export default function Home() {
   return (
     <>
       <div className="flex h-screen overflow-hidden bg-linear1">
-        <div className="w-[6vw]  h-full flex flex-col justify-end items-center">
-        <NavBar />
+        {/* Sidebar - Hidden on smaller screens, appears on md+ */}
+        <div className="hidden md:flex w-[6vw] min-w-[50px] h-full flex-col justify-end items-center">
+          <NavBar />
         </div>
-        <div className="w-[94vw] h-full">
-          <div className="h-full grid grid-cols-12 grid-rows-12">
-            <div className="col-span-12 row-span-4 col-start-1 bg-linear1 flex justify-around p-4">
-              <div
-                className="rounded-lg text-4xl flex items-center justify-center p-[15px] shadow-lg mt-2"
-                style={{
-                  width: "65%",
-                  background:
-                    "linear-gradient(180deg, rgba(183, 201, 211) 0%, rgba(218, 237, 255) 100%)",
-                }}
-              >
-                <div className="h-full w-1/2 text-[large] flex items-center justify-center flex-col">
+  
+        {/* Main Content */}
+        <div className="w-full md:w-[94vw] h-full">
+          <div className="h-full grid grid-cols-1 md:grid-cols-12 grid-rows-12">
+            
+            {/* Top Section */}
+            <div className="col-span-1 md:col-span-12 row-span-4 bg-linear1 flex flex-col md:flex-row justify-around p-4">
+              {/* Status Box */}
+              <div className="rounded-lg text-lg md:text-4xl flex items-center justify-center p-4 shadow-lg mt-2 w-full md:w-[65%] bg-gradient-to-b from-[#B7C9D3] to-[#DAEDFF]">
+                <div className="h-full w-1/2 text-center flex flex-col items-center justify-center">
                   {selectedDateInfo ? (
                     <>
-                      <h2>
+                      <h2 className="text-lg md:text-2xl">
                         {selectedDateInfo.status === 1
                           ? "Pending"
                           : selectedDateInfo.status === 2
@@ -195,7 +236,7 @@ export default function Home() {
                           : ""}
                       </h2>
                       <div
-                        className="h-[120px] w-[210px] flex flex-col items-center justify-center rounded-[8%]"
+                        className="h-[100px] w-[180px] flex flex-col items-center justify-center rounded-lg"
                         style={{
                           backgroundColor:
                             selectedDateInfo.status === 1
@@ -207,91 +248,65 @@ export default function Home() {
                               : "gray",
                         }}
                       >
-                        <h1>{formatDateWithTime(selectedDateInfo.startDate)}</h1>
+                        <h1 className="text-sm md:text-lg">{formatDateWithTime(selectedDateInfo.startDate)}</h1>
                         <h1>to</h1>
-                        <h1>{formatDateWithTime(selectedDateInfo.endDate)}</h1>
+                        <h1 className="text-sm md:text-lg">{formatDateWithTime(selectedDateInfo.endDate)}</h1>
                       </div>
                     </>
                   ) : (
-                    <h1>Good morning, {user?.userName}</h1>
+                    <h1 className="text-lg md:text-2xl">Good morning, {user?.userName}</h1>
                   )}
                 </div>
-
-                {selectedDateInfo ? (
+  
+                {selectedDateInfo && (
                   <div className="flex flex-col items-center">
-                    <h1 className="text-[large]">Reason: {selectedDateInfo.reason}</h1>
-                    <button
-                      className="mt-4 h-[50px] w-[150px] bg-[white] border-[black] border-[solid] border-[2px] text-[x-large]"
-                      onClick={handleDelete}
-                    >
+                    <h1 className="text-sm md:text-lg">Reason: {selectedDateInfo.reason}</h1>
+                    <button className="mt-4 h-[40px] md:h-[50px] w-full md:w-[150px] bg-white border-black border-2 text-lg md:text-xl" onClick={handleDelete}>
                       Remove
                     </button>
                   </div>
-                ) : null}
+                )}
               </div>
-
-              <div style={{ width: "20%" }}>
-                <div
-                  className="w-full h-[75%] bg-cover bg-center"
-                  style={{
-                    backgroundImage: "url('images/Logo GeoProfs.png')",
-                  }}
-                ></div>
-
-                {/* Conditionally render the admin button */}
+  
+              {/* Right Side Section */}
+              <div className="w-full md:w-[20%] flex flex-col items-center">
+                <div className="w-full h-[75%] bg-cover bg-center" style={{ backgroundImage: "url('images/Logo GeoProfs.png')" }}></div>
+  
                 {user?.role === "admin" && (
-                  <button
-                    className="bg-blue-500 text-white border-2 border-black rounded-lg w-full h-[16%] mb-2"
-                    onClick={handleAdminClick}
-                  >
-                    <h1>Admin Action</h1>
+                  <button className="bg-blue-500 text-white border-2 border-black rounded-lg w-full h-[16%] mb-2 text-lg md:text-xl" onClick={handleAdminClick}>
+                    Admin Action
                   </button>
                 )}
-
-                <button
-                  className="bg-white border-2 border-black rounded-lg w-full h-[20%]"
-                  onClick={handleSickLeave} // Call sick leave function
-                >
-                  <h1>Ziek Melden</h1>
+  
+                <button className="bg-white border-2 border-black rounded-lg w-full md:h-[20%] text-lg md:text-xl" onClick={handleSickLeave}>
+                  Ziek Melden
                 </button>
               </div>
             </div>
-            <div className="col-span-12 row-span-8 col-start-1 row-start-5 bg-custom-gray-500 flex justify-center items-center">
-              <div
-                className="rounded-lg"
-                style={{
-                  width: "90%",
-                  height: "90%",
-                  background:
-                    "linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(52,198,254,1) 100%)",
-                }}
-              >
+  
+            {/* Bottom Section */}
+            <div className="col-span-1 md:col-span-12 row-span-8 bg-custom-gray-500 flex justify-center items-center">
+              <div className="rounded-lg w-[90%] h-[90%] bg-gradient-to-b from-white to-[#34C6FE]">
                 <CalendarComponent onDateSelect={handleDateSelect} />
               </div>
             </div>
           </div>
         </div>
       </div>
-
+  
+      {/* Popups */}
       {showPopup && selectedDate && (
-        <VerlofComponent
-          selectedDate={selectedDate}
-          onClose={() => setShowPopup(false)}
-        />
+        <VerlofComponent selectedDate={selectedDate} onClose={() => setShowPopup(false)} />
       )}
-
-      {/* Popup for sick leave submission */}
+  
       {sickLeaveSubmitted && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-4 rounded shadow-md">
+          <div className="bg-white p-4 rounded shadow-md text-center">
             <h2 className="text-lg font-bold">Ziekmelding succesvol ingediend!</h2>
-            <button
-              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-              onClick={() => {
-                setSickLeaveSubmitted(false); // Close the popup
-                window.location.reload(); // Reload the page
-              }}
-            >
+            <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded" onClick={() => {
+              setSickLeaveSubmitted(false);
+              window.location.reload();
+            }}>
               Ok
             </button>
           </div>
@@ -299,4 +314,4 @@ export default function Home() {
       )}
     </>
   );
-}
+}  

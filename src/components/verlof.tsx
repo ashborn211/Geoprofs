@@ -3,7 +3,14 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext"; // Update the path accordingly
 import "./verlof.css";
-import { addDoc, collection, doc, getDoc, Timestamp } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  updateDoc,
+  Timestamp,
+} from "firebase/firestore";
 import { db } from "@/FireBase/FireBaseConfig";
 import { Button } from "@nextui-org/react";
 import { format } from "date-fns";
@@ -17,30 +24,24 @@ interface VerlofComponentProps {
 const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
   const { user } = useUser(); // Access the user context
   const [reason, setReason] = useState<string>("");
-  const [leaveTypes, setLeaveTypes] = useState<string[]>([]); // State for leave types
+  const [leaveTypes, setLeaveTypes] = useState<string[]>([]);
   const [selectedButton, setSelectedButton] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<Timestamp>(
     Timestamp.fromDate(selectedDate)
-  ); // Initialize as Firebase Timestamp
+  );
   const [endDate, setEndDate] = useState<Timestamp>(
     Timestamp.fromDate(selectedDate)
-  ); // Initialize as Firebase Timestamp
+  );
 
-  // Fetch leave types from Firestore
   useEffect(() => {
     const fetchLeaveTypes = async () => {
       try {
-        const docRef = doc(db, "Type", "CWePoyL2VOnYR41hVCuE"); // Replace with your actual document ID
+        const docRef = doc(db, "Type", "CWePoyL2VOnYR41hVCuE");
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           const data = docSnap.data();
-          // Assuming the fields in the document are the strings you want
-          setLeaveTypes([
-            data.vakantie,
-            data.verlof,
-            data.ziek,
-          ]);
+          setLeaveTypes([data.vakantie, data.verlof, data.ziek]);
         } else {
           console.log("No such document!");
         }
@@ -48,44 +49,54 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
         console.error("Error fetching leave types: ", error);
       }
     };
-
     fetchLeaveTypes();
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, []);
 
-  // Helper to format date for "datetime-local" input
   const formatDateForInput = (timestamp: Timestamp) => {
     const date = timestamp.toDate();
-    const timeZone = "Europe/Amsterdam"; // Fixed timezone
-
-    // Convert the date to the Netherlands timezone
+    const timeZone = "Europe/Amsterdam";
     const zonedDate = toZonedTime(date, timeZone);
-
-    // Format it as YYYY-MM-DDTHH:MM (required by datetime-local input)
     return format(zonedDate, "yyyy-MM-dd'T'HH:mm");
   };
 
-  // Handle form submission
+  const calculateLeaveDays = (start: Timestamp, end: Timestamp) => {
+    const startDate = start.toDate();
+    const endDate = end.toDate();
+    const differenceInTime = endDate.getTime() - startDate.getTime();
+    return Math.ceil(differenceInTime / (1000 * 60 * 60 * 24)) + 1;
+  };
+
   const handleSubmit = async () => {
     if (selectedButton && reason && user) {
       try {
-        console.log("Submitting:", {
-          type: selectedButton,
-          reason,
-          startDate: startDate.toDate(), // Debug log
-          endDate: endDate.toDate(),     // Debug log
-          uid: user.uid,
-          name: user.userName,
-          status: 1,
-        });
+        const leaveDays = calculateLeaveDays(startDate, endDate);
+
+        if (selectedButton === "vakantie") {
+          const userRef = doc(db, "users", user.uid);
+          const userSnap = await getDoc(userRef);
+
+          if (userSnap.exists()) {
+            const currentVacationDays = userSnap.data().vakantiedagen;
+
+            if (currentVacationDays >= leaveDays) {
+              await updateDoc(userRef, {
+                vakantiedagen: currentVacationDays - leaveDays,
+              });
+            } else {
+              alert("Je hebt niet genoeg vakantiedagen!");
+              return;
+            }
+          }
+        }
 
         await addDoc(collection(db, "verlof"), {
           type: selectedButton,
           reason,
-          startDate, // Submit start date as Firebase Timestamp
-          endDate,   // Submit end date as Firebase Timestamp
-          uid: user.uid, // Use uid from user context
-          name: user.userName, // Use name from user context
-          status: 1, // Set status to a number value of 1
+          startDate,
+          endDate,
+          uid: user.uid,
+          name: user.userName,
+          status: 1,
         });
 
         onClose();
@@ -100,26 +111,12 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
     }
   };
 
-  // Handle changes to date inputs
-  const handleDateChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    setter: (value: Timestamp) => void
-  ) => {
-    const newDate = new Date(event.target.value);
-    console.log("Selected date:", newDate); // Debug log
-    setter(Timestamp.fromDate(newDate));
-  };
-
   return (
     <div className="verlof-popup-overlay">
       <div className="verlof-popup">
         <div className="popup-header">
-          <span className="date-range">
-            {formatDateForInput(startDate)} {/* Display formatted start date */}
-          </span>
-          <button className="close-button" onClick={onClose}>
-            &times;
-          </button>
+          <span className="date-range">{formatDateForInput(startDate)}</span>
+          <button className="close-button" onClick={onClose}>&times;</button>
         </div>
 
         <div className="content">
@@ -148,14 +145,18 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
                   id="startdate-input"
                   type="datetime-local"
                   value={formatDateForInput(startDate)}
-                  onChange={(e) => handleDateChange(e, setStartDate)}
+                  onChange={(e) =>
+                    setStartDate(Timestamp.fromDate(new Date(e.target.value)))
+                  }
                 />
                 <label htmlFor="enddate-input">End Date and Time:</label>
                 <input
                   id="enddate-input"
                   type="datetime-local"
                   value={formatDateForInput(endDate)}
-                  onChange={(e) => handleDateChange(e, setEndDate)}
+                  onChange={(e) =>
+                    setEndDate(Timestamp.fromDate(new Date(e.target.value)))
+                  }
                 />
               </div>
             </div>
@@ -170,11 +171,7 @@ const VerlofComponent = ({ selectedDate, onClose }: VerlofComponentProps) => {
             ></textarea>
           </div>
 
-          <Button
-            className="submit-button"
-            color="primary"
-            onClick={handleSubmit}
-          >
+          <Button className="submit-button" color="primary" onClick={handleSubmit}>
             Verstuur
           </Button>
         </div>
