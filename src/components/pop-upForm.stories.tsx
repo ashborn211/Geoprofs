@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import ResetPasswordForm from './ResetPasswordForm';
+import PopUpForm from './pop-upForm';
 
 const meta = {
-  component: ResetPasswordForm,
-} satisfies Meta<typeof ResetPasswordForm>;
+  component: PopUpForm,
+} satisfies Meta<typeof PopUpForm>;
 
 export default meta;
 

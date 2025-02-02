@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { UserProvider } from "@/context/UserContext"; 
 
 import Page from './page';
 
