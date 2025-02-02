@@ -33,6 +33,7 @@ export default function Home() {
     uid: string;
     status: number;
     docId: string; // Document ID toegevoegd
+    type: string;
   }[]>([]); // Store existing date ranges
 
   const [selectedDateInfo, setSelectedDateInfo] = useState<{
