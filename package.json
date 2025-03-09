@@ -26,6 +26,7 @@
     "test:Route": "jest __tests__/ProtectedRoute.test.tsx --verbose",
     "test:password": "jest __tests__/passwordGenerator.test.ts --verbose",
     "test:verifyEmail": "jest __tests__/verifyEmailUtils.test.ts --coverage --verbose",
+    "test:validBSN": "jest __tests__/validBSN.test.ts --coverage --verbose",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
