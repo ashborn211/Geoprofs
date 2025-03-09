@@ -34,7 +34,7 @@ describe("Verlof Page - Decline Single Request", () => {
     // Verify that the first row shows the declined status
     cy.get("table tbody tr")
       .first()
-      .contains("Rejected") // Replace with your app's actual declined text (e.g., "Afgekeurd")
+      .contains("Afkeuren") // Replace with your app's actual declined text (e.g., "Afgekeurd")
       .should("exist");
   });
 });

@@ -29,7 +29,7 @@ describe("Verlof Page Actions", () => {
       });
   
       // Optionally verify UI changes after approval
-      cy.contains("Approved").should("exist"); // Update based on your UI behavior
+      cy.contains("Goedkeuren").should("exist"); // Update based on your UI behavior
     });
   });
   
